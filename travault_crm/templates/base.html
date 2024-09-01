@@ -68,7 +68,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#">Profile</a></li>
-                            {% if user.companyuser.is_admin %}
+                            {% if user.user_type == 'admin' and user.agency %}
                             <li><a class="dropdown-item" href="#">Manage Users</a></li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#">Agency Profile</a>

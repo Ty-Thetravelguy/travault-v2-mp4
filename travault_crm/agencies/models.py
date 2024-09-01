@@ -12,6 +12,10 @@ class CustomUser(AbstractUser):
     )
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='agent')
     agency = models.ForeignKey('Agency', on_delete=models.CASCADE, related_name='users', null=True, blank=True)
+    
+    # Adding first_name and last_name fields
+    first_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
 
 class Agency(models.Model):
     name = models.CharField(max_length=255)

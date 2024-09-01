@@ -77,6 +77,15 @@ class AgencyRegistrationForm(SignupForm):
         user = super(AgencyRegistrationForm, self).save(request)
         user.user_type = 'admin'
         
+        # Split the full name into first and last name
+        full_name = self.cleaned_data['contact_full_name'].split()
+        if len(full_name) > 1:
+            user.first_name = full_name[0]
+            user.last_name = ' '.join(full_name[1:])
+        else:
+            user.first_name = full_name[0]
+            user.last_name = ''
+        
         address_lines = self.cleaned_data['company_address'].split('\n')
         
         agency = Agency.objects.create(
@@ -93,6 +102,3 @@ class AgencyRegistrationForm(SignupForm):
         
         user.agency = agency
         user.save()
-        
-        return user
-

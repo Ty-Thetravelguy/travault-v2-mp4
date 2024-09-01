@@ -96,7 +96,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link home-nav-text {% if request.path == '/custom-registration/' %}active{% endif %}"
-                            href="#">Register</a>
+                            href="{% url 'agency_register' %}">Register</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link home-nav-text {% if request.path == '/accounts/login/' %}active{% endif %}"

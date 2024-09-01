@@ -34,6 +34,7 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'agencies', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,8 +42,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+
+    # Third-party apps
     'allauth',
     'allauth.account',
+    'allauth.socialaccount',
+
+    # Local apps
+    'home',
+    'agent_support',
+    'crm',
+    'dashboard',
+    'tickets',
 ]
 
 MIDDLEWARE = [
@@ -61,7 +72,7 @@ ROOT_URLCONF = 'travault_crm.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -99,6 +110,7 @@ ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = '/'
+
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
 ACCOUNT_LOGOUT_ON_GET = True
@@ -107,16 +119,16 @@ ACCOUNT_RATE_LIMITS = {
     'login_failed': '5/300s',  # 5 failed attempts in 300 seconds (5 minutes)
 }
 
-# Add these new settings
-ACCOUNT_FORMS = {
-   
-}
-
+ACCOUNT_FORMS = {'signup': 'agencies.forms.AgencyRegistrationForm'}
 ACCOUNT_SIGNUP_FORM_CLASS = ''
 ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_UNIQUE_EMAIL = True
+
+
+AUTH_USER_MODEL = 'agencies.CustomUser'
+
 
 
 # Database

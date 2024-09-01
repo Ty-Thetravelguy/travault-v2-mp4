@@ -60,7 +60,7 @@
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                     <li class="nav-item pt-1">
-                        <a class="nav-link home-nav-text" href="{% url 'dashboard:index' %}">Dashboard</a>
+                        <a class="nav-link home-nav-text" href="#">Dashboard</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -69,12 +69,12 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#">Profile</a></li>
                             {% if user.companyuser.is_admin %}
-                            <li><a class="dropdown-item" href="{% url 'users:manage_users' %}">Manage Users</a></li>
+                            <li><a class="dropdown-item" href="#">Manage Users</a></li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#">Agency Profile</a>
                             </li>
                             {% endif %}
-                            <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
+                            <li><a class="dropdown-item" href="#">Logout</a></li>
                         </ul>
                     </li>
                     {% else %}
@@ -96,11 +96,11 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link home-nav-text {% if request.path == '/custom-registration/' %}active{% endif %}"
-                            href="{% url 'register' %}">Register</a>
+                            href="#">Register</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link home-nav-text {% if request.path == '/accounts/login/' %}active{% endif %}"
-                            href="{% url 'account_login' %}">Login</a>
+                            href="#">Login</a>
                     </li>
                     {% endif %}
                 </ul>

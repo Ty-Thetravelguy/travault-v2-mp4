@@ -10,7 +10,7 @@ class CustomUser(AbstractUser):
         ('manager', 'Manager'),
         ('sales', 'Sales'),
     )
-    user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='agent')
+    user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='admin')
     agency = models.ForeignKey('Agency', on_delete=models.CASCADE, related_name='users', null=True, blank=True)
     
     # Adding first_name and last_name fields

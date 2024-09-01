@@ -75,7 +75,14 @@ class AgencyRegistrationForm(SignupForm):
 
     def save(self, request):
         user = super(AgencyRegistrationForm, self).save(request)
-        user.user_type = 'admin'
+        if request.user.is_authenticated and request.user.user_type == 'admin':
+            # If an admin is creating this user, set the type to 'agent'
+            user.user_type = 'agent'
+        else:
+            # If it's a self-registration, set the type to 'admin'
+            user.user_type = 'admin'
+        user.save()
+        return user
         
         # Split the full name into first and last name
         full_name = self.cleaned_data['contact_full_name'].split()

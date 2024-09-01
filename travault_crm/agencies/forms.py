@@ -17,6 +17,7 @@ class AgencyRegistrationForm(SignupForm):
     phone_number = forms.CharField(max_length=20, required=True)
     contact_full_name = forms.CharField(max_length=100, required=True, label="Primary Contact Full Name",
                                         help_text="Enter the full name (first and last name) of the primary contact.")
+    # email and username are already included in SignupForm
     employees = forms.ChoiceField(choices=[
         ('', 'Select range'),
         ('1-10', '1-10'),
@@ -30,7 +31,18 @@ class AgencyRegistrationForm(SignupForm):
         ('leisure', 'Leisure Travel'),
         ('mixed', 'Mixed')
     ], required=True)
+    # password1 and password2 are already included in SignupForm
     agree_terms = forms.BooleanField(required=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Reorder the fields exactly as specified
+        field_order = [
+            'company_name', 'company_address', 'vat_number', 'company_reg_number', 'phone_number',
+            'contact_full_name', 'email', 'email2', 'username', 'employees', 'business_focus',
+            'password1', 'password2', 'agree_terms'
+        ]
+        self.order_fields(field_order)
 
     def clean_company_name(self):
         company_name = self.cleaned_data.get('company_name')
@@ -56,13 +68,13 @@ class AgencyRegistrationForm(SignupForm):
 
     def clean_company_address(self):
         address = self.cleaned_data.get('company_address')
-        lines = address.split('\n')
-        if len(lines) != 6:
-            raise forms.ValidationError("Please provide exactly 6 lines for the address.")
+        lines = [line for line in address.split('\n') if line.strip()]  # Ignore empty lines
+        if len(lines) > 6:
+            raise forms.ValidationError("Please provide up to 6 lines for the address.")
         return address
 
     def save(self, request):
-        user = super(CustomSignupForm, self).save(request)
+        user = super(AgencyRegistrationForm, self).save(request)
         user.user_type = 'admin'
         
         address_lines = self.cleaned_data['company_address'].split('\n')
@@ -83,3 +95,4 @@ class AgencyRegistrationForm(SignupForm):
         user.save()
         
         return user
+

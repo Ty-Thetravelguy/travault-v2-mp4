@@ -60,7 +60,7 @@
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                     <li class="nav-item pt-1">
-                        <a class="nav-link home-nav-text" href="#">Dashboard</a>
+                        <a class="nav-link home-nav-text" href="{% url 'dashboard' %}">Dashboard</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -74,7 +74,7 @@
                                 <a class="nav-link" href="#">Agency Profile</a>
                             </li>
                             {% endif %}
-                            <li><a class="dropdown-item" href="#">Logout</a></li>
+                            <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
                         </ul>
                     </li>
                     {% else %}
@@ -100,7 +100,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link home-nav-text {% if request.path == '/accounts/login/' %}active{% endif %}"
-                            href="#">Login</a>
+                            href="{% url 'account_login' %}">Login</a>
                     </li>
                     {% endif %}
                 </ul>

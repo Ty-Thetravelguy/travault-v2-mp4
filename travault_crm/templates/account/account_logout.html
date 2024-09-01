@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+{% load i18n %}
+
+{% block head_title %}{% trans "Sign Out" %} - TraVault{% endblock %}
+
+{% block content %}
+<section id="logout" class="bg-gray-200 full-height-bg">
+    <div class="container top-padding roboto">
+        <div class="row justify-content-center py-5">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="card-title text-center mb-4">{% trans "Sign Out" %}</h2>
+                        
+                        <p class="text-center">{% trans 'Are you sure you want to sign out?' %}</p>
+
+                        <form method="post" action="{% url 'account_logout' %}">
+                            {% csrf_token %}
+                            {% if redirect_field_value %}
+                            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                            {% endif %}
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-get-started btn-lg">{% trans 'Sign Out' %}</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

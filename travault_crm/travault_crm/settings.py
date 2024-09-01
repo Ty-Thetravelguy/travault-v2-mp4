@@ -102,6 +102,8 @@ EAEMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 WSGI_APPLICATION = 'travault_crm.wsgi.application'
 
+CSRF_COOKIE_SECURE = True
+CSRF_USE_SESSIONS = True
 
 # Allauth settings
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"

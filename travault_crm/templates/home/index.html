@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section id="home">
+    <div class="container-fluid hero-bg-img"></div>
+
+    <div class="py-5">
+        <div class="container text-center  py-5">
+            <h1 class="display-2">Welcome to TraVault</h1>
+            <p class="lead pb-1">Secure and Efficient Corporate Travel CRM Programme </p>
+            <a href="{% url 'register' %}" class="btn btn-get-started btn-lg">Get Started</a>
+        </div>
+    </div>
+</section>
+
+<section id="features" class="bg-gray-200 py-5 roboto">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h1 class="display-4">Features</h1>
+                <p class="lead">Organise, Optimise, Outperform</p>
+            </div>
+        </div>
+        <div class="feature-list bg-gray-200">
+            <div class="row py-4 align-items-center">
+                <div class="col-md-6">
+                    <h2 class="mb-3">Client Management</h2>
+                    <p>Store and manage detailed client data, including travel preferences, contact information, and
+                        spend history. Easily access and update client data to provide personalized service.</p>
+                </div>
+                <div class="col-md-6 d-none d-md-block">
+                    <div class="feature-icon text-center">
+                        <i class="fas fa-users fa-4x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="row py-4 align-items-center">
+                <div class="col-md-6 order-md-2">
+                    <h2 class="mb-3">Supplier Database</h2>
+                    <p>Maintain a robust database of suppliers, including airlines, hotels, car rental companies, ground
+                        transport providers & rail. Store contract details, negotiated rates, payment information and
+                        performance metrics for quick reference.</p>
+                </div>
+                <div class="col-md-6 order-md-1 d-none d-md-block">
+                    <div class="feature-icon text-center">
+                        <i class="fas fa-building fa-4x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="row py-4 align-items-center">
+                <div class="col-md-6">
+                    <h2 class="mb-3">Ticket Logging and Tracking</h2>
+                    <p>Efficiently log and track client requests, inquiries, and issues. Our ticket system ensures that
+                        no client need goes unaddressed, improving response times and client satisfaction.</p>
+                </div>
+                <div class="col-md-6 d-none d-md-block">
+                    <div class="feature-icon text-center">
+                        <i class="fas fa-ticket-alt fa-4x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="row py-4 align-items-center">
+                <div class="col-md-6 order-md-2">
+                    <h2 class="mb-3">Agent Support Management</h2>
+                    <p>Store detailed information to support your travel consultants. Load and update agent support
+                        contact information, and supplier processes.</p>
+                </div>
+                <div class="col-md-6 order-md-1 d-none d-md-block">
+                    <div class="feature-icon text-center">
+                        <i class="fas fa-headset fa-4x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="row py-4 align-items-center">
+                <div class="col-md-6">
+                    <h2 class="mb-3">Document Storage and Retrieval</h2>
+                    <p>Securely store and easily retrieve important documents such as client contracts, supplier
+                        agreements, and travel itineraries. Our intuitive filing system ensures that you have the right
+                        information at your fingertips.</p>
+                </div>
+                <div class="col-md-6 d-none d-md-block">
+                    <div class="feature-icon text-center">
+                        <i class="fas fa-file-alt fa-4x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="row py-4 align-items-center">
+                <div class="col-md-6 order-md-2">
+                    <h2 class="mb-3">Data Security and Compliance</h2>
+                    <p>Protect sensitive client and business data with robust security measures. Our system helps you
+                        maintain compliance with data protection regulations in the travel industry.</p>
+                </div>
+                <div class="col-md-6 order-md-1 d-none d-md-block">
+                    <div class="feature-icon text-center">
+                        <i class="fas fa-shield-alt fa-4x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="row py-4 align-items-center">
+                <div class="col-md-6">
+                    <h2 class="mb-3">Integration Capabilities</h2>
+                    <p>Seamlessly integrate with other tools such as email platforms and accounting software to
+                        streamline your operations and reduce data duplication.</p>
+                </div>
+                <div class="col-md-6 d-none d-md-block">
+                    <div class="feature-icon text-center">
+                        <i class="fas fa-plug fa-4x"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="row py-4 align-items-center">
+                <div class="col-md-6 order-md-2">
+                    <h2 class="mb-3">Mobile Access</h2>
+                    <p>Access critical client and supplier information on-the-go with our mobile-friendly interface,
+                        allowing consultants to provide top-notch service from anywhere.</p>
+                </div>
+                <div class="col-md-6 order-md-1 d-none d-md-block">
+                    <div class="feature-icon text-center">
+                        <i class="fas fa-mobile-alt fa-4x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="about-us" class="about-us bg-light">
+    <div class="banna-img-1"></div>
+    <div class="container pt-5">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h2 class="display-4">About TraVault</h2>
+                <p class="lead">From Travel Agent to Tech Innovator</p>
+            </div>
+        </div>
+
+        <div class="row mb-4 text-center roboto">
+            <div class="col-md-6">
+                <h3>Meet Our Founder</h3>
+                <p>With 20 years in the travel sector, Tyrone has navigated every aspect of the industry. From retail
+                    beginnings to corporate travel management, and now serving in operations for a travel management
+                    company, Tyrone's journey has provided a comprehensive understanding of the challenges faced by
+                    travel businesses of all sizes.</p>
+            </div>
+            <div class="col-md-6">
+                <h3>The TraVault Vision</h3>
+                <p>During his years in the industry, Tyrone identified a critical gap in the market: smaller travel
+                    management companies were struggling with expensive CRM systems that often exceeded their needs and
+                    budgets. This realization sparked an idea - to create a CRM solution tailored specifically for
+                    boutique travel management companies in the corporate travel sector.</p>
+            </div>
+        </div>
+
+        <div class="row mb-4 text-center roboto">
+            <div class="col-md-6">
+                <h3>Bridging Technology and Travel Expertise</h3>
+                <p>Combining his deep industry knowledge with newfound coding skills, Tyrone embarked on creating
+                    TraVault as his final project. This CRM system is designed to meet the unique needs of smaller
+                    travel management companies, offering robust functionality without the hefty price tag of larger
+                    systems.</p>
+            </div>
+            <div class="col-md-6">
+                <h3>Our Mission</h3>
+                <p>At TraVault, our mission is clear: to provide boutique travel management companies with a powerful,
+                    user-friendly CRM system at a fraction of the cost of traditional solutions. We believe that with
+                    the right tools, smaller companies can compete effectively in the corporate travel market,
+                    delivering exceptional service to their clients without breaking the bank.</p>
+            </div>
+        </div>
+
+        <div class="row pb-5">
+            <div class="col-12 text-center roboto">
+                <h3>Looking to the Future</h3>
+                <p>As we continue to develop and refine TraVault, we remain committed to our core values of
+                    affordability, efficiency, and industry-specific functionality. We're excited to be part of the
+                    journey in modernizing travel management technology and supporting the success of boutique travel
+                    management companies around the world.</p>
+                <p class="lead mt-4">Join us in revolutionizing the way boutique travel management companies operate in
+                    the corporate travel sector!</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="pricing" class="bg-gray-200 ">
+    <div class="banna-img-2"></div>
+    <div class="container py-5 roboto">
+        <div class="row text-center mb-4">
+            <div class="col">
+                <h2 class="display-4">Pricing</h2>
+                <p class="lead">Pricing That Fits Your Journey</p>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow">
+                    <div class="card-body text-center">
+                        <h3 class="card-title">Simplicity Meets Affordability</h3>
+                        <p class="lead">£4.00 per user, per month</p>
+                        <p>That's it. No hidden fees, no complicated tiers.</p>
+                        <hr>
+                        <h4>What's Included:</h4>
+                        <ul class="list-unstyled">
+                            <li>Full access to all TraVault features</li>
+                            <li>Unlimited client and supplier entries</li>
+                            <li>Secure document storage</li>
+                            <li>Customisable reporting</li>
+                            <li>Mobile access</li>
+                            <li>Regular updates and new features</li>
+                            <li>Email support</li>
+                        </ul>
+                        <a href="{% url 'register' %}" class="btn btn-get-started btn-lg mt-3">Get Started</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-5 ms-5 custom-margin">
+            <div class="col-md-4">
+                <h4>Why Choose TraVault?</h4>
+                <ul>
+                    <li>Cost-Effective: Pay only for the users you need</li>
+                    <li>Scalable: Easily add or remove users</li>
+                    <li>No Long-Term Commitments: Monthly billing</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h4>Perfect for:</h4>
+                <ul>
+                    <li>Startup travel management companies</li>
+                    <li>Boutique TMCs looking to optimise costs</li>
+                    <li>Growing teams that need flexible, scalable solutions</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h4>Get Started Today</h4>
+                <ul>
+                    <li>Quick and easy sign-up process</li>
+                    <li>30-day money-back guarantee</li>
+                    <li>Dedicated onboarding support</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="contact-us">
+    <!-- Floating Contact Button -->
+    <div class="floating-contact-btn">
+        <button class="btn rounded-circle" type="button" data-bs-toggle="offcanvas" data-bs-target="#contactOffcanvas"
+            aria-controls="contactOffcanvas">
+            <i class="fas fa-envelope"></i>
+        </button>
+    </div>
+
+    <!-- Contact Offcanvas -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="contactOffcanvas" aria-labelledby="contactOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="contactOffcanvasLabel">Contact Us</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <!-- Add your contact form or contact information here -->
+            <form>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <textarea class="form-control" id="message" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<footer class="bg-dark text-light py-4">
+    <div class="container roboto">
+        <div class="row ms-5 custom-margin">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h5>TraVault</h5>
+                <p class="mb-0">Efficient Corporate Travel CRM Solution</p>
+                <small class="d-block mt-3">&copy; 2024 TraVault. All rights reserved.</small>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#about-us">About Us</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="{% url 'terms_of_service' %}" target="_blank" rel="noopener noreferrer">Terms of Service</a></li>
+                    <li><a href="{% url 'privacy_policy' %}" target="_blank" rel="noopener noreferrer">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h5>Connect With Us</h5>
+                <ul class="list-inline social-links">
+                    <li class="list-inline-item">
+                        <a href="https://uk.linkedin.com/" target="_blank" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin fa-2x"></i>
+                        </a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="https://www.facebook.com/" target="_blank" aria-label="Facebook">
+                            <i class="fab fa-facebook fa-2x"></i>
+                        </a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="https://www.instagram.com/" target="_blank" aria-label="Instagram">
+                            <i class="fab fa-instagram fa-2x"></i>
+                        </a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="https://x.com/" target="_blank" aria-label="X">
+                            <i class="fa-brands fa-x-twitter fa-2x"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</footer>
+
+{% endblock %}

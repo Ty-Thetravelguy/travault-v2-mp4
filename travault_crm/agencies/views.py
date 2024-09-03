@@ -6,8 +6,14 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.http import HttpResponseRedirect
 from django.contrib import messages
-from allauth.account.views import LoginView, LogoutView, PasswordResetView, PasswordResetDoneView, PasswordResetFromKeyView, PasswordResetFromKeyDoneView
-
+from allauth.account.views import (
+    LoginView, 
+    LogoutView, 
+    PasswordResetView, 
+    PasswordResetDoneView, 
+    PasswordResetFromKeyView, 
+    PasswordResetFromKeyDoneView
+)
 from .forms import AgencyRegistrationForm, UserForm
 from .models import CustomUser
 
@@ -57,8 +63,6 @@ class CustomPasswordResetFromKeyView(PasswordResetFromKeyView):
 class CustomPasswordResetFromKeyDoneView(PasswordResetFromKeyDoneView):
     template_name = 'account/password_reset_from_key_done.html'
 
-from django.shortcuts import render
-from agencies.models import CustomUser
 
 def manage_users(request):
     # Get the agency of the logged-in user
@@ -84,7 +88,7 @@ def add_user(request):
             new_user.save()
 
             messages.success(request, "User has been added successfully!")
-            return redirect('users:manage_users')
+            return redirect('agencies:manage_users')
         else:
             messages.error(request, "Please correct the errors below.")
     else:

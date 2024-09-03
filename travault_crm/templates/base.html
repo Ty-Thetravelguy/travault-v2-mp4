@@ -69,7 +69,7 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#">Profile</a></li>
                             {% if user.user_type == 'admin' %}
-                            <li><a class="dropdown-item" href="{% url 'manage_users' %}">Manage Users</a></li>
+                            <li><a class="dropdown-item" href="{% url 'agencies:manage_users' %}">Manage Users</a></li>
                             <li><a class="dropdown-item" href="#">Agency Profile</a></li>
                             {% endif %}
                             <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
@@ -94,7 +94,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link home-nav-text {% if request.path == '/custom-registration/' %}active{% endif %}"
-                            href="{% url 'agency_register' %}">Register</a>
+                            href="{% url 'agencies:agency_register' %}">Register</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link home-nav-text {% if request.path == '/accounts/login/' %}active{% endif %}"

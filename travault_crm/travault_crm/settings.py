@@ -117,22 +117,25 @@ ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
-
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
 ACCOUNT_LOGOUT_ON_GET = True
-
 ACCOUNT_RATE_LIMITS = {
-    'login_failed': '5/300s',  # 5 failed attempts in 300 seconds (5 minutes)
+    'login_failed': '5/300s',
 }
-
 ACCOUNT_FORMS = {'signup': 'agencies.forms.AgencyRegistrationForm'}
-ACCOUNT_SIGNUP_FORM_CLASS = ''
 ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_UNIQUE_EMAIL = True
 
+# Add these lines to specify your custom templates
+ACCOUNT_LOGIN_TEMPLATE = 'account/account_login.html'
+ACCOUNT_LOGOUT_TEMPLATE = 'account/account_logout.html'
+ACCOUNT_PASSWORD_RESET_TEMPLATE = 'account/password_reset.html'
+ACCOUNT_PASSWORD_RESET_DONE_TEMPLATE = 'account/password_reset_done.html'
+ACCOUNT_PASSWORD_RESET_FROM_KEY_TEMPLATE = 'account/password_reset_from_key.html'
+ACCOUNT_PASSWORD_RESET_FROM_KEY_DONE_TEMPLATE = 'account/password_reset_from_key_done.html'
 
 AUTH_USER_MODEL = 'agencies.CustomUser'
 

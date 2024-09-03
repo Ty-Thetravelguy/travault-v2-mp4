@@ -6,7 +6,7 @@
     <div class="container mt-4 full-height-bg bg-gray-200 top-padding">
         <h2 class="roboto text-center">Manage Users</h2>
         <div class="text-end">
-            <a href="#" class="btn btn-link project-primary-color" title="Add User">
+            <a href="{% url 'add_user' %}" class="btn btn-link project-primary-color" title="Add User">
                 <i class="fas fa-plus"></i>
             </a>
         </div>
@@ -29,7 +29,6 @@
                     <td>{{ user.first_name }}</td>
                     <td>{{ user.last_name }}</td>
                     <td>{{ user.get_user_type_display }}</td>
-                    <!-- Adjust as needed if roles are displayed differently -->
                     <td>
                         <a href="#" class="btn btn-outline-primary btn-sm me-2">
                             <i class="fas fa-edit"></i> Edit</a>

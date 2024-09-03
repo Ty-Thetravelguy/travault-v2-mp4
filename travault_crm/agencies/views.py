@@ -1,4 +1,5 @@
 import logging
+from django.shortcuts import render, redirect
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -7,7 +8,8 @@ from django.http import HttpResponseRedirect
 from django.contrib import messages
 from allauth.account.views import LoginView, LogoutView, PasswordResetView, PasswordResetDoneView, PasswordResetFromKeyView, PasswordResetFromKeyDoneView
 
-from .forms import AgencyRegistrationForm
+from .forms import AgencyRegistrationForm, UserForm
+from .models import CustomUser
 
 logger = logging.getLogger(__name__)
 
@@ -66,3 +68,28 @@ def manage_users(request):
     users = CustomUser.objects.filter(agency=user_agency, is_superuser=False)
 
     return render(request, 'users/manage_users.html', {'users': users})
+
+def add_user(request):
+    if request.method == 'POST':
+        user_form = UserForm(request.POST)
+
+        if user_form.is_valid():
+            # Save the user form without committing to the database yet
+            new_user = user_form.save(commit=False)
+            
+            # Link the new user to the current user's agency
+            new_user.agency = request.user.agency
+            
+            # Save the new user to the database
+            new_user.save()
+
+            messages.success(request, "User has been added successfully!")
+            return redirect('users:manage_users')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        user_form = UserForm()
+
+    return render(request, 'users/add_user.html', {
+        'user_form': user_form,
+    })

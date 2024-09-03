@@ -102,7 +102,7 @@ AUTHENTICATION_BACKENDS = [
 
 SITE_ID = 1
 
-EAEMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 WSGI_APPLICATION = 'travault_crm.wsgi.application'
 

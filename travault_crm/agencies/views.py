@@ -59,10 +59,10 @@ from django.shortcuts import render
 from agencies.models import CustomUser
 
 def manage_users(request):
-    # Ensure the logged-in user has an agency associated
+    # Get the agency of the logged-in user
     user_agency = request.user.agency
-    
-    # Filter users belonging to the same agency
-    users = CustomUser.objects.filter(agency=user_agency)
-    
-    return render(request, 'agencies/manage_users/manage_users.html', {'users': users})
+
+    # Filter users belonging to the same agency and exclude superusers
+    users = CustomUser.objects.filter(agency=user_agency, is_superuser=False)
+
+    return render(request, 'users/manage_users.html', {'users': users})

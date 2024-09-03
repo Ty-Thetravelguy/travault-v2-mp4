@@ -54,3 +54,15 @@ class CustomPasswordResetFromKeyView(PasswordResetFromKeyView):
 
 class CustomPasswordResetFromKeyDoneView(PasswordResetFromKeyDoneView):
     template_name = 'account/password_reset_from_key_done.html'
+
+from django.shortcuts import render
+from agencies.models import CustomUser
+
+def manage_users(request):
+    # Ensure the logged-in user has an agency associated
+    user_agency = request.user.agency
+    
+    # Filter users belonging to the same agency
+    users = CustomUser.objects.filter(agency=user_agency)
+    
+    return render(request, 'agencies/manage_users/manage_users.html', {'users': users})

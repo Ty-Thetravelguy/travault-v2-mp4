@@ -69,10 +69,8 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#">Profile</a></li>
                             {% if user.user_type == 'admin' %}
-                            <li><a class="dropdown-item" href="#">Manage Users</a></li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Agency Profile</a>
-                            </li>
+                            <li><a class="dropdown-item" href="{% url 'manage_users' %}">Manage Users</a></li>
+                            <li><a class="dropdown-item" href="#">Agency Profile</a></li>
                             {% endif %}
                             <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
                         </ul>

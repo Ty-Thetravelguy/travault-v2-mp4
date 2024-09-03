@@ -75,14 +75,6 @@ class AgencyRegistrationForm(SignupForm):
 
     def save(self, request):
         user = super(AgencyRegistrationForm, self).save(request)
-        if request.user.is_authenticated and request.user.user_type == 'admin':
-            # If an admin is creating this user, set the type to 'agent'
-            user.user_type = 'agent'
-        else:
-            # If it's a self-registration, set the type to 'admin'
-            user.user_type = 'admin'
-        user.save()
-        return user
         
         # Split the full name into first and last name
         full_name = self.cleaned_data['contact_full_name'].split()
@@ -93,8 +85,17 @@ class AgencyRegistrationForm(SignupForm):
             user.first_name = full_name[0]
             user.last_name = ''
         
-        address_lines = self.cleaned_data['company_address'].split('\n')
+        # Setting user role
+        if request.user.is_authenticated and request.user.user_type == 'admin':
+            user.user_type = 'agent'
+        else:
+            user.user_type = 'admin'
         
+        # Save the user with updated names and role
+        user.save()
+        
+        # Create the agency linked to the user
+        address_lines = self.cleaned_data['company_address'].split('\n')
         agency = Agency.objects.create(
             name=self.cleaned_data['company_name'],
             address='\n'.join(address_lines),
@@ -107,5 +108,8 @@ class AgencyRegistrationForm(SignupForm):
             contact_name=self.cleaned_data['contact_full_name']
         )
         
+        # Link the agency to the user
         user.agency = agency
         user.save()
+        
+        return user

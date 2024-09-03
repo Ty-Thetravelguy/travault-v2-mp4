@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class AgencyRegistrationView(CreateView):
     template_name = 'agencies/registration.html'
     form_class = AgencyRegistrationForm
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('dashboard')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

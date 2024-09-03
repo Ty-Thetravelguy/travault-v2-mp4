@@ -5,6 +5,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.http import HttpResponseRedirect
 from django.contrib import messages
+from allauth.account.views import LoginView, LogoutView, PasswordResetView, PasswordResetDoneView, PasswordResetFromKeyView, PasswordResetFromKeyDoneView
+
 from .forms import AgencyRegistrationForm
 
 logger = logging.getLogger(__name__)
@@ -34,3 +36,21 @@ class AgencyRegistrationView(CreateView):
         logger.error(f"Form validation failed: {form.errors}")
         messages.error(self.request, "Please correct the errors below.")
         return super().form_invalid(form)
+
+class CustomLoginView(LoginView):
+    template_name = 'account/account_login.html'
+
+class CustomLogoutView(LogoutView):
+    template_name = 'account/account_logout.html'
+
+class CustomPasswordResetView(PasswordResetView):
+    template_name = 'account/password_reset.html'
+
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    template_name = 'account/password_reset_done.html'
+
+class CustomPasswordResetFromKeyView(PasswordResetFromKeyView):
+    template_name = 'account/password_reset_from_key.html'
+
+class CustomPasswordResetFromKeyDoneView(PasswordResetFromKeyDoneView):
+    template_name = 'account/password_reset_from_key_done.html'

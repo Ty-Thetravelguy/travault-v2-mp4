@@ -12,4 +12,6 @@ urlpatterns = [
     path('password/reset/key/done/', views.CustomPasswordResetFromKeyDoneView.as_view(), name='account_reset_password_from_key_done'),
     path('manage_users/', views.manage_users, name='manage_users'),
     path('add_user/', views.add_user, name='add_user'),
+    path('edit_user/<int:user_id>/', views.edit_user, name='edit_user'),
+
 ]

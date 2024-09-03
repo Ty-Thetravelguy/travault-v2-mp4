@@ -90,7 +90,7 @@ def add_user(request):
             new_user.save()
 
             messages.success(request, "User has been added successfully!")
-            return redirect('users:manage_users')
+            return redirect('agencies:manage_users')
         else:
             messages.error(request, "Please correct the errors below.")
     else:

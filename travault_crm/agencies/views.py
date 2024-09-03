@@ -47,6 +47,9 @@ class AgencyRegistrationView(CreateView):
 
 class CustomLoginView(LoginView):
     template_name = 'account/account_login.html'
+    def get(self, request, *args, **kwargs):
+        print("CustomLoginView is accessed")  # Debug line
+        return super().get(request, *args, **kwargs)
 
 class CustomLogoutView(LogoutView):
     template_name = 'account/account_logout.html'
@@ -62,7 +65,6 @@ class CustomPasswordResetFromKeyView(PasswordResetFromKeyView):
 
 class CustomPasswordResetFromKeyDoneView(PasswordResetFromKeyDoneView):
     template_name = 'account/password_reset_from_key_done.html'
-
 
 def manage_users(request):
     # Get the agency of the logged-in user
@@ -88,7 +90,7 @@ def add_user(request):
             new_user.save()
 
             messages.success(request, "User has been added successfully!")
-            return redirect('agencies:manage_users')
+            return redirect('users:manage_users')
         else:
             messages.error(request, "Please correct the errors below.")
     else:

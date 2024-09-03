@@ -92,11 +92,8 @@ TEMPLATES = [
 
 
 AUTHENTICATION_BACKENDS = [
-    # Needed to login by username in Django admin, regardless of `allauth`
     'django.contrib.auth.backends.ModelBackend',
-
-    # `allauth` specific authentication methods, such as login by email
-    'allauth.account.auth_backends.AuthenticationBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',  
 ]
 
 
@@ -115,10 +112,10 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True
+LOGIN_URL = '/'  # Should point to your custom login view
+LOGOUT_URL = 'agencies:account_logout'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'home'
-LOGIN_URL = 'agencies:account_login'  
-LOGOUT_URL = 'agencies:account_logout'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
 ACCOUNT_LOGOUT_ON_GET = True

@@ -70,7 +70,8 @@
                             <li><a class="dropdown-item" href="{% url 'agencies:profile' %}">Profile</a></li>
                             {% if user.user_type == 'admin' %}
                             <li><a class="dropdown-item" href="{% url 'agencies:manage_users' %}">Manage Users</a></li>
-                            <li><a class="dropdown-item" href="#">Agency Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'agencies:agency_profile' %}">Agency Profile</a>
+                            </li>
                             {% endif %}
                             <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
                         </ul>

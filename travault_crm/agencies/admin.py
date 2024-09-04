@@ -16,9 +16,9 @@ class CustomUserAdmin(UserAdmin):
     )
 
 class AgencyAdmin(admin.ModelAdmin):
-    list_display = ['name', 'email', 'phone', 'vat_number', 'company_reg_number', 'business_focus', 'employees', 'created_at']
+    list_display = ['agency_name', 'email', 'phone', 'vat_number', 'company_reg_number', 'business_focus', 'employees', 'created_at']
     list_filter = ['business_focus', 'employees']
-    search_fields = ['name', 'email', 'vat_number', 'company_reg_number']
+    search_fields = ['agency_name', 'email', 'vat_number', 'company_reg_number']
     readonly_fields = ['created_at', 'updated_at']
     fieldsets = (
         (None, {'fields': ('name', 'email', 'phone', 'website')}),

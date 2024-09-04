@@ -125,3 +125,20 @@ class UserForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'user_type': forms.Select(attrs={'class': 'form-control'}), 
         }
+
+
+class AgencyProfileForm(forms.ModelForm):
+    class Meta:
+        model = Agency
+        fields = ['agency_name', 'address', 'vat_number', 'company_reg_number', 'phone', 'email', 'employees', 'business_focus', 'contact_name']
+        widgets = {
+            'agency_name': forms.TextInput(attrs={'class': 'form-control'}),  # Use agency_name
+            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 6}),
+            'vat_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'company_reg_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'employees': forms.Select(attrs={'class': 'form-control'}),
+            'business_focus': forms.Select(attrs={'class': 'form-control'}),
+            'contact_name': forms.TextInput(attrs={'class': 'form-control'}),
+        }

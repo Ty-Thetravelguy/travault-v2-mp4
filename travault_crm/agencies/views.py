@@ -15,7 +15,7 @@ from allauth.account.views import (
     PasswordResetFromKeyView, 
     PasswordResetFromKeyDoneView
 )
-from .forms import AgencyRegistrationForm, UserForm
+from .forms import AgencyRegistrationForm, UserForm, AgencyProfileForm
 from .models import CustomUser
 from allauth.account.models import EmailAddress
 from django.contrib.auth.forms import PasswordResetForm
@@ -101,6 +101,29 @@ def profile_view(request):
 
     # Update the template path to match your actual template location
     return render(request, 'users/profile.html', {'form': form})
+
+
+@login_required
+def agency_profile_view(request):
+    # Ensure the user is an admin
+    if request.user.user_type != 'admin':
+        messages.error(request, "You do not have permission to access this page.")
+        return redirect('agencies:manage_users')
+
+    agency = request.user.agency
+
+    if request.method == 'POST':
+        form = AgencyProfileForm(request.POST, instance=agency)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Agency profile updated successfully!")
+            return redirect('agencies:agency_profile')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = AgencyProfileForm(instance=agency)
+
+    return render(request, 'agencies/agency_profile.html', {'form': form})
 
 
 @method_decorator(login_required, name='dispatch')

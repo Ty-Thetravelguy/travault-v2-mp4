@@ -1,0 +1,17 @@
+{% load i18n %}
+{% blocktrans %}Hello {{ user.username }}!{% endblocktrans %}
+
+{% blocktrans %}
+You're receiving this email because a new account was created for you at {{ site_name }}.
+{% endblocktrans %}
+
+{% blocktrans %}
+Please click the link below to confirm your email address and set your password:
+{% endblocktrans %}
+
+{% blocktrans %}
+Confirm your email address and set your password:
+{% endblocktrans %}
+<a href="{{ confirm_url }}">{{ confirm_url }}</a>
+
+{% blocktrans %}Thank you for using {{ site_name }}!{% endblocktrans %}

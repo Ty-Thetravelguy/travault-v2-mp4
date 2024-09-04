@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid bg-gray-200 py-5 full-height-bg">
+    <div class="container py-5 mt-4">
+        <h1 class="mb-4 roboto">CRM</h1>
+
+        <!-- Filtering Options -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" id="companyNameFilter" class="form-control" placeholder="Search by company name...">
+            </div>
+            <div class="col-md-6">
+                <select id="companyOwnerFilter" class="form-select">
+                    <option value="">All Company Owners</option>
+                    <!-- Populate with available owners, e.g., sales users or admins -->
+                    {% for owner in company_owners %}
+                    <option value="{{ owner.id }}">{{ owner.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Table Layout -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Company Name <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
+                    <th>Company Owner <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
+                    <th>Create Date <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
+                    <th>Last Activity Date <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
+                    <th>Phone Number <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
+                    <th>Country <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
+                    <th>Industry <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
+                    <th>Type <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for company in companies %}
+                <tr>
+                    <td><a href="{% url 'crm:company_detail' company.id %}">{{ company.company_name }}</a></td>
+                    <td>{{ company.company_owner }}</td>
+                    <td>{{ company.create_date|date:"d/m/Y" }}</td>
+                    <td>{{ company.last_activity_date|date:"d/m/Y" }}</td>
+                    <td>{{ company.phone_number }}</td>
+                    <td>{{ company.country }}</td>
+                    <td>{{ company.industry }}</td>
+                    <td>{{ company.company_type }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center">No companies found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination Controls (Placeholder) -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}

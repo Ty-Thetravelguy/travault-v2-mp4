@@ -142,3 +142,5 @@ class AgencyProfileForm(forms.ModelForm):
             'business_focus': forms.Select(attrs={'class': 'form-control'}),
             'contact_name': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+    field_order = ['agency_name', 'address', 'vat_number', 'company_reg_number', 'contact_name', 'phone', 'email', 'employees', 'business_focus']

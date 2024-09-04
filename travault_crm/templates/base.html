@@ -60,7 +60,7 @@
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                     <li class="nav-item pt-1">
-                        <a class="nav-link home-nav-text" href="{% url 'dashboard' %}">Dashboard</a>
+                        <a class="nav-link home-nav-text" href="{% url 'dashboard:dashboard' %}">Dashboard</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">

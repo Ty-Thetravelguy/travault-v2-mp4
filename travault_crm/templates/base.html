@@ -67,7 +67,7 @@
                             <i class="fa-solid fa-gear"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'agencies:profile' %}">Profile</a></li>
                             {% if user.user_type == 'admin' %}
                             <li><a class="dropdown-item" href="{% url 'agencies:manage_users' %}">Manage Users</a></li>
                             <li><a class="dropdown-item" href="#">Agency Profile</a></li>

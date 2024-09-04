@@ -61,8 +61,47 @@ class AgencyRegistrationView(CreateView):
 class CustomLoginView(LoginView):
     template_name = 'account/account_login.html'
     def get(self, request, *args, **kwargs):
-        print("CustomLoginView is accessed")  # Debug line
         return super().get(request, *args, **kwargs)
+
+
+@login_required
+def profile_view(request):
+    user = request.user
+    original_email = user.email
+
+    if request.method == 'POST':
+        form = UserForm(request.POST, instance=user)
+        # Exclude fields you don't want to be editable in the profile context
+        form.fields.pop('username', None)
+        form.fields.pop('user_type', None)
+
+        if form.is_valid():
+            updated_user = form.save(commit=False)
+            new_email = updated_user.email
+
+            # Check if the email address has changed
+            if original_email != new_email:
+                # Mark the new email as unverified
+                EmailAddress.objects.filter(user=updated_user).delete()  # Remove old email records
+                EmailAddress.objects.create(user=updated_user, email=new_email, primary=True, verified=False)
+                send_email_confirmation(request, updated_user)  # Send verification email
+
+                messages.info(request, "The email address has been changed. A verification email has been sent to the new address.")
+
+            updated_user.save()
+            messages.success(request, "Profile updated successfully!")
+            return redirect('/agencies/profile/')  # Adjust to your profile URL name
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = UserForm(instance=user)
+        # Exclude fields you don't want to be editable in the profile context
+        form.fields.pop('username', None)
+        form.fields.pop('user_type', None)
+
+    # Update the template path to match your actual template location
+    return render(request, 'users/profile.html', {'form': form})
+
 
 @method_decorator(login_required, name='dispatch')
 class CustomLogoutView(LogoutView):

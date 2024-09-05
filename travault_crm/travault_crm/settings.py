@@ -1,15 +1,14 @@
 from pathlib import Path
 import os
-import environ
-import env
+from dotenv import load_dotenv
+
 
 
 # Initialise environment variables
-env = environ.Env()
-environ.Env.read_env() 
+load_dotenv()
 
 # Access variables
-DIFFBOT_API_KEY = env('DIFFBOT_API_KEY')
+DIFFBOT_API_KEY = os.getenv('DIFFBOT_API_KEY')
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

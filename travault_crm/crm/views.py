@@ -5,6 +5,7 @@ import requests
 import os
 from .models import Company
 from .forms import CompanyForm
+from urllib.parse import quote
 
 @login_required
 def crm_index(request):
@@ -44,7 +45,6 @@ def add_company(request):
     return render(request, 'crm/add_company.html', {'form': form})
 
 
-@login_required
 def fetch_company_data(request):
     website = request.GET.get('website')
     if website:
@@ -53,18 +53,29 @@ def fetch_company_data(request):
         if not api_key:
             return JsonResponse({'error': 'API key is missing'}, status=500)
         
+        # URL encode the website URL
+        encoded_website = quote(website)
+        
         # Make API call to Diffbot
-        response = requests.get(f'https://api.diffbot.com/v3/analyze?token={api_key}&url={website}')
+        response = requests.get(f'https://api.diffbot.com/v3/analyze?url={encoded_website}&token={api_key}')
+        
+        # Check for API errors
+        if response.status_code != 200:
+            return JsonResponse({'error': 'Error processing page.'}, status=response.status_code)
+        
+        # Extract data from the API response
         data = response.json()
         
-        # Extract required data fields
+        # Extract required data fields from the API response
         company_data = {
-            'name': data.get('name'),
+            'company_name': data.get('name'),
             'address': data.get('address'),
             'email': data.get('email'),
+            'industry': data.get('industry'),
             'description': data.get('description'),
-            'linkedin': data.get('linkedin'),
+            'linkedin_social_page': data.get('linkedin'),
         }
+        
         return JsonResponse(company_data)
 
     return JsonResponse({'error': 'Website not provided'}, status=400)

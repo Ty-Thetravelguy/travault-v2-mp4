@@ -2,6 +2,9 @@
 {% load static %}
 {% load crm_tags %}
 
+
+{% block extra_title %}- Add Company{% endblock %}
+
 {% block content %}
 <section id="add-company" class="bg-gray-200">
     <div class="container top-padding roboto">
@@ -13,7 +16,8 @@
 
                         <!-- Fetch Data Button -->
                         <div class="text-center mb-3">
-                            <button id="fetchCompanyDataBtn" class="btn btn-outline-primary">
+                            <button id="fetchCompanyDataBtn" class="btn btn-outline-primary" data-bs-toggle="modal"
+                                data-bs-target="#companyModal">
                                 <i class="fas fa-globe"></i> Fetch Data from Website
                             </button>
                         </div>
@@ -69,4 +73,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block postload_js %}
+<script src="{% static 'js/crm_script.js' %}"></script>
 {% endblock %}

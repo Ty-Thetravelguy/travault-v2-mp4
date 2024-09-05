@@ -108,3 +108,4 @@ document.addEventListener('DOMContentLoaded', function() {
     adjustTabs();
     window.addEventListener('resize', adjustTabs);
 });
+

@@ -2,10 +2,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import requests
-import os
 from .models import Company
 from .forms import CompanyForm
 from urllib.parse import quote
+from django.conf import settings
+import json
 
 @login_required
 def crm_index(request):
@@ -44,38 +45,47 @@ def add_company(request):
     
     return render(request, 'crm/add_company.html', {'form': form})
 
-
+@login_required
 def fetch_company_data(request):
-    website = request.GET.get('website')
+    website = request.GET.get('website', '').strip()
     if website:
-        # Fetch API key from environment variable
-        api_key = os.environ.get('DIFFBOT_API_KEY')
+        api_key = settings.DIFFBOT_API_KEY
         if not api_key:
             return JsonResponse({'error': 'API key is missing'}, status=500)
         
-        # URL encode the website URL
         encoded_website = quote(website)
         
-        # Make API call to Diffbot
-        response = requests.get(f'https://api.diffbot.com/v3/analyze?url={encoded_website}&token={api_key}')
+        full_url = f'https://api.diffbot.com/v3/analyze?url={encoded_website}&token={api_key}&timeout=50000'
         
-        # Check for API errors
-        if response.status_code != 200:
-            return JsonResponse({'error': 'Error processing page.'}, status=response.status_code)
+        try:
+            response = requests.get(full_url, timeout=60)
+            
+            if response.status_code != 200:
+                return JsonResponse({'error': f'Error processing page: {response.text}'}, status=response.status_code)
+            
+            data = response.json()
+            
+            if 'objects' in data and len(data['objects']) > 0:
+                company_obj = data['objects'][0]
+                location = company_obj.get('locations', [{}])[0]
+                company_data = {
+                    'company_name': company_obj.get('name', ''),
+                    'street': location.get('street', ''),
+                    'city': location.get('city', {}).get('name', ''),
+                    'country': location.get('country', {}).get('name', ''),
+                    'postcode': location.get('postalCode', ''),
+                    'email': next((email['contactString'] for email in company_obj.get('emailAddresses', []) if email.get('contactString')), ''),
+                    'description': company_obj.get('description', ''),
+                    'linkedin_social_page': next((uri for uri in company_obj.get('allUris', []) if 'linkedin.com' in uri), '')
+                }
+                
+                return JsonResponse(company_data)
+            else:
+                return JsonResponse({'error': 'No company data found in the response'}, status=404)
         
-        # Extract data from the API response
-        data = response.json()
-        
-        # Extract required data fields from the API response
-        company_data = {
-            'company_name': data.get('name'),
-            'address': data.get('address'),
-            'email': data.get('email'),
-            'industry': data.get('industry'),
-            'description': data.get('description'),
-            'linkedin_social_page': data.get('linkedin'),
-        }
-        
-        return JsonResponse(company_data)
+        except requests.Timeout:
+            return JsonResponse({'error': 'Request to Diffbot API timed out'}, status=504)
+        except Exception as e:
+            return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
 
     return JsonResponse({'error': 'Website not provided'}, status=400)

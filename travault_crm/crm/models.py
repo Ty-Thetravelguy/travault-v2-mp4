@@ -7,7 +7,7 @@ from django.conf import settings
 class Company(models.Model):
     agency = models.ForeignKey(Agency, on_delete=models.CASCADE, related_name='companies', null=True)   
     company_name = models.CharField(max_length=255)
-    address = models.TextField(blank=True, null=True)
+    company_address = models.TextField(blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     industry = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)

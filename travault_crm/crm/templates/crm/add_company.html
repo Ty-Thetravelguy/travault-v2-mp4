@@ -2,7 +2,6 @@
 {% load static %}
 {% load crm_tags %}
 
-
 {% block extra_title %}- Add Company{% endblock %}
 
 {% block content %}
@@ -13,6 +12,16 @@
                 <div class="card shadow">
                     <div class="card-body">
                         <h2 class="card-title text-center mb-4">Add Company</h2>
+
+                        <!-- Debug output -->
+                        <div class="debug-output" style="display: none;">
+                            <h3>Form Fields:</h3>
+                            <pre>
+                            {% for field in form %}
+                            {{ field.name }}: {{ field.id_for_label }}
+                            {% endfor %}
+                            </pre>
+                        </div>
 
                         <!-- Fetch Data Button -->
                         <div class="text-center mb-3">
@@ -27,7 +36,10 @@
                             {% for field in form %}
                             <div class="mb-3">
                                 <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                {% if field.name == 'industry' %}
+                                {% if field.name == 'company_address' %}
+                                <input type="text" name="company_address" id="{{ field.id_for_label }}"
+                                    class="form-control" value="{{ field.value|default:'' }}">
+                                {% elif field.name == 'industry' %}
                                 {{ field|add_class:"form-select" }}
                                 {% elif field.name == 'description' %}
                                 {{ field|add_class:"form-control"|attr:"rows:4" }}
@@ -72,6 +84,11 @@
             </div>
         </div>
     </div>
+</div>
+
+<div id="loading-spinner" class="loading-spinner" style="display: none;">
+    <div class="spinner"></div>
+    <p>Fetching company data...</p>
 </div>
 {% endblock %}
 

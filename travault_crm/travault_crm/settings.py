@@ -3,7 +3,6 @@ import os
 from dotenv import load_dotenv
 
 
-
 # Initialise environment variables
 load_dotenv()
 

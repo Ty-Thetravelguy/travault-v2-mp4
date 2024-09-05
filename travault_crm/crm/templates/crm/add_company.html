@@ -1,32 +1,72 @@
 {% extends "base.html" %}
 {% load static %}
+{% load crm_tags %}
 
 {% block content %}
-<div class="container-fluid bg-gray-200 full-height-bg top-padding">
-    <h1 class="mb-4 roboto">Add Company</h1>
+<section id="add-company" class="bg-gray-200">
+    <div class="container top-padding roboto">
+        <div class="row justify-content-center py-5">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="card-title text-center mb-4">Add Company</h2>
 
-    <!-- Popup to enter company website -->
-    <button id="fetchCompanyDataBtn" class="btn btn-primary">Fetch Data from Website</button>
+                        <!-- Fetch Data Button -->
+                        <div class="text-center mb-3">
+                            <button id="fetchCompanyDataBtn" class="btn btn-outline-primary">
+                                <i class="fas fa-globe"></i> Fetch Data from Website
+                            </button>
+                        </div>
 
-    <form method="post" id="addCompanyForm">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Save Company</button>
-    </form>
-</div>
+                        <form method="post" action="#" id="addCompanyForm">
+                            {% csrf_token %}
+                            {% for field in form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {% if field.name == 'industry' %}
+                                {{ field|add_class:"form-select" }}
+                                {% elif field.name == 'description' %}
+                                {{ field|add_class:"form-control"|attr:"rows:4" }}
+                                {% else %}
+                                {{ field|add_class:"form-control" }}
+                                {% endif %}
+                                <div class="form-text text-muted">{{ field.help_text }}</div>
+                                {% if field.errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in field.errors %}
+                                    <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg">Add Company</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Modal for entering website -->
-<div id="companyModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Enter Company Website</h2>
-        <input type="text" id="companyWebsiteInput" placeholder="https://example.com">
-        <button id="fetchDataBtn">Fetch Data</button>
+<div class="modal fade" id="companyModal" tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="companyModalLabel">Enter Company Website</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="companyWebsiteInput" class="form-control" placeholder="https://example.com">
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="fetchDataBtn" class="btn btn-primary">Fetch Data</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
     </div>
 </div>
-
-
-{% block postload_js %}
-{% endblock %}
-
 {% endblock %}

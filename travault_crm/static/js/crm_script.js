@@ -51,7 +51,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 fields.forEach(field => {
                     const element = document.querySelector(`${field.type}[name="${field.name}"]`);
                     if (element) {
-                        const value = field.value || data[field.name] || '';
+                        let value = field.value || data[field.name] || '';
+            
+                        // Ensure LinkedIn URL starts with 'https://'
+                        if (field.name === 'linkedin_social_page' && value && !value.startsWith('http://') && !value.startsWith('https://')) {
+                            value = 'https://' + value;
+                        }
+            
                         element.value = value;
                     }
                 });

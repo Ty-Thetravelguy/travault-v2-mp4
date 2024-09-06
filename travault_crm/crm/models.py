@@ -52,9 +52,10 @@ ACCOUNT_STATUS_CHOICES = [
 ]
 
 class Company(models.Model):
-    agency = models.ForeignKey(Agency, on_delete=models.CASCADE, related_name='companies', null=True)   
+    agency = models.ForeignKey(Agency, on_delete=models.CASCADE, related_name='companies', null=False)   
     company_name = models.CharField(max_length=255)
     company_address = models.TextField(blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     linkedin_social_page = models.URLField(blank=True, null=True)
@@ -64,6 +65,8 @@ class Company(models.Model):
     ops_team = models.CharField(max_length=255, blank=True, null=True)
     client_type = models.CharField(max_length=255, choices=CLIENT_TYPE_CHOICES, default='Travel')
     account_status = models.CharField(max_length=255, choices=ACCOUNT_STATUS_CHOICES, default='Lead')
+    create_date = models.DateTimeField(auto_now_add=True) 
+    linked_companies = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='linked_to')
 
     def __str__(self):
         return self.company_name

@@ -1,3 +1,6 @@
+# agencies/models.py
+
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -42,4 +45,4 @@ class Agency(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.agency_name  # Update to reflect the new field name
+        return self.agency_name

@@ -1,3 +1,5 @@
+#crm/views.py
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -6,7 +8,8 @@ from .models import Company
 from .forms import CompanyForm
 from urllib.parse import quote
 from django.conf import settings
-import json
+from django.db.models import Q
+
 
 @login_required
 def crm_index(request):
@@ -32,17 +35,17 @@ def company_detail(request, company_id):
 @login_required
 def add_company(request):
     agency = request.user.agency  # Get the agency of the logged-in user
-    
+
     if request.method == 'POST':
-        form = CompanyForm(request.POST)
+        form = CompanyForm(request.POST, agency=agency)  # Pass agency to form
         if form.is_valid():
             company = form.save(commit=False)
-            company.agency = agency  # Link the company to the user's agency
-            company.save()
+            company.agency = agency 
+            form.save_m2m()
             return redirect('crm:index')
     else:
-        form = CompanyForm()
-    
+        form = CompanyForm(agency=agency)  # Pass agency to form
+
     return render(request, 'crm/add_company.html', {'form': form})
 
 @login_required
@@ -74,6 +77,7 @@ def fetch_company_data(request):
                     'city': location.get('city', {}).get('name', ''),
                     'country': location.get('country', {}).get('name', ''),
                     'postcode': location.get('postalCode', ''),
+                    'phone_number': company_obj.get('phoneNumbers', [{}])[0].get('number', ''),
                     'email': next((email['contactString'] for email in company_obj.get('emailAddresses', []) if email.get('contactString')), ''),
                     'description': company_obj.get('description', ''),
                     'linkedin_social_page': next((uri for uri in company_obj.get('allUris', []) if 'linkedin.com' in uri), '')
@@ -89,3 +93,16 @@ def fetch_company_data(request):
             return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
 
     return JsonResponse({'error': 'Website not provided'}, status=400)
+
+@login_required
+def search_companies(request):
+    query = request.GET.get('q', '')
+    agency = request.user.agency
+
+    companies = Company.objects.filter(
+        company_name__istartswith=query,
+        agency=agency
+    )[:10]
+    
+    results = [{'id': company.id, 'text': company.company_name} for company in companies]
+    return JsonResponse({'results': results})

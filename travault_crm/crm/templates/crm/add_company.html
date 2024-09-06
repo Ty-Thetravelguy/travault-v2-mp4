@@ -4,6 +4,7 @@
 
 {% block extra_title %}- Add Company{% endblock %}
 
+
 {% block content %}
 <section id="add-company" class="bg-gray-200">
     <div class="container top-padding roboto">
@@ -12,16 +13,6 @@
                 <div class="card shadow">
                     <div class="card-body">
                         <h2 class="card-title text-center mb-4">Add Company</h2>
-
-                        <!-- Debug output -->
-                        <div class="debug-output" style="display: none;">
-                            <h3>Form Fields:</h3>
-                            <pre>
-                            {% for field in form %}
-                            {{ field.name }}: {{ field.id_for_label }}
-                            {% endfor %}
-                            </pre>
-                        </div>
 
                         <!-- Fetch Data Button -->
                         <div class="text-center mb-3">
@@ -43,6 +34,14 @@
                                 {{ field|add_class:"form-select" }}
                                 {% elif field.name == 'description' %}
                                 {{ field|add_class:"form-control"|attr:"rows:4" }}
+                                {% elif field.name == 'linked_companies' %}
+                                <div class="linked-companies-container">
+                                    <input type="text" id="linked-companies-search" class="form-control"
+                                        placeholder="Search for companies to link">
+                                    <select name="linked_companies" multiple style="display: none;"></select>
+                                    <div id="linked-companies-results" class="linked-companies-results"></div>
+                                    <div id="selected-companies" class="selected-companies mt-2"></div>
+                                </div>
                                 {% else %}
                                 {{ field|add_class:"form-control" }}
                                 {% endif %}

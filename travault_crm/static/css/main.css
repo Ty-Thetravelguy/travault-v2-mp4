@@ -65,6 +65,7 @@ html, body {
 
 .btn-link {
     font-size: 30px;
+    text-decoration: none;
 }
 
 
@@ -314,6 +315,47 @@ footer a:hover {
     margin-top: 10px;
 }
 
+.selected-companies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    margin-top: 0.5em;
+}
+
+.selected-company-badge {
+    display: inline-flex;
+    align-items: center;
+    background-color: #001f3f;
+    color: white;
+    padding: 0.5em 0.7em;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.btn-close-custom {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2em;
+    line-height: 1;
+    padding: 0;
+    margin-left: 0.5em;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.btn-close-custom:hover {
+    opacity: 1;
+}
+
+.linked-companies-container {
+    margin-bottom: 1em;
+}
+
+#linked-companies-search {
+    margin-bottom: 0.5em;
+}
 
 /******************** Media queires ********************/
 
@@ -367,6 +409,7 @@ footer a:hover {
 
     .btn-link {
         font-size: 24px;
+        text-decoration: none;
     }
 
     .accordion-button {

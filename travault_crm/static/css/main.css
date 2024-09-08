@@ -289,6 +289,28 @@ footer a:hover {
     overflow-y: auto;
     overflow-x: auto; /* Allow horizontal scroll only for table */
     margin-bottom: 13px;
+
+    /* Firefox scrollbar styling */
+    scrollbar-width: auto; /* 'thin' or 'auto' for thicker scrollbar */
+    scrollbar-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.05); /* Thumb and track colors */
+
+    /* Internet Explorer scrollbar styling */
+    -ms-overflow-style: auto; /* Use default or thicker scrollbar style */
+}
+
+/* WebKit browsers (Chrome, Safari, newer versions of Opera) */
+.table-responsive::-webkit-scrollbar {
+    width: 12px;  /* Vertical scrollbar width */
+    height: 12px; /* Horizontal scrollbar height */
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 6px; /* Rounder scrollbar thumb */
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .table {
@@ -299,32 +321,6 @@ footer a:hover {
 .table th,
 .table td {
     padding: 0.5rem;
-}
-
-/* WebKit browsers (Chrome, Safari, newer versions of Opera) */
-.table-responsive::-webkit-scrollbar {
-    width: 12px;  /* Increase vertical scrollbar width */
-    height: 12px; /* Increase horizontal scrollbar height */
-}
-
-.table-responsive::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 6px; /* Adjust for a rounder scrollbar thumb */
-}
-
-.table-responsive::-webkit-scrollbar-track {
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-/* Firefox */
-.table-responsive {
-    scrollbar-width: auto; /* Use 'auto' for default width, or a larger value */
-    scrollbar-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.05);
-}
-
-/* Internet Explorer */
-.table-responsive {
-    -ms-overflow-style: auto; /* Use default or thicker scrollbar style */
 }
 
 .loading-spinner {

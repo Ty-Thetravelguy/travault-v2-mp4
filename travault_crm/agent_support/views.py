@@ -12,25 +12,35 @@ CustomUser = get_user_model()
 
 @login_required
 def agent_support(request):
-    # Check if user is an admin
-    if request.user.user_type == 'admin':
-        # Handle admin logic here, e.g., access all suppliers or bypass agency check
-        suppliers = AgentSupportSupplier.objects.all().order_by('supplier_name')
-    else:
-        # Standard check for agency
-        agency = request.user.agency
-        if agency is None:
-            return render(request, 'error.html', {'message': 'You are not associated with any agency. Please contact support.'})
+    print(f"Agency type: {type(request.user.agency)}")  # Debug line
+    agency = request.user.agency
 
-       # suppliers = AgentSupportSupplier.objects.filter(agency=agency).order_by('supplier_name')
-        suppliers = AgentSupportSupplier.objects.all().only('id', 'supplier_name')
-        
+    # Check if agency is actually an Agency instance
+    if not isinstance(agency, Agency):
+        raise ValueError(f"Expected Agency instance, got {type(agency)}")
+
+    suppliers = AgentSupportSupplier.objects.filter(agency=agency)
     return render(request, 'agent_support/index.html', {'suppliers': suppliers})
 
 
 @login_required
 def add_agent_supplier(request):
-    agency = request.user.profile.agency
+    if request.method == 'POST':
+        form = AgentSupportSupplierForm(request.POST, request.FILES)
+        if form.is_valid():
+            agent_supplier = form.save(commit=False)
+            agent_supplier.agency = request.user.agency  # Access agency correctly
+            agent_supplier.user = request.user
+            agent_supplier.save()
+            return redirect('agent_support:index')
+    else:
+        form = AgentSupportSupplierForm()
+    return render(request, 'agent_support/add_agent_supplier.html', {'form': form})
+
+
+@login_required
+def add_agent_supplier(request):
+    agency = request.user.agency
     if request.method == 'POST':
         form = AgentSupportSupplierForm(request.POST, request.FILES)
         if form.is_valid():
@@ -45,7 +55,7 @@ def add_agent_supplier(request):
 
 @login_required
 def edit_agent_supplier(request, pk):
-    agency = request.user.profile.agency
+    agency = request.user.agency
     supplier = get_object_or_404(AgentSupportSupplier, pk=pk, agency=agency)
     if request.method == 'POST':
         form = AgentSupportSupplierForm(request.POST, request.FILES, instance=supplier)

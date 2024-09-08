@@ -150,7 +150,7 @@ html, body {
 
 .btn-get-started,
 .btn-search,
-.btn-edit {
+.btn-green {
     color: #00ab8b ; 
     background-color: #ffffff ; 
     border-color: #00ab8b ; 
@@ -159,7 +159,7 @@ html, body {
 
 .btn-get-started:hover,
 .btn-search:hover,
-.btn-edit:hover {
+.btn-green:hover {
     background-color: #00ab8b ; 
     color: #fafafa ; 
     border-color: #00ab8b ; 

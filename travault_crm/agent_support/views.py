@@ -1,48 +1,57 @@
-from django.shortcuts import render, redirect
-from django.contrib import messages
+#agent_support/vies.py
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from .forms import AgentSupportSupplierForm
-from .models import AgentSupportSupplier
+from .models import AgentSupportSupplier, Agency
 
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 
+CustomUser = get_user_model()
+
 @login_required
 def agent_support(request):
-    # Ensure the user is linked to an agency
-    if not request.user.agency:
-        messages.error(request, 'You are not associated with any agency.')
-        return redirect('home')  
+    # Check if user is an admin
+    if request.user.user_type == 'admin':
+        # Handle admin logic here, e.g., access all suppliers or bypass agency check
+        suppliers = AgentSupportSupplier.objects.all().order_by('supplier_name')
+    else:
+        # Standard check for agency
+        agency = request.user.agency
+        if agency is None:
+            return render(request, 'error.html', {'message': 'You are not associated with any agency. Please contact support.'})
 
-    # Fetch suppliers linked to the user's agency
-    suppliers = AgentSupportSupplier.objects.filter(agency=request.user.agency).order_by('supplier_name')
-    supplier_types = AgentSupportSupplier.SUPPLIER_TYPES
+       # suppliers = AgentSupportSupplier.objects.filter(agency=agency).order_by('supplier_name')
+        suppliers = AgentSupportSupplier.objects.all().only('id', 'supplier_name')
+        
+    return render(request, 'agent_support/index.html', {'suppliers': suppliers})
 
-    return render(request, 'agent_support/index.html', {
-        'suppliers': suppliers,
-        'supplier_types': supplier_types,
-    })
 
 @login_required
 def add_agent_supplier(request):
+    agency = request.user.profile.agency
     if request.method == 'POST':
-        form = AgentSupportSupplierForm(request.POST)
+        form = AgentSupportSupplierForm(request.POST, request.FILES)
         if form.is_valid():
             supplier = form.save(commit=False)
-            supplier.user = request.user
-            
-            # Link the supplier to the user's agency
-            if request.user.agency:
-                supplier.agency = request.user.agency
-                supplier.save()
-                messages.success(request, 'Supplier added successfully.')
-                return redirect('agent_support:agent_support')
-            else:
-                messages.error(request, 'You are not associated with any agency. Please contact support.')
-                return redirect('agent_support:agent_support')
-
-        else:
-            messages.error(request, 'Please correct the errors below.')
+            supplier.agency = agency
+            supplier.save()
+            return redirect('agent_support:index')
     else:
         form = AgentSupportSupplierForm()
+    return render(request, 'agent_support/add_supplier.html', {'form': form})
 
-    return render(request, 'agent_support/add_agent_supplier.html', {'form': form})
+
+@login_required
+def edit_agent_supplier(request, pk):
+    agency = request.user.profile.agency
+    supplier = get_object_or_404(AgentSupportSupplier, pk=pk, agency=agency)
+    if request.method == 'POST':
+        form = AgentSupportSupplierForm(request.POST, request.FILES, instance=supplier)
+        if form.is_valid():
+            form.save()
+            return redirect('agent_support:index')
+    else:
+        form = AgentSupportSupplierForm(instance=supplier)
+    return render(request, 'agent_support/edit_supplier.html', {'form': form})

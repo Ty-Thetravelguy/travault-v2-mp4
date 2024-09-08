@@ -1,3 +1,5 @@
+#agent_support/forms.py
+
 from django import forms
 from .models import AgentSupportSupplier
 
@@ -68,17 +70,18 @@ class AgentSupportSupplierForm(forms.ModelForm):
 
     class Meta:
         model = AgentSupportSupplier
-        fields = ['supplier_type', 'supplier_name', 'agent_websites', 'contact_numbers', 
-                  'group_email', 'general_email', 'account_manager', 'account_manager_contact', 
-                  'account_manager_email', 'other', 
-                  'process_1_subject', 'process_1_text', 
-                  'process_2_subject', 'process_2_text',
-                  'process_3_subject', 'process_3_text',
-                  'process_4_subject', 'process_4_text']
+        fields = [
+            'supplier_type', 'supplier_name', 'agent_websites', 'contact_numbers', 
+            'group_email', 'general_email', 'account_manager', 'account_manager_contact', 
+            'account_manager_email', 'other', 
+            'process_1_subject', 'process_1_text', 'process_1_pdf', 
+            'process_2_subject', 'process_2_text', 'process_2_pdf', 
+            'process_3_subject', 'process_3_text', 'process_3_pdf', 
+            'process_4_subject', 'process_4_text', 'process_4_pdf'
+        ]
         widgets = {
-            'supplier_type': forms.Select(attrs={'class': 'form-control'}),
-            'supplier_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'account_manager': forms.TextInput(attrs={'class': 'form-control'}),
-            'account_manager_contact': forms.TextInput(attrs={'class': 'form-control'}),
-            'account_manager_email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'process_1_pdf': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'process_2_pdf': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'process_3_pdf': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'process_4_pdf': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }

@@ -88,15 +88,26 @@
                             <div class="tab-pane fade show active" id="info{{ forloop.counter }}" role="tabpanel"
                                 aria-labelledby="info-tab{{ forloop.counter }}">
                                 <p><strong>Supplier Type:</strong> {{ supplier.get_supplier_type_display }}</p>
-                                <p><strong>Agent Websites:</strong>
-                                    {% for website in supplier.agent_websites|split_urls %}
-                                    <a href="{{ website }}" target="_blank">{{ website }}</a>{% if not forloop.last %},
-                                    {% endif %}
+                                <p><strong>Agent Websites:</strong><br>
+                                    {% for website in supplier.agent_websites|split_by_comma %}
+                                    <a href="{{ website }}" target="_blank">{{ website }}</a><br>
                                     {% endfor %}
                                 </p>
-                                <p><strong>Contact Numbers:</strong> {{ supplier.contact_numbers }}</p>
-                                <p><strong>Group Email:</strong> {{ supplier.group_email }}</p>
-                                <p><strong>General Email:</strong> {{ supplier.general_email }}</p>
+                                <p><strong>Contact Numbers:</strong><br>
+                                    {% for number in supplier.contact_numbers|split_by_comma %}
+                                    {{ number }}<br>
+                                    {% endfor %}
+                                </p>
+                                <p><strong>Group Email:</strong><br>
+                                    {% for email in supplier.group_email|split_by_comma %}
+                                    {{ email }}<br>
+                                    {% endfor %}
+                                </p>
+                                <p><strong>General Email:</strong><br>
+                                    {% for email in supplier.general_email|split_by_comma %}
+                                    {{ email }}<br>
+                                    {% endfor %}
+                                </p>
                                 <p><strong>Account Manager:</strong> {{ supplier.account_manager }}</p>
                                 <p><strong>Account Manager Contact:</strong> {{ supplier.account_manager_contact }}</p>
                                 <p><strong>Account Manager Email:</strong> {{ supplier.account_manager_email }}</p>
@@ -107,6 +118,14 @@
                                 aria-labelledby="process1-tab{{ forloop.counter }}">
                                 <p><strong>Process 1 Subject:</strong> {{ supplier.process_1_subject }}</p>
                                 <p>{{ supplier.process_1_text }}</p>
+                                <p>
+                                    {% if supplier.process_1_pdf %}
+                                    <strong>Uploaded PDF:</strong> <a href="{{ supplier.process_1_pdf.url }}"
+                                        target="_blank">{{ supplier.process_1_pdf.name }}</a>
+                                    {% else %}
+                                    No PDF uploaded for this process.
+                                    {% endif %}
+                                </p>
                             </div>
                             {% endif %}
                             {% if supplier.process_2_subject %}
@@ -114,6 +133,14 @@
                                 aria-labelledby="process2-tab{{ forloop.counter }}">
                                 <p><strong>Process 2 Subject:</strong> {{ supplier.process_2_subject }}</p>
                                 <p>{{ supplier.process_2_text }}</p>
+                                <p>
+                                    {% if supplier.process_2_pdf %}
+                                    <strong>Uploaded PDF:</strong> <a href="{{ supplier.process_2_pdf.url }}"
+                                        target="_blank">{{ supplier.process_2_pdf.name }}</a>
+                                    {% else %}
+                                    No PDF uploaded for this process.
+                                    {% endif %}
+                                </p>
                             </div>
                             {% endif %}
                             {% if supplier.process_3_subject %}
@@ -121,6 +148,14 @@
                                 aria-labelledby="process3-tab{{ forloop.counter }}">
                                 <p><strong>Process 3 Subject:</strong> {{ supplier.process_3_subject }}</p>
                                 <p>{{ supplier.process_3_text }}</p>
+                                <p>
+                                    {% if supplier.process_3_pdf %}
+                                    <strong>Uploaded PDF:</strong> <a href="{{ supplier.process_3_pdf.url }}"
+                                        target="_blank">{{ supplier.process_3_pdf.name }}</a>
+                                    {% else %}
+                                    No PDF uploaded for this process.
+                                    {% endif %}
+                                </p>
                             </div>
                             {% endif %}
                             {% if supplier.process_4_subject %}
@@ -128,12 +163,21 @@
                                 aria-labelledby="process4-tab{{ forloop.counter }}">
                                 <p><strong>Process 4 Subject:</strong> {{ supplier.process_4_subject }}</p>
                                 <p>{{ supplier.process_4_text }}</p>
+                                <p>
+                                    {% if supplier.process_4_pdf %}
+                                    <strong>Uploaded PDF:</strong> <a href="{{ supplier.process_4_pdf.url }}"
+                                        target="_blank">{{ supplier.process_4_pdf.name }}</a>
+                                    {% else %}
+                                    No PDF uploaded for this process.
+                                    {% endif %}
+                                </p>
                             </div>
                             {% endif %}
                         </div>
                     </div>
                     <div class="d-flex justify-content-end my-3 me-3">
-                        <a href="#" class="btn btn-outline-primary btn-sm me-2">
+                        <a href="{% url 'agent_support:edit_agent_supplier' pk=supplier.id %}"
+                            class="btn btn-green btn-sm me-2">
                             <i class="fas fa-edit"></i> Edit
                         </a>
                         <form action="#" method="post" style="display: inline;">

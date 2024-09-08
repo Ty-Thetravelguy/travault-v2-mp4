@@ -1,6 +1,9 @@
 # travault_crm/urls.py
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls.static import static
+from django.conf import settings
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -10,4 +13,7 @@ urlpatterns = [
     path('dashboard/', include(('dashboard.urls', 'dashboard'), namespace='dashboard')),  
     path('agent_support/', include(('agent_support.urls', 'agent_support'), namespace='agent_support')),  
     path('crm/', include(('crm.urls', 'crm'), namespace='crm')),
-]
+] 
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

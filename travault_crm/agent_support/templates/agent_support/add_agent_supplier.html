@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load agent_tags %}
 
 {% block content %}
 <div class="container-fluid bg-gray-200 full-height-bg top-padding">
@@ -8,15 +9,20 @@
             <div class="col-md-8">
                 <div class="card shadow">
                     <div class="card-header">
-                        <h2 class="mb-0 roboto">Add Agent Support Supplier</h2>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="mb-0 roboto">Add Agent Support Supplier</h2>
+                            <a href="{% url 'agent_support:agent_support' %}" class="btn btn-green">
+                                <i class="fas fa-arrow-left"></i> Go Back
+                            </a>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <form method="post" class="mt-4">
+                        <form method="post" enctype="multipart/form-data" class="mt-4">
                             {% csrf_token %}
                             {% for field in form %}
                             <div class="mb-3">
                                 <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                {{ field }}
+                                {{ field|add_class:"form-control" }}
                                 {% if field.help_text %}
                                 <small class="form-text text-muted">{{ field.help_text }}</small>
                                 {% endif %}

@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
         showLoadingSpinner();
         companyModal.hide();
 
+        console.log('Fetching data for website:', website);
+
         fetch(`/crm/fetch-company-data/?website=${encodeURIComponent(website)}`)
             .then(response => {
                 return response.json().then(data => {
@@ -31,19 +33,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             })
             .then(data => {
-                // Combine address components
-                const street = data.street || '';
-                const city = data.city || '';
-                const country = data.country || '';
-                const postcode = (data.postcode || '').toUpperCase();  
-                const fullAddress = [street, city, country, postcode].filter(Boolean).join(', ');
-                
+                console.log('Received data:', data);
                 // Populate the fields
                 const fields = [
                     { name: 'company_name', type: 'input' },
-                    { name: 'company_address', type: 'input', value: fullAddress },
-                    { name: 'email', type: 'input' },
+                    { name: 'street_address', type: 'input' },
+                    { name: 'city', type: 'input' },
+                    { name: 'state_province', type: 'input' },
+                    { name: 'postal_code', type: 'input' },
+                    { name: 'country', type: 'input' },
                     { name: 'phone_number', type: 'input' },
+                    { name: 'email', type: 'input' },
                     { name: 'description', type: 'textarea' },
                     { name: 'linkedin_social_page', type: 'input' },
                 ];
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 fields.forEach(field => {
                     const element = document.querySelector(`${field.type}[name="${field.name}"]`);
                     if (element) {
-                        let value = field.value || data[field.name] || '';
+                        let value = data[field.name] || '';
             
                         // Ensure LinkedIn URL starts with 'https://'
                         if (field.name === 'linkedin_social_page' && value && !value.startsWith('http://') && !value.startsWith('https://')) {
@@ -59,17 +59,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
             
                         element.value = value;
+                        console.log(`Set ${field.name} to:`, value);
+                    } else {
+                        console.warn(`Element not found for field: ${field.name}`);
                     }
                 });
             })
             .catch(error => {
+                console.error('Error fetching company data:', error);
                 alert(`Error: ${error.message || 'An unexpected error occurred. Please try again.'}`);
             })
             .finally(() => {
                 hideLoadingSpinner();
             });
     });
-
     // linked companies search functionality
     const linkedCompaniesSearch = document.getElementById('linked-companies-search');
     const linkedCompaniesSelect = document.querySelector('select[name="linked_companies"]');
@@ -172,5 +175,68 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Initial update of selected companies
         updateSelectedCompanies();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const companyNameFilter = document.getElementById('companyNameFilter');
+    const companyTypeFilter = document.getElementById('companyType');
+    const companyOwnerFilter = document.getElementById('companyOwnerFilter');
+    const tableBody = document.querySelector('.table tbody');
+    const originalRows = Array.from(tableBody.querySelectorAll('tr'));
+
+    function filterTable() {
+        const nameFilter = companyNameFilter.value.toLowerCase();
+        const typeFilter = companyTypeFilter.value;
+        const ownerFilter = companyOwnerFilter.value;
+
+        originalRows.forEach(row => {
+            const name = row.cells[0].textContent.toLowerCase();
+            const owner = row.cells[1].textContent;
+            const type = row.cells[7].textContent;
+
+            const nameMatch = name.includes(nameFilter);
+            const typeMatch = !typeFilter || type === typeFilter;
+            const ownerMatch = !ownerFilter || owner === ownerFilter;
+
+            if (nameMatch && typeMatch && ownerMatch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    companyNameFilter.addEventListener('input', filterTable);
+    companyTypeFilter.addEventListener('change', filterTable);
+    companyOwnerFilter.addEventListener('change', filterTable);
+
+    // Sorting functionality
+    const headers = document.querySelectorAll('th');
+    headers.forEach(header => {
+        header.addEventListener('click', () => {
+            const index = Array.from(header.parentElement.children).indexOf(header);
+            const ascending = header.classList.contains('asc');
+            
+            sortTable(index, !ascending);
+            
+            headers.forEach(h => h.classList.remove('asc', 'desc'));
+            header.classList.add(ascending ? 'desc' : 'asc');
+        });
+    });
+
+    function sortTable(column, asc = true) {
+        const rows = Array.from(tableBody.querySelectorAll('tr:not([style*="display: none"])'));
+        const sortedRows = rows.sort((a, b) => {
+            const aColText = a.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
+            const bColText = b.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
+            return asc ? aColText.localeCompare(bColText) : bColText.localeCompare(aColText);
+        });
+
+        while (tableBody.firstChild) {
+            tableBody.removeChild(tableBody.firstChild);
+        }
+
+        tableBody.append(...sortedRows);
     }
 });

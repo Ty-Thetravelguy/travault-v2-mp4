@@ -2,22 +2,34 @@
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 import requests
-from .models import Company
+from .models import Company, COMPANY_TYPE_CHOICES
 from .forms import CompanyForm
 from urllib.parse import quote
 from django.conf import settings
 from django.db.models import Q
+import logging
 
+logger = logging.getLogger(__name__)
+User = get_user_model()
 
 @login_required
 def crm_index(request):
-    # Fetch companies linked to the logged-in user's agency
     agency = request.user.agency
-    companies = Company.objects.filter(agency=agency)
+    companies = Company.objects.filter(agency=agency).order_by('-create_date')
+    company_owners = User.objects.filter(agency=agency, user_type__in=['admin', 'sales'])
 
-    return render(request, 'crm/index.html', {'companies': companies})
+    print(f"Number of companies fetched: {companies.count()}")  # Debug print
+
+    context = {
+        'companies': companies,
+        'company_type_choices': COMPANY_TYPE_CHOICES,
+        'company_owners': company_owners,
+    }
+
+    return render(request, 'crm/index.html', context)
 
 @login_required
 def company_detail(request, company_id):
@@ -41,7 +53,8 @@ def add_company(request):
         if form.is_valid():
             company = form.save(commit=False)
             company.agency = agency 
-            form.save_m2m()
+            company.save()  # Save the company first
+            form.save_m2m()  # Then save the many-to-many data
             return redirect('crm:index')
     else:
         form = CompanyForm(agency=agency)  # Pass agency to form
@@ -71,13 +84,20 @@ def fetch_company_data(request):
             if 'objects' in data and len(data['objects']) > 0:
                 company_obj = data['objects'][0]
                 location = company_obj.get('locations', [{}])[0]
+                
+                # Extract phone number using only 'string'
+                phone_number = ''
+                if company_obj.get('phoneNumbers'):
+                    phone_number = company_obj['phoneNumbers'][0].get('string', '')
+                
                 company_data = {
                     'company_name': company_obj.get('name', ''),
-                    'street': location.get('street', ''),
+                    'street_address': location.get('street', ''),
                     'city': location.get('city', {}).get('name', ''),
+                    'state_province': location.get('region', {}).get('name', '') or location.get('state', ''),
+                    'postal_code': location.get('postalCode', ''),
                     'country': location.get('country', {}).get('name', ''),
-                    'postcode': location.get('postalCode', ''),
-                    'phone_number': company_obj.get('phoneNumbers', [{}])[0].get('number', ''),
+                    'phone_number': phone_number,
                     'email': next((email['contactString'] for email in company_obj.get('emailAddresses', []) if email.get('contactString')), ''),
                     'description': company_obj.get('description', ''),
                     'linkedin_social_page': next((uri for uri in company_obj.get('allUris', []) if 'linkedin.com' in uri), '')

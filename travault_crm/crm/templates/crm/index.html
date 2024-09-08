@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="container-fluid bg-gray-200 full-height-bg top-padding">
@@ -11,64 +12,64 @@
     </div>
 
     <div class="crm-container py-2 mt-4">
-
         <!-- Filtering Options -->
         <div class="row mb-3">
-            <div class="col-md-4">
+            <div class="col-md-4 mb-2">
                 <input type="text" id="companyNameFilter" class="form-control" placeholder="Search by company name...">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 mb-2">
                 <select id="companyType" class="form-select">
-                    <option value="">All Companies</option>
-                    {% for company in companies %}
-                    <option value="{{ company_type }}">{{ company_type }}</option>
+                    <option value="">All Company Types</option>
+                    {% for type, _ in company_type_choices %}
+                    <option value="{{ type }}">{{ type }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 mb-2">
                 <select id="companyOwnerFilter" class="form-select">
                     <option value="">All Company Owners</option>
-                    <!-- Populate with available owners, e.g., sales users or admins -->
                     {% for owner in company_owners %}
-                    <option value="{{ owner.id }}">{{ owner.username }}</option>
+                    <option value="{{ owner.username }}">{{ owner.username }}</option>
                     {% endfor %}
                 </select>
             </div>
         </div>
 
         <!-- Table Layout -->
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Company Name <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
-                    <th>Company Owner <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
-                    <th>Create Date <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
-                    <th>Last Activity Date <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
-                    <th>Phone Number <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
-                    <th>Ops Team <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
-                    <th>Industry <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
-                    <th>Type <a href="#">&#9650;</a><a href="#">&#9660;</a></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for company in companies %}
-                <tr>
-                    <td><a href="{% url 'crm:company_detail' company.id %}">{{ company.company_name }}</a></td>
-                    <td>{{ company.company_owner }}</td>
-                    <td>{{ company.create_date|date:"d/m/Y H:i" }}</td>
-                    <td>{{ company.last_activity_date|date:"d/m/Y" }}</td>
-                    <td>{{ company.phone_number }}</td>
-                    <td>{{ company.ops_team }}</td>
-                    <td>{{ company.industry }}</td>
-                    <td>{{ company.company_type }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="8" class="text-center">No companies found.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Company Name <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Company Owner <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Create Date <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Last Activity Date <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Phone Number <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Ops Team <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Industry <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Type <span class="sort-icon">&#9650;&#9660;</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for company in companies %}
+                    <tr>
+                        <td><a href="{% url 'crm:company_detail' company.id %}">{{ company.company_name }}</a></td>
+                        <td>{{ company.company_owner }}</td>
+                        <td>{{ company.create_date|date:"d/m/Y H:i" }}</td>
+                        <td>{{ company.last_activity_date|date:"d/m/Y" }}</td>
+                        <td>{{ company.phone_number }}</td>
+                        <td>{{ company.ops_team }}</td>
+                        <td>{{ company.industry }}</td>
+                        <td>{{ company.company_type }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center">No companies found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
         <!-- Pagination Controls (Placeholder) -->
         <nav aria-label="Page navigation">
@@ -86,4 +87,8 @@
         </nav>
     </div>
 </div>
+{% endblock %}
+
+{% block postload_js %}
+<script src="{% static 'js/crm_script.js' %}"></script>
 {% endblock %}

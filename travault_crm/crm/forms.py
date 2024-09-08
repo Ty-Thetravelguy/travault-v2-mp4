@@ -17,7 +17,11 @@ class CompanyForm(forms.ModelForm):
         model = Company
         fields = [
             'company_name',         
-            'company_address', 
+            'street_address',
+            'city',
+            'state_province',
+            'postal_code',
+            'country',
             'phone_number', 
             'email',
             'description',
@@ -37,12 +41,11 @@ class CompanyForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        agency = kwargs.pop('agency', None)  # Pass agency when instantiating the form
+        agency = kwargs.pop('agency', None)
         super().__init__(*args, **kwargs)
         if agency:
             self.fields['linked_companies'].queryset = Company.objects.filter(agency=agency).exclude(id=self.instance.id)
-            # Filter users who are part of the given agency and have the role 'admin' or 'sales'
             self.fields['company_owner'].queryset = User.objects.filter(
                 agency=agency,
-                user_type__in=['admin', 'sales']  # Filter based on user_type
+                user_type__in=['admin', 'sales']
             )

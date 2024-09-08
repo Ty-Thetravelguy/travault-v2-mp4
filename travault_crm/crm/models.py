@@ -18,6 +18,7 @@ INDUSTRY_CHOICES = [
     ('Real Estate', 'Real Estate'),
     ('Media and Entertainment', 'Media and Entertainment'),
     ('Agriculture', 'Agriculture'),
+    ('Pharmaceuticals', 'Pharmaceuticals'),
     ('Telecommunications', 'Telecommunications'),
     ('Legal and Professional Services', 'Legal and Professional Services'),
     ('Fashion and Apparel', 'Fashion and Apparel'),
@@ -53,13 +54,17 @@ ACCOUNT_STATUS_CHOICES = [
 
 class Company(models.Model):
     agency = models.ForeignKey(Agency, on_delete=models.CASCADE, related_name='companies', null=False)   
-    company_name = models.CharField(max_length=255)
-    company_address = models.TextField(blank=True, null=True)
+    company_name = models.CharField(max_length=255, blank=False, null=False)
+    street_address = models.CharField(max_length=255, blank=False, null=False)
+    city = models.CharField(max_length=100, blank=False, null=False)
+    state_province = models.CharField(max_length=100, blank=False, null=False)
+    postal_code = models.CharField(max_length=20, blank=False, null=False)
+    country = models.CharField(max_length=100, blank=False, null=False)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
+    email = models.EmailField(blank=False, null=False)
     description = models.TextField(blank=True, null=True)
     linkedin_social_page = models.URLField(blank=True, null=True)
-    industry = models.CharField(max_length=255, choices=INDUSTRY_CHOICES, blank=True, null=True)
+    industry = models.CharField(max_length=255, choices=INDUSTRY_CHOICES, blank=False, null=False)
     company_type = models.CharField(max_length=255, choices=COMPANY_TYPE_CHOICES, default='Prospect Client')
     company_owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     ops_team = models.CharField(max_length=255, blank=True, null=True)
@@ -67,6 +72,9 @@ class Company(models.Model):
     account_status = models.CharField(max_length=255, choices=ACCOUNT_STATUS_CHOICES, default='Lead')
     create_date = models.DateTimeField(auto_now_add=True) 
     linked_companies = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='linked_to')
+
+    # New fields (these will be added in a new migration)
+
 
     def __str__(self):
         return self.company_name

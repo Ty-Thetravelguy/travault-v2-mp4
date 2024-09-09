@@ -60,7 +60,8 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-
+    'storages',
+    
     # Local apps
     'home',
     'agent_support',

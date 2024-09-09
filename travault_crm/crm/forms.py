@@ -31,7 +31,8 @@ class CompanyForm(forms.ModelForm):
             'company_owner',
             'ops_team',
             'client_type',
-            'account_status'
+            'account_status',
+            'linked_companies',
         ]
         widgets = {
             'company_type': forms.Select(attrs={'class': 'form-control'}),

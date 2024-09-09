@@ -27,14 +27,7 @@
                                 <div class="linked-companies-container">
                                     <input type="text" id="linked-companies-search" class="form-control"
                                         placeholder="Search for companies to link">
-                                    <select name="linked_companies" multiple style="display: none;">
-                                        {% for company in form.linked_companies.queryset %}
-                                        <option value="{{ company.id }}"
-                                            {% if company in form.linked_companies.initial %}selected{% endif %}>
-                                            {{ company.company_name }}
-                                        </option>
-                                        {% endfor %}
-                                    </select>
+                                    <select name="linked_companies" multiple style="display: none;"></select>
                                     <div id="linked-companies-results" class="linked-companies-results"></div>
                                     <div id="selected-companies" class="selected-companies mt-2"></div>
                                 </div>

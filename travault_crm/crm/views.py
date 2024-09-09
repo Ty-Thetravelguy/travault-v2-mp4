@@ -52,7 +52,9 @@ def edit_company(request, pk):
     if request.method == 'POST':
         form = CompanyForm(request.POST, instance=company, agency=request.user.agency)
         if form.is_valid():
-            form.save()
+            company = form.save(commit=False)
+            company.save()  
+            form.save_m2m()  
             return redirect('crm:company_detail', pk=company.pk)
     else:
         form = CompanyForm(instance=company, agency=request.user.agency)
@@ -76,15 +78,15 @@ def delete_company(request, pk):
 
 @login_required
 def add_company(request):
-    agency = request.user.agency  # Get the agency of the logged-in user
+    agency = request.user.agency 
 
     if request.method == 'POST':
-        form = CompanyForm(request.POST, agency=agency)  # Pass agency to form
+        form = CompanyForm(request.POST, agency=agency)  
         if form.is_valid():
             company = form.save(commit=False)
             company.agency = agency 
-            company.save()  # Save the company first
-            form.save_m2m()  # Then save the many-to-many data
+            company.save()  
+            form.save_m2m()  
             return redirect('crm:index')
     else:
         form = CompanyForm(agency=agency)  # Pass agency to form

@@ -9,18 +9,29 @@ load_dotenv()
 # Access variables
 DIFFBOT_API_KEY = os.getenv('DIFFBOT_API_KEY')
 
+SECRET_KEY = os.getenv('SECRET_KEY')
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Debug mode
+DEBUG = os.getenv('DEBUG', 'False') == 'True'  # Casts the string to a boolean
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+# Allowed hosts
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')  # Reads ALLOWED_HOSTS from .env as a comma-separated list
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-23qa%%9xo%=2rk1jeuvr)-4gtem6jalgbso!zt!tzbv$h1t5di'
+# AWS S3 settings
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'eu-west-2') 
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# Static and media files configuration for S3
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+
+
 DEBUG = True
 
 ALLOWED_HOSTS = [

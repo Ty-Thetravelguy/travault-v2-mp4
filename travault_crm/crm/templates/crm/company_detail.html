@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid full-height-bg py-5 bg-gray-200">
+    <div class="container mt-4">
+        <div class="text-center mb-4">
+            <h1 class="project-primary-color">{{ company.company_name }}</h1>
+        </div>
+
+        {% if user.user_type == 'admin' or user.user_type == 'sales' %}
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{% url 'crm:edit_company' pk=company.id %}" class="btn btn-green btn-sm me-2">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <form action="{% url 'crm:delete_company' pk=company.id %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        <ul class="nav nav-tabs" id="companyTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details"
+                    type="button" role="tab" aria-controls="details" aria-selected="true">Company Details</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts" type="button"
+                    role="tab" aria-controls="contacts" aria-selected="false">Company Contacts</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button"
+                    role="tab" aria-controls="notes" aria-selected="false">Company Notes</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button"
+                    role="tab" aria-controls="activity" aria-selected="false">Activity Log</button>
+            </li>
+        </ul>
+
+        <div class="tab-content mt-3" id="companyTabContent">
+            <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Street Address:</strong> {{ company.street_address }}</p>
+                        <p><strong>City:</strong> {{ company.city }}</p>
+                        <p><strong>State/Province:</strong> {{ company.state_province }}</p>
+                        <p><strong>Postal Code:</strong> {{ company.postal_code }}</p>
+                        <p><strong>Country:</strong> {{ company.country }}</p>
+                        <p><strong>Phone Number:</strong> {{ company.phone_number }}</p>
+                        <p><strong>Email:</strong> {{ company.email }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Description:</strong> {{ company.description }}</p>
+                        <p><strong>LinkedIn:</strong> <a href="{{ company.linkedin_social_page }}"
+                                target="_blank">{{ company.linkedin_social_page }}</a></p>
+                        <p><strong>Industry:</strong> {{ company.industry }}</p>
+                        <p><strong>Company Type:</strong> {{ company.get_company_type_display }}</p>
+                        <p><strong>Company Owner:</strong> {{ company.company_owner }}</p>
+                        <p><strong>Ops Team:</strong> {{ company.ops_team }}</p>
+                        <p><strong>Client Type:</strong> {{ company.get_client_type_display }}</p>
+                        <p><strong>Account Status:</strong> {{ company.get_account_status_display }}</p>
+                    </div>
+                </div>
+                {% if company.linked_companies.exists %}
+                <div class="mt-3">
+                    <h4>Linked Companies</h4>
+                    <ul>
+                        {% for linked_company in company.linked_companies.all %}
+                        <li>{{ linked_company.company_name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            <div class="tab-pane fade" id="contacts" role="tabpanel" aria-labelledby="contacts-tab">
+                <!-- Company Contacts content will go here -->
+                <p>Company Contacts information will be displayed here.</p>
+            </div>
+            <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
+                <!-- Company Notes content will go here -->
+                <p>Company Notes will be displayed here.</p>
+            </div>
+            <div class="tab-pane fade" id="activity" role="tabpanel" aria-labelledby="activity-tab">
+                <!-- Activity Log content will go here -->
+                <p>Activity Log will be displayed here.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

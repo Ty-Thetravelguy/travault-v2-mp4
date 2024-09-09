@@ -53,7 +53,7 @@
                 <tbody>
                     {% for company in companies %}
                     <tr>
-                        <td><a href="{% url 'crm:company_detail' company.id %}">{{ company.company_name }}</a></td>
+                        <td><a href="{% url 'crm:company_detail' pk=company.pk %}">{{ company.company_name }}</a></td>
                         <td>{{ company.company_owner }}</td>
                         <td>{{ company.create_date|date:"d/m/Y H:i" }}</td>
                         <td>{{ company.last_activity_date|date:"d/m/Y" }}</td>

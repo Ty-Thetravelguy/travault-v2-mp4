@@ -32,16 +32,41 @@ def crm_index(request):
     return render(request, 'crm/index.html', context)
 
 @login_required
-def company_detail(request, company_id):
-    # Fetch the company object based on the provided company_id and linked to the user's agency
-    agency = request.user.agency
-    company = get_object_or_404(Company, id=company_id, agency=agency)
+def company_detail(request, pk):
+    company = get_object_or_404(Company, pk=pk, agency=request.user.agency)
     
     # Fetch all companies to keep the company list visible as well
-    companies = Company.objects.filter(agency=agency)
+    companies = Company.objects.filter(agency=request.user.agency)
 
-    # Pass both the specific company and the list of companies
-    return render(request, 'crm/index.html', {'companies': companies, 'selected_company': company})
+    context = {
+        'company': company,
+        'companies': companies,
+        'selected_company': company
+    }
+    return render(request, 'crm/company_detail.html', context)
+
+
+@login_required
+def edit_company(request, pk):
+    company = get_object_or_404(Company, pk=pk, agency=request.user.agency)
+    if request.method == 'POST':
+        form = CompanyForm(request.POST, instance=company, agency=request.user.agency)
+        if form.is_valid():
+            form.save()
+            return redirect('crm:company_detail', pk=company.pk)
+    else:
+        form = CompanyForm(instance=company, agency=request.user.agency)
+    return render(request, 'crm/edit_company.html', {'form': form, 'company': company})
+
+
+@login_required
+def delete_company(request, pk):
+    company = get_object_or_404(Company, pk=pk, agency=request.user.agency)
+    if request.method == 'POST':
+        company.delete()
+        return redirect('crm:index')
+    return render(request, 'crm/delete_company_confirm.html', {'company': company})
+
 
 
 @login_required

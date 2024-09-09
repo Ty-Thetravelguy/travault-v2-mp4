@@ -56,7 +56,12 @@ def edit_company(request, pk):
             return redirect('crm:company_detail', pk=company.pk)
     else:
         form = CompanyForm(instance=company, agency=request.user.agency)
-    return render(request, 'crm/edit_company.html', {'form': form, 'company': company})
+    
+    context = {
+        'form': form,
+        'company': company,
+    }
+    return render(request, 'crm/edit_company.html', context)
 
 
 @login_required

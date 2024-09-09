@@ -1,13 +1,68 @@
 {% extends "base.html" %}
 {% load static %}
+{% load crm_tags %}
+
+{% block extra_title %}- Edit Company{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Edit Company: {{ company.company_name }}</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-    </form>
-</div>
+<section id="edit-company" class="bg-gray-200">
+    <div class="container top-padding roboto">
+        <div class="row justify-content-center py-5">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="mb-0 roboto">Edit Company: {{ company.company_name }}</h2>
+                            <a href="{% url 'crm:company_detail' pk=company.pk %}" class="btn btn-green">
+                                <i class="fas fa-arrow-left"></i> Go Back
+                            </a>
+                        </div>
+
+                        <form method="post" action="#" id="editCompanyForm">
+                            {% csrf_token %}
+                            {% for field in form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {% if field.name == 'linked_companies' %}
+                                <div class="linked-companies-container">
+                                    <input type="text" id="linked-companies-search" class="form-control"
+                                        placeholder="Search for companies to link">
+                                    <select name="linked_companies" multiple style="display: none;">
+                                        {% for company in form.linked_companies.queryset %}
+                                        <option value="{{ company.id }}"
+                                            {% if company in form.linked_companies.initial %}selected{% endif %}>
+                                            {{ company.company_name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div id="linked-companies-results" class="linked-companies-results"></div>
+                                    <div id="selected-companies" class="selected-companies mt-2"></div>
+                                </div>
+                                {% else %}
+                                {{ field|add_class:"form-control" }}
+                                {% endif %}
+                                <div class="form-text text-muted">{{ field.help_text }}</div>
+                                {% if field.errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in field.errors %}
+                                    <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block postload_js %}
+<script src="{% static 'js/crm_script.js' %}"></script>
 {% endblock %}

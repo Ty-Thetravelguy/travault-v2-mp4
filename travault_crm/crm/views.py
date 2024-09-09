@@ -53,10 +53,11 @@ def edit_company(request, pk):
         form = CompanyForm(request.POST, instance=company, agency=request.user.agency)
         if form.is_valid():
             company = form.save(commit=False)
-            company.save()  
-            form.save_m2m()  
+            company.save()  # Save the company instance first
+            form.save_m2m()  # Save many-to-many relationships to handle linked companies
             return redirect('crm:company_detail', pk=company.pk)
     else:
+        # Properly initialize the form with the current company instance
         form = CompanyForm(instance=company, agency=request.user.agency)
     
     context = {

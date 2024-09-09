@@ -27,9 +27,15 @@
                                 <div class="linked-companies-container">
                                     <input type="text" id="linked-companies-search" class="form-control"
                                         placeholder="Search for companies to link">
-                                    <select name="linked_companies" multiple style="display: none;"></select>
+                                    {{ field }}
+                                    <!-- Render the select field for linked companies -->
                                     <div id="linked-companies-results" class="linked-companies-results"></div>
-                                    <div id="selected-companies" class="selected-companies mt-2"></div>
+                                    <div id="selected-companies" class="selected-companies mt-2">
+                                        {% for linked_company in company.linked_companies.all %}
+                                        <span
+                                            class="badge me-2 mb-2 selected-company-badge">{{ linked_company.company_name }}</span>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                                 {% else %}
                                 {{ field|add_class:"form-control" }}

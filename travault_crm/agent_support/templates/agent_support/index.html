@@ -41,77 +41,92 @@
                 <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse"
                     aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#agentSupportAccordion">
                     <div class="accordion-body">
-                        <ul class="nav nav-tabs" id="supplierInfoTabs{{ forloop.counter }}" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="info-tab{{ forloop.counter }}" data-bs-toggle="tab"
-                                    data-bs-target="#info{{ forloop.counter }}" type="button" role="tab"
-                                    aria-controls="info{{ forloop.counter }}" aria-selected="true">Information</button>
-                            </li>
-                            {% if supplier.process_1_subject %}
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="process1-tab{{ forloop.counter }}" data-bs-toggle="tab"
-                                    data-bs-target="#process1{{ forloop.counter }}" type="button" role="tab"
-                                    aria-controls="process1{{ forloop.counter }}" aria-selected="false">
-                                    {{ supplier.process_1_subject|default:"Process 1" }}
-                                </button>
-                            </li>
-                            {% endif %}
-                            {% if supplier.process_2_subject %}
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="process2-tab{{ forloop.counter }}" data-bs-toggle="tab"
-                                    data-bs-target="#process2{{ forloop.counter }}" type="button" role="tab"
-                                    aria-controls="process2{{ forloop.counter }}" aria-selected="false">
-                                    {{ supplier.process_2_subject|default:"Process 2" }}
-                                </button>
-                            </li>
-                            {% endif %}
-                            {% if supplier.process_3_subject %}
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="process3-tab{{ forloop.counter }}" data-bs-toggle="tab"
-                                    data-bs-target="#process3{{ forloop.counter }}" type="button" role="tab"
-                                    aria-controls="process3{{ forloop.counter }}" aria-selected="false">
-                                    {{ supplier.process_3_subject|default:"Process 3" }}
-                                </button>
-                            </li>
-                            {% endif %}
-                            {% if supplier.process_4_subject %}
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="process4-tab{{ forloop.counter }}" data-bs-toggle="tab"
-                                    data-bs-target="#process4{{ forloop.counter }}" type="button" role="tab"
-                                    aria-controls="process4{{ forloop.counter }}" aria-selected="false">
-                                    {{ supplier.process_4_subject|default:"Process 4" }}
-                                </button>
-                            </li>
-                            {% endif %}
-                        </ul>
+                        <div class="tabs-wrapper">
+                            <ul class="nav nav-tabs" id="supplierInfoTabs{{ forloop.counter }}" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="info-tab{{ forloop.counter }}"
+                                        data-bs-toggle="tab" data-bs-target="#info{{ forloop.counter }}" type="button"
+                                        role="tab" aria-controls="info{{ forloop.counter }}"
+                                        aria-selected="true">Information</button>
+                                </li>
+                                {% if supplier.process_1_subject %}
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="process1-tab{{ forloop.counter }}" data-bs-toggle="tab"
+                                        data-bs-target="#process1{{ forloop.counter }}" type="button" role="tab"
+                                        aria-controls="process1{{ forloop.counter }}" aria-selected="false">
+                                        {{ supplier.process_1_subject|default:"Process 1" }}
+                                    </button>
+                                </li>
+                                {% endif %}
+                                {% if supplier.process_2_subject %}
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="process2-tab{{ forloop.counter }}" data-bs-toggle="tab"
+                                        data-bs-target="#process2{{ forloop.counter }}" type="button" role="tab"
+                                        aria-controls="process2{{ forloop.counter }}" aria-selected="false">
+                                        {{ supplier.process_2_subject|default:"Process 2" }}
+                                    </button>
+                                </li>
+                                {% endif %}
+                                {% if supplier.process_3_subject %}
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="process3-tab{{ forloop.counter }}" data-bs-toggle="tab"
+                                        data-bs-target="#process3{{ forloop.counter }}" type="button" role="tab"
+                                        aria-controls="process3{{ forloop.counter }}" aria-selected="false">
+                                        {{ supplier.process_3_subject|default:"Process 3" }}
+                                    </button>
+                                </li>
+                                {% endif %}
+                                {% if supplier.process_4_subject %}
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="process4-tab{{ forloop.counter }}" data-bs-toggle="tab"
+                                        data-bs-target="#process4{{ forloop.counter }}" type="button" role="tab"
+                                        aria-controls="process4{{ forloop.counter }}" aria-selected="false">
+                                        {{ supplier.process_4_subject|default:"Process 4" }}
+                                    </button>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
                         <div class="tab-content" id="supplierInfoTabContent{{ forloop.counter }}">
                             <div class="tab-pane fade show active" id="info{{ forloop.counter }}" role="tabpanel"
                                 aria-labelledby="info-tab{{ forloop.counter }}">
-                                <p><strong>Supplier Type:</strong> {{ supplier.get_supplier_type_display }}</p>
-                                <p><strong>Agent Websites:</strong><br>
-                                    {% for website in supplier.agent_websites|split_by_comma %}
-                                    <a href="{{ website }}" target="_blank">{{ website }}</a><br>
-                                    {% endfor %}
-                                </p>
-                                <p><strong>Contact Numbers:</strong><br>
-                                    {% for number in supplier.contact_numbers|split_by_comma %}
-                                    {{ number }}<br>
-                                    {% endfor %}
-                                </p>
-                                <p><strong>Group Email:</strong><br>
-                                    {% for email in supplier.group_email|split_by_comma %}
-                                    {{ email }}<br>
-                                    {% endfor %}
-                                </p>
-                                <p><strong>General Email:</strong><br>
-                                    {% for email in supplier.general_email|split_by_comma %}
-                                    {{ email }}<br>
-                                    {% endfor %}
-                                </p>
-                                <p><strong>Account Manager:</strong> {{ supplier.account_manager }}</p>
-                                <p><strong>Account Manager Contact:</strong> {{ supplier.account_manager_contact }}</p>
-                                <p><strong>Account Manager Email:</strong> {{ supplier.account_manager_email }}</p>
-                                <p><strong>Other:</strong> {{ supplier.other }}</p>
+                                <div class="supplier-info">
+                                    <p><strong>Supplier Type:</strong><br>
+                                        {{ supplier.get_supplier_type_display }}</p>
+
+                                    <p><strong>Agent Websites:</strong><br>
+                                        {% for website in supplier.agent_websites|split_by_comma %}
+                                        <a href="{{ website }}"
+                                            target="_blank">{{ website }}</a>{% if not forloop.last %}<br>{% endif %}
+                                        {% endfor %}</p>
+
+                                    <p><strong>Contact Numbers:</strong><br>
+                                        {% for number in supplier.contact_numbers|split_by_comma %}
+                                        {{ number }}{% if not forloop.last %}<br>{% endif %}
+                                        {% endfor %}</p>
+
+                                    <p><strong>Group Email:</strong><br>
+                                        {% for email in supplier.group_email|split_by_comma %}
+                                        {{ email }}{% if not forloop.last %}<br>{% endif %}
+                                        {% endfor %}</p>
+
+                                    <p><strong>General Email:</strong><br>
+                                        {% for email in supplier.general_email|split_by_comma %}
+                                        {{ email }}{% if not forloop.last %}<br>{% endif %}
+                                        {% endfor %}</p>
+
+                                    <p><strong>Account Manager:</strong><br>
+                                        {{ supplier.account_manager|default:"None" }}</p>
+
+                                    <p><strong>Account Manager Contact:</strong><br>
+                                        {{ supplier.account_manager_contact|default:"None" }}</p>
+
+                                    <p><strong>Account Manager Email:</strong><br>
+                                        {{ supplier.account_manager_email|default:"None" }}</p>
+
+                                    <p><strong>Other:</strong><br>
+                                        {{ supplier.other|default:"" }}</p>
+                                </div>
                             </div>
                             {% if supplier.process_1_subject %}
                             <div class="tab-pane fade" id="process1{{ forloop.counter }}" role="tabpanel"

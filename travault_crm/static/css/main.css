@@ -278,6 +278,42 @@ footer a:hover {
     color: inherit;
 }
 
+/******************** Agent Support  ********************/
+
+
+.tabs-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.scrollable-tabs .nav-tabs {
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.scrollable-tabs .nav-tabs::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and Opera */
+}
+
+.supplier-info p {
+    margin-bottom: 1rem;
+}
+
+.supplier-info p:last-child {
+    margin-bottom: 0;
+}
+
+.supplier-info strong {
+    display: inline-block;
+    margin-bottom: 0;
+}
+
+.supplier-info br {
+    line-height: 1;
+}
 
 /******************** CRM  ********************/
 .crm-container {

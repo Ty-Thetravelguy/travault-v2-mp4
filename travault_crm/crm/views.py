@@ -76,7 +76,6 @@ def delete_company(request, pk):
     return render(request, 'crm/delete_company_confirm.html', {'company': company})
 
 
-
 @login_required
 def add_company(request):
     agency = request.user.agency 

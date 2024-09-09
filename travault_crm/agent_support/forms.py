@@ -114,12 +114,12 @@ class AgentSupportSupplierForm(forms.ModelForm):
 
     def clean_process_4_pdf(self):
         return self.clean_pdf('process_4_pdf')
-
+    
     def clean_pdf(self, field_name):
         pdf = self.cleaned_data.get(field_name)
         if pdf:
             if not pdf.name.lower().endswith('.pdf'):
                 raise ValidationError("Only PDF files are allowed.")
-            if pdf.size > 5 * 1024 * 1024:  # 5 MB limit
-                raise ValidationError("File size cannot exceed 5 MB.")
+            if pdf.size > 10 * 1024 * 1024:  # 10 MB limit
+                raise ValidationError("File size cannot exceed 10 MB.")
         return pdf

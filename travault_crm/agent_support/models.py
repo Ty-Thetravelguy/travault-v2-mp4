@@ -1,9 +1,13 @@
 # agent_support/models.py
 
 from django.db import models
-from django.conf import settings
 from agencies.models import Agency 
+from django.core.files.storage import default_storage
 
+
+def upload_to_s3(instance, filename):
+    # This function will be used for all process PDF fields
+    return f'pdfs/{instance.supplier_type}/{filename}'
 
 class AgentSupportSupplier(models.Model):
     SUPPLIER_TYPES = [
@@ -29,19 +33,19 @@ class AgentSupportSupplier(models.Model):
     
     process_1_subject = models.CharField(max_length=100, blank=True, null=True)
     process_1_text = models.TextField(blank=True, null=True)
-    process_1_pdf = models.FileField(upload_to='pdfs/process_1/', blank=True, null=True)
+    process_1_pdf = models.FileField(upload_to=upload_to_s3, storage=default_storage, blank=True, null=True)
 
     process_2_subject = models.CharField(max_length=100, blank=True, null=True)
     process_2_text = models.TextField(blank=True, null=True)
-    process_2_pdf = models.FileField(upload_to='pdfs/process_2/', blank=True, null=True)
+    process_2_pdf = models.FileField(upload_to=upload_to_s3, storage=default_storage, blank=True, null=True)
 
     process_3_subject = models.CharField(max_length=100, blank=True, null=True)
     process_3_text = models.TextField(blank=True, null=True)
-    process_3_pdf = models.FileField(upload_to='pdfs/process_3/', blank=True, null=True)
+    process_3_pdf = models.FileField(upload_to=upload_to_s3, storage=default_storage, blank=True, null=True)
 
     process_4_subject = models.CharField(max_length=100, blank=True, null=True)
     process_4_text = models.TextField(blank=True, null=True)
-    process_4_pdf = models.FileField(upload_to='pdfs/process_4/', blank=True, null=True)
+    process_4_pdf = models.FileField(upload_to=upload_to_s3, storage=default_storage, blank=True, null=True)
 
     def __str__(self):
         return f"{self.supplier_name} - {self.get_supplier_type_display()}"

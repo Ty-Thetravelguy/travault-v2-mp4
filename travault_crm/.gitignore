@@ -12,3 +12,4 @@ cloudinary_python.txt
 *.pyc
 __pycache__
 .env
+db.sqlite3

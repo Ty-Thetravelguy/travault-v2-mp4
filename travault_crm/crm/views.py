@@ -5,11 +5,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 import requests
-from .models import Company, COMPANY_TYPE_CHOICES
-from .forms import CompanyForm
+from .models import Company, COMPANY_TYPE_CHOICES, Contact
+from .forms import CompanyForm, ContactForm
 from urllib.parse import quote
 from django.conf import settings
-from django.db.models import Q
+from django.db.models import Case, When, BooleanField
 import logging
 
 logger = logging.getLogger(__name__)
@@ -38,10 +38,20 @@ def company_detail(request, pk):
     # Fetch all companies to keep the company list visible as well
     companies = Company.objects.filter(agency=request.user.agency)
 
+    # Sort contacts with primary contacts first
+    contacts = company.contacts.annotate(
+        is_primary=Case(
+            When(is_primary_contact=True, then=True),
+            default=False,
+            output_field=BooleanField(),
+        )
+    ).order_by('-is_primary', 'first_name', 'last_name')
+
     context = {
         'company': company,
         'companies': companies,
-        'selected_company': company
+        'selected_company': company,
+        'contacts': contacts
     }
     return render(request, 'crm/company_detail.html', context)
 
@@ -158,3 +168,32 @@ def search_companies(request):
     
     results = [{'id': company.id, 'text': company.company_name} for company in companies]
     return JsonResponse({'results': results})
+
+
+@login_required
+def add_contact(request, pk):
+    company = get_object_or_404(Company, pk=pk)
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            contact = form.save(commit=False)
+            contact.company = company
+            contact.save()
+            return redirect('crm:contact_detail', pk=contact.pk)
+    else:
+        form = ContactForm()
+    
+    return render(request, 'crm/add_contact.html', {'form': form, 'company': company})
+
+@login_required
+def edit_contact(request, pk):
+    contact = get_object_or_404(Contact, pk=pk)
+    if request.method == 'POST':
+        form = ContactForm(request.POST, instance=contact)
+        if form.is_valid():
+            contact = form.save()
+            return redirect('crm:contact_detail', pk=contact.pk)
+    else:
+        form = ContactForm(instance=contact)
+    
+    return render(request, 'crm/edit_contact.html', {'form': form, 'contact': contact})

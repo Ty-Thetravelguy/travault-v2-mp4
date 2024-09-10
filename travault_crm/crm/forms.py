@@ -1,6 +1,6 @@
 # crm/forms.py
 from django import forms
-from .models import Company
+from .models import Company, Contact
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -50,3 +50,34 @@ class CompanyForm(forms.ModelForm):
                 agency=agency,
                 user_type__in=['admin', 'sales']
             )
+
+
+class ContactForm(forms.ModelForm):
+    is_primary_contact = forms.BooleanField(required=False, label="Is Primary Contact")
+    department = forms.CharField(max_length=100, required=False)
+
+    class Meta:
+        model = Contact
+        fields = ['first_name', 'last_name', 'email', 'phone', 'job_title', 'department', 'is_primary_contact', 'notes']
+        widgets = {
+            'notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            if field != 'is_primary_contact':
+                self.fields[field].widget.attrs.update({'class': 'form-control'})
+        self.fields['is_primary_contact'].widget.attrs.update({'class': 'form-check-input'})
+
+    def clean(self):
+        cleaned_data = super().clean()
+        is_primary = cleaned_data.get('is_primary_contact')
+        company = self.instance.company if self.instance.pk else None
+
+        if is_primary and company:
+            existing_primary = Contact.objects.filter(company=company, is_primary_contact=True).exclude(pk=self.instance.pk).exists()
+            if existing_primary:
+                self.add_error('is_primary_contact', 'There is already a primary contact for this company.')
+
+        return cleaned_data

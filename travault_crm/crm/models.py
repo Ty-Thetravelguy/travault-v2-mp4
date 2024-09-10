@@ -78,3 +78,18 @@ class Company(models.Model):
 
     def __str__(self):
         return self.company_name
+
+
+class Contact(models.Model):
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='contacts')
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    job_title = models.CharField(max_length=100)
+    department = models.CharField(max_length=100, blank=True, null=True)
+    is_primary_contact = models.BooleanField(default=False)
+    notes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"

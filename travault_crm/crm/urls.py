@@ -13,5 +13,5 @@ urlpatterns = [
     path('company/<int:pk>/', views.company_detail, name='company_detail'),
     path('company/<int:pk>/edit/', views.edit_company, name='edit_company'),
     path('company/<int:pk>/delete/', views.delete_company, name='delete_company'),
-
+    path('company/<int:pk>/add-contact/', views.add_contact, name='add_contact'),
 ]

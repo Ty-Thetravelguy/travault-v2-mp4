@@ -14,6 +14,10 @@ html, body {
     color: #001f3f;
 }
 
+.project-secondary-color {
+    color: #00ab8b;
+}
+
 #message-container {
     max-width: 600px;
     margin: 0;

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid full-height-bg top-padding bg-gray-200">
+    <div class="container mt-5">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h1 class="project-primary-color mb-0">Contact Details</h1>
+            </div>
+        </div>
+        <div class="row justify-content-end mb-4">
+            <div class="col-auto">
+                <a href="{% url 'crm:company_detail' pk=contact.company.pk %}" class="btn btn-green">
+                    <i class="fas fa-arrow-left"></i> Back to Company
+                </a>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="card-title">{{ contact.first_name }} {{ contact.last_name }}
+                            {% if contact.is_primary_contact %}
+                            <span class="badge bg-primary">Primary Contact</span>
+                            {% endif %}
+                        </h2>
+                        <p><strong>Company:</strong> {{ contact.company.company_name }}</p>
+                        <p><strong>Job Title:</strong> {{ contact.job_title }}</p>
+                        <p><strong>Department:</strong> {{ contact.department }}</p>
+                        <p><strong>Email:</strong> {{ contact.email }}</p>
+                        <p><strong>Phone:</strong> {{ contact.phone }}</p>
+                        {% if contact.notes %}
+                        <h4 class="mt-4">Notes:</h4>
+                        <p>{{ contact.notes|linebreaks }}</p>
+                        {% endif %}
+                        <div class="mt-4">
+                            <a href="{% url 'crm:edit_contact' pk=contact.id %}" class="btn btn-green">
+                                <i class="fas fa-edit"></i> Edit Contact
+                            </a>
+                            <form action="{% url 'crm:confirm_delete_contact' pk=contact.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

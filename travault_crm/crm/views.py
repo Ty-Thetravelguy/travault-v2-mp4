@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+from django.contrib import messages
 import requests
 from .models import Company, COMPANY_TYPE_CHOICES, Contact
 from .forms import CompanyForm, ContactForm
@@ -185,6 +186,13 @@ def add_contact(request, pk):
     
     return render(request, 'crm/add_contact.html', {'form': form, 'company': company})
 
+
+@login_required
+def contact_detail(request, pk):
+    contact = get_object_or_404(Contact, pk=pk)
+    return render(request, 'crm/contact_detail.html', {'contact': contact})
+
+
 @login_required
 def edit_contact(request, pk):
     contact = get_object_or_404(Contact, pk=pk)
@@ -197,3 +205,24 @@ def edit_contact(request, pk):
         form = ContactForm(instance=contact)
     
     return render(request, 'crm/edit_contact.html', {'form': form, 'contact': contact})
+
+
+
+def delete_contact_view(request, pk):
+    contact = get_object_or_404(Contact, pk=pk)
+    if request.method == "POST":
+        confirmation_name = request.POST.get("confirmation_name")
+        if confirmation_name == contact.first_name + " " + contact.last_name:
+            contact.delete()
+            messages.success(request, "Contact successfully deleted.")
+            return redirect('crm:company_detail', pk=contact.company.pk)
+        else:
+            messages.error(request, "The contact name does not match.")
+    return render(request, 'crm/confirm_delete_contact.html', {'contact': contact})
+
+def confirm_delete_contact(request, pk):
+    contact = get_object_or_404(Contact, pk=pk)
+    context = {
+        'contact': contact
+    }
+    return render(request, 'crm/confirm_delete_contact.html', context)

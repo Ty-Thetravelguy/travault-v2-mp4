@@ -149,7 +149,7 @@ html, body {
     display: none;
 }
 
-/******************** Get started section / Buttons colors ********************/
+/******************** Get started section / Buttons colors / Badge ********************/
 
 
 .btn-get-started,
@@ -167,6 +167,34 @@ html, body {
     background-color: #00ab8b ; 
     color: #fafafa ; 
     border-color: #00ab8b ; 
+}
+
+.btn-special {
+    color: #ffffff;
+    background-color: #00ab8b;
+    border-color: #00ab8b;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-special:hover {
+    background-color: #ffffff;
+    color: #00ab8b;
+    border-color: #00ab8b;
+}
+
+.badge.rounded-pill.text-bg-primary {
+    background-color: #e17d49 !important;
+    color: #fff !important; 
+}
+
+.badge.rounded-pill.text-bg-success {
+    background-color: #00ab8b !important;
+    color: #ffffff; 
+}
+
+.badge.rounded-pill.text-bg-info {
+    background-color: #7d8efe !important;
+    color: #ffffff !important; 
 }
 
 /******************** Features ********************/

@@ -86,10 +86,13 @@ class Contact(models.Model):
     last_name = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=20)
-    mobile = models.CharField(max_length=20, blank=True, null=True)  # New field
+    mobile = models.CharField(max_length=20, blank=True, null=True) 
     job_title = models.CharField(max_length=100)
     department = models.CharField(max_length=100, blank=True, null=True)
     is_primary_contact = models.BooleanField(default=False)
+    is_travel_booker_contact = models.BooleanField(default=False)
+    is_traveller_contact = models.BooleanField(default=False)
+    is_vip_traveller_contact = models.BooleanField(default=False)  
     notes = models.TextField(blank=True, null=True)
 
     def __str__(self):

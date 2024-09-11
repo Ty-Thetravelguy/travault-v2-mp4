@@ -136,7 +136,16 @@
                                         <td>{{ contact.phone }}</td>
                                         <td>
                                             {% if contact.is_primary_contact %}
-                                            <span class="badge bg-primary">Primary</span>
+                                            <span class="badge rounded-pill text-bg-primary me-1">Primary</span>
+                                            {% endif %}
+                                            {% if contact.is_travel_booker_contact %}
+                                            <span class="badge rounded-pill text-bg-success me-1">Travel Booker</span>
+                                            {% endif %}
+                                            {% if contact.is_traveller_contact %}
+                                            <span class="badge rounded-pill text-bg-info me-1">Traveller</span>
+                                            {% endif %}
+                                            {% if contact.is_vip_traveller_contact %}
+                                            <span class="badge rounded-pill text-bg-warning me-1">VIP</span>
                                             {% endif %}
                                         </td>
                                     </tr>

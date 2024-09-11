@@ -9,7 +9,8 @@
     <div class="container top-padding roboto full-height-bg">
         <div class="row mt-4">
             <div class="col-12 text-center">
-                <h1 class="project-primary-color mb-0">Edit Contact for {{ contact.company.company_name }}</h1>
+                <h1 class="project-primary-color mb-0">Edit Contact {{ contact.first_name }} {{ contact.last_name }}
+                </h1>
             </div>
         </div>
 
@@ -30,7 +31,7 @@
                         <form method="post" action="#" id="editContactForm">
                             {% csrf_token %}
                             {% for field in form %}
-                            {% if field.name == 'is_primary_contact' %}
+                            {% if field.name in 'is_primary_contact,is_travel_booker_contact,is_traveller_contact,is_vip_traveller_contact' %}
                             <div class="mb-3 form-check">
                                 {{ field }}
                                 <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -53,7 +54,7 @@
                             {% endif %}
                             {% endfor %}
                             <div class="text-center">
-                                <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
+                                <button type="submit" class="btn btn-special btn-lg">Save Changes</button>
                             </div>
                         </form>
                     </div>

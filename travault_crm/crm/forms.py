@@ -54,11 +54,15 @@ class CompanyForm(forms.ModelForm):
 
 class ContactForm(forms.ModelForm):
     is_primary_contact = forms.BooleanField(required=False, label="Is Primary Contact")
+    is_travel_booker_contact = forms.BooleanField(required=False, label="Is a Travel Booker")
+    is_traveller_contact = forms.BooleanField(required=False, label="Is a Traveller")
+    is_vip_traveller_contact = forms.BooleanField(required=False, label="VIP")
     department = forms.CharField(max_length=100, required=False)
 
     class Meta:
         model = Contact
-        fields = ['first_name', 'last_name', 'email', 'phone', 'mobile', 'job_title', 'department', 'is_primary_contact', 'notes']
+        fields = ['first_name', 'last_name', 'email', 'phone', 'mobile', 'job_title', 'department', 
+                  'is_primary_contact', 'is_travel_booker_contact', 'is_traveller_contact', 'is_vip_traveller_contact', 'notes']
         widgets = {
             'notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
         }
@@ -66,18 +70,7 @@ class ContactForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields:
-            if field != 'is_primary_contact':
+            if field in ['is_primary_contact', 'is_travel_booker_contact', 'is_traveller_contact','is_vip_traveller_contact']:
+                self.fields[field].widget.attrs.update({'class': 'form-check-input'})
+            else:
                 self.fields[field].widget.attrs.update({'class': 'form-control'})
-        self.fields['is_primary_contact'].widget.attrs.update({'class': 'form-check-input'})
-
-    def clean(self):
-        cleaned_data = super().clean()
-        is_primary = cleaned_data.get('is_primary_contact')
-        company = self.instance.company if self.instance.pk else None
-
-        if is_primary and company:
-            existing_primary = Contact.objects.filter(company=company, is_primary_contact=True).exclude(pk=self.instance.pk).exists()
-            if existing_primary:
-                self.add_error('is_primary_contact', 'There is already a primary contact for this company.')
-
-        return cleaned_data

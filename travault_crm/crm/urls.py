@@ -18,4 +18,6 @@ urlpatterns = [
     path('contact/<int:pk>/edit/', views.edit_contact, name='edit_contact'),
     path('contact/<int:pk>/delete/', views.delete_contact_view, name='delete_contact_view'),
     path('contact/<int:pk>/delete/confirm/', views.confirm_delete_contact, name='confirm_delete_contact'),
+    path('company/<int:pk>/add-notes/', views.add_company_notes, name='add_company_notes'),
+    path('company/<int:pk>/edit-notes/', views.edit_company_notes, name='edit_company_notes'),
 ]

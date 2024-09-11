@@ -10,7 +10,9 @@ def add_class(value, css_class):
         return value
     if isinstance(value.field.widget, (CheckboxInput, RadioSelect)):
         return value
-    return value.as_widget(attrs={"class": css_class})
+    existing_classes = value.field.widget.attrs.get('class', '')
+    new_classes = f"{existing_classes} {css_class}".strip()
+    return value.as_widget(attrs={"class": new_classes})
 
 @register.filter(name='attr')
 def set_attr(field, attr_name_value):
@@ -20,3 +22,4 @@ def set_attr(field, attr_name_value):
     attrs = field.field.widget.attrs.copy()
     attrs[attr_name] = attr_value
     return field.as_widget(attrs=attrs)
+

@@ -6,8 +6,8 @@ from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.contrib import messages
 import requests
-from .models import Company, COMPANY_TYPE_CHOICES, Contact
-from .forms import CompanyForm, ContactForm
+from .models import Company, COMPANY_TYPE_CHOICES, Contact, CompanyNotes
+from .forms import CompanyForm, ContactForm, CompanyNotesForm
 from urllib.parse import quote
 from django.conf import settings
 from django.db.models import Case, When, BooleanField
@@ -36,7 +36,7 @@ def crm_index(request):
 def company_detail(request, pk):
     company = get_object_or_404(Company, pk=pk, agency=request.user.agency)
     
-    # Fetch all companies to keep the company list visible as well
+    # Fetch all companies to keep the company list visible
     companies = Company.objects.filter(agency=request.user.agency)
 
     # Sort contacts with primary contacts first
@@ -48,12 +48,29 @@ def company_detail(request, pk):
         )
     ).order_by('-is_primary', 'first_name', 'last_name')
 
+    travel_bookers = contacts.filter(is_travel_booker_contact=True)
+    vip_travellers = contacts.filter(is_vip_traveller_contact=True)
+    
+    try:
+        company_notes = company.notes
+        logger.debug(f"Company notes found for company {company.pk}: {company_notes}")
+    except CompanyNotes.DoesNotExist:
+        company_notes = None
+        logger.debug(f"No company notes found for company {company.pk}")
+
+    transaction_fees = company.transaction_fees.all()
+
     context = {
         'company': company,
         'companies': companies,
         'selected_company': company,
-        'contacts': contacts
+        'contacts': contacts,
+        'travel_bookers': travel_bookers,
+        'vip_travellers': vip_travellers,
+        'company_notes': company_notes,
+        'transaction_fees': transaction_fees,
     }
+    logger.debug(f"Context being passed to template: {context}")
     return render(request, 'crm/company_detail.html', context)
 
 
@@ -232,3 +249,45 @@ def confirm_delete_contact(request, pk):
         'contact': contact
     }
     return render(request, 'crm/confirm_delete_contact.html', context)
+
+
+@login_required
+def add_company_notes(request, pk):
+    company = get_object_or_404(Company, pk=pk)
+    if hasattr(company, 'notes'):
+        return redirect('crm:edit_company_notes', pk=company.pk)
+
+    if request.method == 'POST':
+        form = CompanyNotesForm(request.POST)
+        if form.is_valid():
+            notes = form.save(commit=False)
+            notes.company = company
+            notes.save()
+            return redirect('crm:company_detail', pk=company.pk)
+    else:
+        form = CompanyNotesForm()  # This creates an empty form
+
+    context = {
+        'form': form,
+        'company': company,
+    }
+    return render(request, 'crm/add_company_notes.html', context)
+
+@login_required
+def edit_company_notes(request, pk):
+    company = get_object_or_404(Company, pk=pk)
+    company_notes = get_object_or_404(CompanyNotes, company=company)
+
+    if request.method == 'POST':
+        form = CompanyNotesForm(request.POST, instance=company_notes)
+        if form.is_valid():
+            form.save()
+            return redirect('crm:company_detail', pk=company.pk)
+    else:
+        form = CompanyNotesForm(instance=company_notes)  # This pre-populates the form with existing data
+
+    context = {
+        'form': form,
+        'company': company,
+    }
+    return render(request, 'crm/edit_company_notes.html', context)

@@ -196,8 +196,7 @@ def contact_detail(request, pk):
 @login_required
 def edit_contact(request, pk):
     contact = get_object_or_404(Contact, pk=pk)
-    print(f"Contact: {contact}")
-    print(f"Contact's Company PK: {contact.company.pk}")
+    company = contact.company  # Get the company associated with this contact
 
     if request.method == 'POST':
         form = ContactForm(request.POST, instance=contact)
@@ -207,7 +206,11 @@ def edit_contact(request, pk):
     else:
         form = ContactForm(instance=contact)
 
-    return render(request, 'crm/edit_contact.html', {'form': form, 'contact': contact})
+    return render(request, 'crm/edit_contact.html', {
+        'form': form,
+        'contact': contact,
+        'company': company,  # Pass the company to the template
+    })
 
 
 

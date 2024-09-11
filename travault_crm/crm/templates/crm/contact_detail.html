@@ -15,7 +15,7 @@
                 <div class="row justify-content-end mb-4">
                     <div class="col-auto">
                         <a href="{% url 'crm:company_detail' pk=contact.company.pk %}#contacts" class="btn btn-green">
-                            <i class="fas fa-arrow-left"></i> Back to Company
+                            <i class="fas fa-arrow-left"></i> Go Back
                         </a>
                     </div>
                 </div>
@@ -61,4 +61,7 @@
         </div>
     </div>
 </div>
+{% endblock %}
+{% block postload_js %}
+<script src="{% static 'js/crm_script.js' %}"></script>
 {% endblock %}

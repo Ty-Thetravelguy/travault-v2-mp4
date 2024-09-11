@@ -247,4 +247,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         tableBody.append(...sortedRows);
     }
+
+    function activateTab() {
+        if (window.location.hash === '#contacts') {
+            var contactsTab = new bootstrap.Tab(document.querySelector('#contacts-tab'));
+            contactsTab.show();
+        }
+    }
+
+    // Run initially when the page loads
+    activateTab();
+
+    // Add an event listener for hashchange to handle user manually changing the hash
+    window.addEventListener('hashchange', activateTab);
 });

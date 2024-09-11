@@ -87,13 +87,13 @@ class CompanyNotesForm(forms.ModelForm):
             'corporate_hotel_rates': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
             'corporate_airline_fares': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
             'company_memberships': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-            'travel_policy': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-            'flight_notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-            'accommodation_notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-            'car_hire_notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-            'transfer_notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-            'rail_notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-            'other_notes': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'travel_policy': forms.Textarea(attrs={'rows': 5, 'class': 'form-control'}),
+            'flight_notes': forms.Textarea(attrs={'rows': 5, 'class': 'form-control'}),
+            'accommodation_notes': forms.Textarea(attrs={'rows': 5, 'class': 'form-control'}),
+            'car_hire_notes': forms.Textarea(attrs={'rows': 5, 'class': 'form-control'}),
+            'transfer_notes': forms.Textarea(attrs={'rows': 5, 'class': 'form-control'}),
+            'rail_notes': forms.Textarea(attrs={'rows': 5, 'class': 'form-control'}),
+            'other_notes': forms.Textarea(attrs={'rows': 5, 'class': 'form-control'}),
         }
 
 class TransactionFeeForm(forms.ModelForm):

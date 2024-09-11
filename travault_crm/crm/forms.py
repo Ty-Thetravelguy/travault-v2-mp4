@@ -1,6 +1,6 @@
 # crm/forms.py
 from django import forms
-from .models import Company, Contact
+from .models import Company, Contact, CompanyNotes, TransactionFee
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -74,3 +74,23 @@ class ContactForm(forms.ModelForm):
                 self.fields[field].widget.attrs.update({'class': 'form-check-input'})
             else:
                 self.fields[field].widget.attrs.update({'class': 'form-control'})
+
+
+class CompanyNotesForm(forms.ModelForm):
+    class Meta:
+        model = CompanyNotes
+        exclude = ['company', 'last_updated', 'updated_by']
+        widgets = {
+            'travel_policy': forms.Textarea(attrs={'rows': 4}),
+            'flight_notes': forms.Textarea(attrs={'rows': 4}),
+            'accommodation_notes': forms.Textarea(attrs={'rows': 4}),
+            'car_hire_notes': forms.Textarea(attrs={'rows': 4}),
+            'transfer_notes': forms.Textarea(attrs={'rows': 4}),
+            'rail_notes': forms.Textarea(attrs={'rows': 4}),
+            'other_notes': forms.Textarea(attrs={'rows': 4}),
+        }
+
+class TransactionFeeForm(forms.ModelForm):
+    class Meta:
+        model = TransactionFee
+        fields = ['service', 'online_fee', 'offline_fee']

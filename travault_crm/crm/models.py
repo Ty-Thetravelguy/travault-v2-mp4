@@ -97,3 +97,32 @@ class Contact(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.company})"
+
+class CompanyNotes(models.Model):
+    company = models.OneToOneField(Company, on_delete=models.CASCADE, related_name='notes')
+    account_number = models.CharField(max_length=100, blank=True)
+    fop_limit = models.CharField(max_length=100, blank=True)
+    invoice_references = models.TextField(blank=True)
+    corporate_hotel_rates = models.TextField(blank=True)
+    corporate_airline_fares = models.TextField(blank=True)
+    company_memberships = models.TextField(blank=True)
+    travel_policy = models.TextField(blank=True)
+    flight_notes = models.TextField(blank=True)
+    accommodation_notes = models.TextField(blank=True)
+    car_hire_notes = models.TextField(blank=True)
+    transfer_notes = models.TextField(blank=True)
+    rail_notes = models.TextField(blank=True)
+    other_notes = models.TextField(blank=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Notes for {self.company.company_name}"
+
+class TransactionFee(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='transaction_fees')
+    service = models.CharField(max_length=100)
+    online_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    offline_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.service} fee for {self.company.company_name}"

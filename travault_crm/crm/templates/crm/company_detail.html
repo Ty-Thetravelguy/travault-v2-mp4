@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
+{% load crm_tags %}
+
 
 {% block content %}
 <div class="container-fluid full-height-bg top-padding bg-gray-200">
@@ -32,7 +34,7 @@
 
         <div class="tab-content mt-3" id="companyTabContent">
             <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
-                <div class="row">
+                <div class="row pb-4">
                     <div class="col-md-8">
                         <div class="card shadow">
                             <div class="card-body">
@@ -45,10 +47,10 @@
                                         <p><strong>Country:</strong> {{ company.country }}</p>
                                         <p><strong>Phone Number:</strong> {{ company.phone_number }}</p>
                                         <p><strong>Email:</strong> {{ company.email }}</p>
-                                    </div>
-                                    <div class="col-md-6">
                                         <p><strong>LinkedIn:</strong> <a href="{{ company.linkedin_social_page }}"
                                                 target="_blank">{{ company.linkedin_social_page }}</a></p>
+                                    </div>
+                                    <div class="col-md-6">
                                         <p><strong>Industry:</strong> {{ company.industry }}</p>
                                         <p><strong>Company Type:</strong> {{ company.get_company_type_display }}</p>
                                         <p><strong>Company Owner:</strong> {{ company.company_owner }}</p>
@@ -120,7 +122,7 @@
                                         <th>Job Title</th>
                                         <th>Department</th>
                                         <th>Phone</th>
-                                        <th>Primary Contact</th>
+                                        <th>Tags</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -175,7 +177,9 @@
                                 <ul class="list-group list-group-flush">
                                     {% for booker in travel_bookers %}
                                     <li class="list-group-item">
-                                        <strong>{{ booker.first_name }} {{ booker.last_name }}</strong><br>
+                                        <a href="{% url 'crm:contact_detail' pk=booker.id %}">
+                                            <strong>{{ booker.first_name }} {{ booker.last_name }}</strong>
+                                        </a><br>
                                         Email: {{ booker.email }}<br>
                                         Phone: {{ booker.phone }}<br>
                                         Mobile: {{ booker.mobile }}
@@ -266,25 +270,123 @@
                     <div class="col-md-4">
                         <div class="card shadow">
                             <div class="card-body">
-                                <h4 class="card-title">Transaction Fees</h4>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h4 class="card-title mb-0">Transaction Fees</h4>
+                                    <!-- Button to trigger add modal -->
+                                    <button class="btn btn-sm btn-green" data-bs-toggle="modal"
+                                        data-bs-target="#addFeeModal">
+                                        <i class="fas fa-plus"></i> Add Fee
+                                    </button>
+                                </div>
                                 <table class="table table-sm">
                                     <thead>
                                         <tr>
                                             <th>Service</th>
                                             <th>Online</th>
                                             <th>Offline</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <!-- Loop for Each Transaction Fee -->
                                         {% for fee in transaction_fees %}
                                         <tr>
                                             <td>{{ fee.service }}</td>
                                             <td>{{ fee.online_fee|default_if_none:"-" }}</td>
                                             <td>{{ fee.offline_fee|default_if_none:"-" }}</td>
+                                            <td>
+                                                <!-- Edit Button -->
+                                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                                    data-bs-target="#editFeeModal{{ fee.id }}">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <!-- Delete Button -->
+                                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                                                    data-bs-target="#deleteFeeModal{{ fee.id }}">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </td>
                                         </tr>
+
+                                        <!-- Edit Fee Modal for each transaction fee -->
+                                        <div class="modal fade" id="editFeeModal{{ fee.id }}" tabindex="-1"
+                                            aria-labelledby="editFeeModalLabel{{ fee.id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="editFeeModalLabel{{ fee.id }}">Edit
+                                                            Transaction Fee</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <form method="post"
+                                                        action="{% url 'crm:edit_transaction_fee' pk=fee.id %}">
+                                                        {% csrf_token %}
+                                                        <div class="modal-body">
+                                                            {% if edit_forms %}
+                                                            {% with form=edit_forms|get_item:fee.id %}
+                                                            {% for field in form %}
+                                                            <div class="mb-3">
+                                                                <label for="{{ field.id_for_label }}"
+                                                                    class="form-label">
+                                                                    {{ field.label }}
+                                                                </label>
+                                                                {{ field|add_class:"form-control" }}
+                                                                {% if field.help_text %}
+                                                                <small
+                                                                    class="form-text text-muted">{{ field.help_text }}</small>
+                                                                {% endif %}
+                                                                {% for error in field.errors %}
+                                                                <div class="text-danger">{{ error }}</div>
+                                                                {% endfor %}
+                                                            </div>
+                                                            {% endfor %}
+                                                            {% endwith %}
+                                                            {% else %}
+                                                            <p>No form available for editing this fee.</p>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-primary">Save
+                                                                Changes</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Delete Confirmation Modal -->
+                                        <div class="modal fade" id="deleteFeeModal{{ fee.id }}" tabindex="-1"
+                                            aria-labelledby="deleteFeeModalLabel{{ fee.id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="deleteFeeModalLabel{{ fee.id }}">
+                                                            Confirm Delete</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Are you sure you want to delete the transaction fee for
+                                                        {{ fee.service }}?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                        <form action="{% url 'crm:delete_transaction_fee' pk=fee.id %}"
+                                                            method="post">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         {% empty %}
                                         <tr>
-                                            <td colspan="3">No transaction fees set.</td>
+                                            <td colspan="4">No transaction fees set.</td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
@@ -292,6 +394,46 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Add Fee Modal -->
+                    <div class="modal fade" id="addFeeModal" tabindex="-1" aria-labelledby="addFeeModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="addFeeModalLabel">Add Transaction Fee</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <form method="post" action="{% url 'crm:add_transaction_fee' pk=company.pk %}">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        {% for field in fee_form %}
+                                        <div class="mb-3">
+                                            <label for="{{ field.id_for_label }}" class="form-label">
+                                                {{ field.label }}
+                                            </label>
+                                            {{ field|add_class:"form-control" }}
+                                            {% if field.help_text %}
+                                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                                            {% endif %}
+                                            {% for error in field.errors %}
+                                            <div class="text-danger">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Add Fee</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+
                 </div>
             </div>
             <div class="tab-pane fade" id="activity" role="tabpanel" aria-labelledby="activity-tab">

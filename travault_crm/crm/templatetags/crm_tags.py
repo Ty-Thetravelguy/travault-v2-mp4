@@ -23,3 +23,7 @@ def set_attr(field, attr_name_value):
     attrs[attr_name] = attr_value
     return field.as_widget(attrs=attrs)
 
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
+

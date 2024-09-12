@@ -6,8 +6,8 @@ from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.contrib import messages
 import requests
-from .models import Company, COMPANY_TYPE_CHOICES, Contact, CompanyNotes
-from .forms import CompanyForm, ContactForm, CompanyNotesForm
+from .models import Company, COMPANY_TYPE_CHOICES, Contact, CompanyNotes, TransactionFee
+from .forms import CompanyForm, ContactForm, CompanyNotesForm, TransactionFeeForm
 from urllib.parse import quote
 from django.conf import settings
 from django.db.models import Case, When, BooleanField
@@ -51,6 +51,7 @@ def company_detail(request, pk):
     travel_bookers = contacts.filter(is_travel_booker_contact=True)
     vip_travellers = contacts.filter(is_vip_traveller_contact=True)
     
+    # Fetch company notes, handle if not exists
     try:
         company_notes = company.notes
         logger.debug(f"Company notes found for company {company.pk}: {company_notes}")
@@ -58,7 +59,14 @@ def company_detail(request, pk):
         company_notes = None
         logger.debug(f"No company notes found for company {company.pk}")
 
+    # Fetch transaction fees
     transaction_fees = company.transaction_fees.all()
+    
+    # Create a blank form for adding fees
+    fee_form = TransactionFeeForm()
+
+    # Create a dictionary of edit forms for each fee
+    edit_forms = {fee.id: TransactionFeeForm(instance=fee) for fee in transaction_fees}
 
     context = {
         'company': company,
@@ -69,10 +77,12 @@ def company_detail(request, pk):
         'vip_travellers': vip_travellers,
         'company_notes': company_notes,
         'transaction_fees': transaction_fees,
+        'fee_form': fee_form,  # Add form for creating new transaction fees
+        'edit_forms': edit_forms,  # Edit forms for existing transaction fees
     }
+    
     logger.debug(f"Context being passed to template: {context}")
     return render(request, 'crm/company_detail.html', context)
-
 
 @login_required
 def edit_company(request, pk):
@@ -291,3 +301,35 @@ def edit_company_notes(request, pk):
         'company': company,
     }
     return render(request, 'crm/edit_company_notes.html', context)
+
+
+@login_required
+def add_transaction_fee(request, pk):
+    company = get_object_or_404(Company, pk=pk)
+    if request.method == 'POST':
+        form = TransactionFeeForm(request.POST)
+        if form.is_valid():
+            fee = form.save(commit=False)
+            fee.company = company
+            fee.save()
+            return redirect('crm:company_detail', pk=company.pk)
+    return redirect('crm:company_detail', pk=company.pk)
+
+@login_required
+def edit_transaction_fee(request, pk):
+    fee = get_object_or_404(TransactionFee, pk=pk)
+    if request.method == 'POST':
+        form = TransactionFeeForm(request.POST, instance=fee)
+        if form.is_valid():
+            form.save()
+            return redirect('crm:company_detail', pk=fee.company.pk)
+    return redirect('crm:company_detail', pk=fee.company.pk)
+
+@login_required
+def delete_transaction_fee(request, pk):
+    fee = get_object_or_404(TransactionFee, pk=pk)
+    company_pk = fee.company.pk
+    if request.method == 'POST':
+        fee.delete()
+        return redirect('crm:company_detail', pk=company_pk)
+    return render(request, 'crm/company_detail.html', {'company': fee.company})

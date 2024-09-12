@@ -167,58 +167,8 @@
             <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
                 <div class="row">
                     <div class="col-md-8">
-                        <div class="card shadow">
-                            <div class="card-body">
-                                <h3 class="card-title mb-4">Company Notes</h3>
-                                {% if company_notes %}
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <p><strong>Account Number:</strong> {{ company_notes.account_number }}</p>
-                                        <p><strong>FOP/Limit:</strong> {{ company_notes.fop_limit }}</p>
-                                        <p><strong>Invoice References:</strong> {{ company_notes.invoice_references }}
-                                        </p>
-                                        <p><strong>Corporate Hotel Rates:</strong>
-                                            {{ company_notes.corporate_hotel_rates }}</p>
-                                        <p><strong>Corporate Airline Fares:</strong>
-                                            {{ company_notes.corporate_airline_fares }}</p>
-                                        <p><strong>Company Memberships:</strong> {{ company_notes.company_memberships }}
-                                        </p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h5>Travel Policy</h5>
-                                        <p>{{ company_notes.travel_policy }}</p>
-                                        <h5>Flight Notes</h5>
-                                        <p>{{ company_notes.flight_notes }}</p>
-                                        <h5>Accommodation Notes</h5>
-                                        <p>{{ company_notes.accommodation_notes }}</p>
-                                        <h5>Car Hire Notes</h5>
-                                        <p>{{ company_notes.car_hire_notes }}</p>
-                                        <h5>Transfer Notes</h5>
-                                        <p>{{ company_notes.transfer_notes }}</p>
-                                        <h5>Rail Notes</h5>
-                                        <p>{{ company_notes.rail_notes }}</p>
-                                        <h5>Other Notes</h5>
-                                        <p>{{ company_notes.other_notes }}</p>
-                                    </div>
-                                </div>
-                                <p><strong>Last Updated:</strong> {{ company_notes.last_updated|date:"F d, Y H:i" }}</p>
-                                <div class="mt-3">
-                                    <a href="{% url 'crm:edit_company_notes' pk=company.pk %}" class="btn btn-green">
-                                        <i class="fas fa-edit"></i> Edit Company Notes
-                                    </a>
-                                </div>
-                                {% else %}
-                                <p>No company notes available.</p>
-                                <div class="mt-3">
-                                    <a href="{% url 'crm:add_company_notes' pk=company.pk %}" class="btn btn-green">
-                                        <i class="fas fa-plus"></i> Add Company Notes
-                                    </a>
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
 
-                        <div class="card shadow mt-4">
+                        <div class="card shadow">
                             <div class="card-body">
                                 <h4 class="card-title">Travel Bookers</h4>
                                 {% if travel_bookers %}
@@ -245,7 +195,9 @@
                                 <ul class="list-group list-group-flush">
                                     {% for vip in vip_travellers %}
                                     <li class="list-group-item">
-                                        {{ vip.first_name }} {{ vip.last_name }}
+                                        <a href="{% url 'crm:contact_detail' pk=vip.id %}">
+                                            {{ vip.first_name }} {{ vip.last_name }}
+                                        </a>
                                     </li>
                                     {% endfor %}
                                 </ul>
@@ -254,6 +206,62 @@
                                 {% endif %}
                             </div>
                         </div>
+
+
+                        <div class="card shadow my-4">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h3 class="card-title">Company Notes</h3>
+                                    <a href="{% url 'crm:edit_company_notes' pk=company.pk %}" class="btn btn-green">
+                                        <i class="fas fa-edit"></i> Edit Company Notes
+                                    </a>
+                                </div>
+                                {% if company_notes %}
+                                <div class="row">
+                                    <div class="col-12">
+                                        <p><strong>Account Number:</strong> {{ company_notes.account_number }}</p>
+                                        <p><strong>FOP/Limit:</strong> {{ company_notes.fop_limit }}</p>
+                                        <p><strong>Invoice References:</strong> {{ company_notes.invoice_references }}
+                                        </p>
+                                        <p><strong>Corporate Hotel Rates:</strong>
+                                            {{ company_notes.corporate_hotel_rates|linebreaksbr }}</p>
+                                        <p><strong>Corporate Airline Fares:</strong>
+                                            {{ company_notes.corporate_airline_fares|linebreaksbr }}</p>
+                                        <p><strong>Company Memberships:</strong>
+                                            {{ company_notes.company_memberships|linebreaksbr }}
+                                        </p>
+                                    </div>
+                                    <div class="col-12">
+                                        <h5>Travel Policy</h5>
+                                        <p>{{ company_notes.travel_policy|linebreaksbr }}</p>
+                                        <h5>Flight Notes</h5>
+                                        <p>{{ company_notes.flight_notes|linebreaksbr }}</p>
+                                        <h5>Accommodation Notes</h5>
+                                        <p>{{ company_notes.accommodation_notes|linebreaksbr }}</p>
+                                        <h5>Car Hire Notes</h5>
+                                        <p>{{ company_notes.car_hire_notes|linebreaksbr }}</p>
+                                        <h5>Transfer Notes</h5>
+                                        <p>{{ company_notes.transfer_notes|linebreaksbr }}</p>
+                                        <h5>Rail Notes</h5>
+                                        <p>{{ company_notes.rail_notes|linebreaksbr }}</p>
+                                        <h5>Other Notes</h5>
+                                        <p>{{ company_notes.other_notes|linebreaksbr }}</p>
+                                    </div>
+                                </div>
+                                <p><strong>Last Updated:</strong> {{ company_notes.last_updated|date:"F d, Y H:i" }}</p>
+
+                                {% else %}
+                                <p>No company notes available.</p>
+                                <div class="mt-3">
+                                    <a href="{% url 'crm:add_company_notes' pk=company.pk %}" class="btn btn-green">
+                                        <i class="fas fa-plus"></i> Add Company Notes
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+
                     </div>
                     <div class="col-md-4">
                         <div class="card shadow">

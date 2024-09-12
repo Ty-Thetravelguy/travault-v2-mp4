@@ -34,23 +34,6 @@ def add_agent_supplier(request):
 
     return render(request, 'agent_support/add_agent_supplier.html', {'form': form})
 
-# @login_required
-# def edit_agent_supplier(request, pk):
-#     # Print the storage backend being used
-#     print(default_storage.__class__.__name__)  # This should output 'S3Boto3Storage'
-
-#     agency = request.user.agency
-#     supplier = get_object_or_404(AgentSupportSupplier, pk=pk, agency=agency)
-
-#     if request.method == 'POST':
-#         form = AgentSupportSupplierForm(request.POST, request.FILES, instance=supplier)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('agent_support:agent_support')
-#     else:
-#         form = AgentSupportSupplierForm(instance=supplier)
-
-#     return render(request, 'agent_support/edit_agent_supplier.html', {'form': form, 'supplier': supplier})
 
 @login_required
 def edit_agent_supplier(request, pk):

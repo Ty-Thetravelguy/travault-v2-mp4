@@ -15,25 +15,34 @@
 
         <ul class="nav nav-tabs" id="companyTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details"
-                    type="button" role="tab" aria-controls="details" aria-selected="true">Company Details</button>
+                <a class="nav-link {% if active_tab == 'details' %}active{% endif %}" id="details-tab"
+                    href="{% url 'crm:company_detail_with_tab' pk=company.pk active_tab='details' %}" role="tab"
+                    aria-controls="details"
+                    aria-selected="{% if active_tab == 'details' %}true{% else %}false{% endif %}">Company Details</a>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts" type="button"
-                    role="tab" aria-controls="contacts" aria-selected="false">Company Contacts</button>
+                <a class="nav-link {% if active_tab == 'contacts' %}active{% endif %}" id="contacts-tab"
+                    href="{% url 'crm:company_detail_with_tab' pk=company.pk active_tab='contacts' %}" role="tab"
+                    aria-controls="contacts"
+                    aria-selected="{% if active_tab == 'contacts' %}true{% else %}false{% endif %}">Company Contacts</a>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button"
-                    role="tab" aria-controls="notes" aria-selected="false">Company Notes</button>
+                <a class="nav-link {% if active_tab == 'notes' %}active{% endif %}" id="notes-tab"
+                    href="{% url 'crm:company_detail_with_tab' pk=company.pk active_tab='notes' %}" role="tab"
+                    aria-controls="notes"
+                    aria-selected="{% if active_tab == 'notes' %}true{% else %}false{% endif %}">Company Notes</a>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button"
-                    role="tab" aria-controls="activity" aria-selected="false">Activity Log</button>
+                <a class="nav-link {% if active_tab == 'activity' %}active{% endif %}" id="activity-tab"
+                    href="{% url 'crm:company_detail_with_tab' pk=company.pk active_tab='activity' %}" role="tab"
+                    aria-controls="activity"
+                    aria-selected="{% if active_tab == 'activity' %}true{% else %}false{% endif %}">Activity Log</a>
             </li>
         </ul>
 
         <div class="tab-content mt-3" id="companyTabContent">
-            <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
+            <div class="tab-pane fade {% if active_tab == 'details' %}show active{% endif %}" id="details"
+                role="tabpanel" aria-labelledby="details-tab">
                 <div class="row pb-4">
                     <div class="col-md-8">
                         <div class="card shadow">
@@ -109,7 +118,10 @@
                     </div>
                 </div>
             </div>
-            <div class="tab-pane fade" id="contacts" role="tabpanel" aria-labelledby="contacts-tab">
+
+
+            <div class="tab-pane fade {% if active_tab == 'contacts' %}show active{% endif %}" id="contacts"
+                role="tabpanel" aria-labelledby="contacts-tab">
                 <div class="card shadow">
                     <div class="card-body">
                         <h3 class="card-title mb-4">Company Contacts</h3>
@@ -166,7 +178,10 @@
                     </div>
                 </div>
             </div>
-            <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
+
+
+            <div class="tab-pane fade {% if active_tab == 'notes' %}show active{% endif %}" id="notes" role="tabpanel"
+                aria-labelledby="notes-tab">
                 <div class="row">
                     <div class="col-md-8">
 
@@ -409,7 +424,8 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                                 </div>
-                                <form method="post" action="{% url 'crm:add_transaction_fee' pk=company.pk %}">
+                                <form id="addFeeForm" method="post"
+                                    action="{% url 'crm:add_transaction_fee' pk=company.pk %}">
                                     {% csrf_token %}
                                     <div class="modal-body">
                                         {% for field in fee_form %}
@@ -440,7 +456,10 @@
 
                 </div>
             </div>
-            <div class="tab-pane fade" id="activity" role="tabpanel" aria-labelledby="activity-tab">
+
+
+            <div class="tab-pane fade {% if active_tab == 'activity' %}show active{% endif %}" id="activity"
+                role="tabpanel" aria-labelledby="activity-tab">
                 <!-- Activity Log content will go here -->
                 <p>Activity Log will be displayed here.</p>
             </div>

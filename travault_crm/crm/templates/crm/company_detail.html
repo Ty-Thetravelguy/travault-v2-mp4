@@ -225,14 +225,18 @@
                                     <div class="col-12">
                                         <p><strong>Account Number:</strong> {{ company_notes.account_number }}</p>
                                         <p><strong>FOP/Limit:</strong> {{ company_notes.fop_limit }}</p>
-                                        <p><strong>Invoice References:</strong></p>
-                                        <p>{{ company_notes.invoice_references|linebreaksbr }}</p>
-                                        <p><strong>Corporate Hotel Rates:</strong></p>
-                                        <p>{{ company_notes.corporate_hotel_rates|linebreaksbr }}</p>
-                                        <p><strong>Corporate Airline Fares:</strong></p>
-                                        <p>{{ company_notes.corporate_airline_fares|linebreaksbr }}</p>
-                                        <p><strong>Company Memberships:</strong></p>
-                                        <p>{{ company_notes.company_memberships|linebreaksbr }}</p>
+                                        <p><strong>Invoice References:</strong><br>
+                                            {{ company_notes.invoice_references|linebreaksbr }}
+                                        </p>
+                                        <p><strong>Corporate Hotel Rates:</strong><br>
+                                            {{ company_notes.corporate_hotel_rates|linebreaksbr }}
+                                        </p>
+                                        <p><strong>Corporate Airline Fares:</strong><br>
+                                            {{ company_notes.corporate_airline_fares|linebreaksbr }}
+                                        </p>
+                                        <p><strong>Company Memberships:</strong><br>
+                                            {{ company_notes.company_memberships|linebreaksbr }}
+                                        </p>
                                     </div>
                                     <div class="col-12">
                                         <h5>Travel Policy</h5>

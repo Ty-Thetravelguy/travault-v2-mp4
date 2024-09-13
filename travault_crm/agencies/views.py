@@ -34,18 +34,53 @@ User = get_user_model()
 
 @method_decorator(csrf_protect, name='dispatch')
 class AgencyRegistrationView(CreateView):
+    """
+    View for registering a new agency.
+
+    This view handles the registration of a new agency using a form. It processes
+    both GET requests for displaying the registration form and POST requests for
+    creating a new agency record upon successful form submission.
+
+    Attributes:
+        template_name (str): The path to the template used for rendering the form.
+        form_class (Form): The form class used for agency registration.
+        success_url (str): The URL to redirect to upon successful registration.
+    """
     template_name = 'agencies/registration.html'
     form_class = AgencyRegistrationForm
     success_url = reverse_lazy('dashboard')
 
     def get_form_kwargs(self):
+        """
+        Override the method to remove 'instance' from the form kwargs.
+
+        This ensures that the form does not accidentally get an instance passed
+        from the CreateView, which is not needed for registration forms.
+
+        Returns:
+            dict: The keyword arguments for initializing the form.
+        """
         kwargs = super().get_form_kwargs()
-        kwargs.pop('instance', None) 
+        kwargs.pop('instance', None)
+        logger.debug("Removed 'instance' from form kwargs.")
         return kwargs
 
     def form_valid(self, form):
+        """
+        Handle a valid form submission.
+
+        On successful form validation, this method saves the form, registers the agency,
+        and redirects the user to the success URL with a success message.
+
+        Args:
+            form (Form): The validated form with cleaned data.
+
+        Returns:
+            HttpResponseRedirect: A redirect response to the success URL.
+        """
         try:
             self.object = form.save(self.request)
+            logger.info("Agency registration successful.")
             messages.success(self.request, "Registration successful!")
             return HttpResponseRedirect(self.get_success_url())
         except Exception as e:
@@ -54,24 +89,72 @@ class AgencyRegistrationView(CreateView):
             return self.form_invalid(form)
 
     def form_invalid(self, form):
+        """
+        Handle an invalid form submission.
+
+        Logs form validation errors and returns the form with errors displayed.
+
+        Args:
+            form (Form): The form instance with errors.
+
+        Returns:
+            HttpResponse: A response rendering the form with errors.
+        """
         logger.error(f"Form validation failed: {form.errors}")
         messages.error(self.request, "Please correct the errors below.")
         return super().form_invalid(form)
 
+
 class CustomLoginView(LoginView):
+    """
+    Custom login view to handle user authentication.
+
+    This view renders the login page and handles the login process using the default
+    functionality provided by Django's LoginView.
+    """
     template_name = 'account/account_login.html'
+
     def get(self, request, *args, **kwargs):
+        """
+        Handle GET requests to render the login form.
+
+        Args:
+            request (HttpRequest): The incoming HTTP request from the client.
+
+        Returns:
+            HttpResponse: A response rendering the login form.
+        """
+        logger.info("Rendering login form.")
         return super().get(request, *args, **kwargs)
 
 
 @login_required
 def profile_view(request):
+    """
+    View to display and update the user's profile.
+
+    This view allows users to view and update their profile information. It handles
+    both GET requests for displaying the current profile details and POST requests for
+    updating the profile. Special handling is included for updating email addresses.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request from the client.
+
+    Returns:
+        HttpResponse: Renders the profile template with the profile form,
+        or redirects to the profile view on successful update.
+    """
+    logger.info("Entering profile_view.")
+    start_time = time.time()
+
+    # Fetch the current user and their original email address
     user = request.user
     original_email = user.email
+    logger.debug(f"Fetched user: {user.username} with email: {original_email}")
 
     if request.method == 'POST':
         form = UserForm(request.POST, instance=user)
-        # Exclude fields you don't want to be editable in the profile context
+        # Exclude fields that should not be editable in the profile context
         form.fields.pop('username', None)
         form.fields.pop('user_type', None)
 
@@ -81,93 +164,203 @@ def profile_view(request):
 
             # Check if the email address has changed
             if original_email != new_email:
+                logger.info(f"Email address change detected for user: {user.username}")
                 # Mark the new email as unverified
                 EmailAddress.objects.filter(user=updated_user).delete()  # Remove old email records
                 EmailAddress.objects.create(user=updated_user, email=new_email, primary=True, verified=False)
                 send_email_confirmation(request, updated_user)  # Send verification email
+                logger.info(f"Verification email sent to new address: {new_email}")
 
                 messages.info(request, "The email address has been changed. A verification email has been sent to the new address.")
 
             updated_user.save()
+            logger.info(f"Profile updated for user: {user.username}")
             messages.success(request, "Profile updated successfully!")
             return redirect('/agencies/profile/')  # Adjust to your profile URL name
         else:
+            logger.error(f"Profile update failed with errors: {form.errors}")
             messages.error(request, "Please correct the errors below.")
+
+    # Initialize the form for GET requests
     else:
         form = UserForm(instance=user)
-        # Exclude fields you don't want to be editable in the profile context
+        # Exclude fields that should not be editable in the profile context
         form.fields.pop('username', None)
         form.fields.pop('user_type', None)
+        logger.debug("Initialized form for profile update.")
 
     # Update the template path to match your actual template location
+    logger.info(f"profile_view completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'users/profile.html', {'form': form})
 
 
 @login_required
 def agency_profile_view(request):
+    """
+    View to display and update the agency profile.
+
+    This view allows admins to view and update the agency's profile information.
+    It handles both GET requests for displaying current profile details and POST
+    requests for updating the profile. Only admins have access to this view.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request from the client.
+
+    Returns:
+        HttpResponse: Renders the agency_profile template with the profile form,
+        or redirects to the agency profile view on successful update.
+    """
+    logger.info("Entering agency_profile_view.")
+    start_time = time.time()
+
     # Ensure the user is an admin
     if request.user.user_type != 'admin':
+        logger.warning(f"Non-admin user {request.user.username} tried to access agency profile.")
         messages.error(request, "You do not have permission to access this page.")
         return redirect('agencies:manage_users')
 
     agency = request.user.agency
+    logger.debug(f"Fetched agency: {agency.name} for profile update.")
 
+    # Handle form submission for updating agency profile
     if request.method == 'POST':
         form = AgencyProfileForm(request.POST, instance=agency)
         if form.is_valid():
             form.save()
+            logger.info(f"Agency profile for '{agency.name}' updated successfully.")
             messages.success(request, "Agency profile updated successfully!")
             return redirect('agencies:agency_profile')
         else:
+            logger.error(f"Form validation errors: {form.errors}")
             messages.error(request, "Please correct the errors below.")
+
+    # Initialize the form for GET requests
     else:
         form = AgencyProfileForm(instance=agency)
+        logger.debug("Initialized form for agency profile update.")
 
+    logger.info(f"agency_profile_view completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'agencies/agency_profile.html', {'form': form})
 
 
 @method_decorator(login_required, name='dispatch')
 class CustomLogoutView(LogoutView):
+    """
+    Custom logout view to handle user logout.
+
+    This view renders a custom logout template upon logging out the user.
+    """
     template_name = 'account/account_logout.html'
 
+
 class CustomPasswordResetView(PasswordResetView):
+    """
+    Custom password reset view to initiate password reset process.
+
+    This view renders a custom password reset template and handles the sending
+    of password reset emails to users who request it.
+    """
     template_name = 'account/password_reset.html'
 
+
 class CustomPasswordResetDoneView(PasswordResetDoneView):
+    """
+    Custom view to display the password reset done page.
+
+    This view renders a custom template confirming that the password reset email
+    has been sent to the user.
+    """
     template_name = 'account/password_reset_done.html'
 
+
 class CustomPasswordResetFromKeyView(PasswordResetFromKeyView):
+    """
+    Custom view to handle password reset using a key from the email.
+
+    This view allows users to reset their password using a link received in
+    their email after initiating a password reset.
+    """
     template_name = 'account/password_reset_from_key.html'
 
+
 class CustomPasswordResetFromKeyDoneView(PasswordResetFromKeyDoneView):
+    """
+    Custom view to display the password reset completion page.
+
+    This view renders a custom template confirming that the password has been
+    successfully reset using the key from the email.
+    """
     template_name = 'account/password_reset_from_key_done.html'
+
 
 @login_required
 def manage_users(request):
+    """
+    View to manage users within the current user's agency.
+
+    This view displays a list of users associated with the agency, excluding
+    superusers, and allows the admin to manage these users.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request from the client.
+
+    Returns:
+        HttpResponse: Renders the manage_users template with a list of users.
+    """
+    logger.info("Entering manage_users view.")
+    start_time = time.time()
+
+    # Fetch users associated with the user's agency, excluding superusers
     user_agency = request.user.agency
     users = CustomUser.objects.filter(agency=user_agency, is_superuser=False)
+    logger.debug(f"Fetched {users.count()} users for agency '{user_agency.name}'.")
+
+    logger.info(f"manage_users completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'users/manage_users.html', {'users': users})
+
 
 @login_required
 def add_user(request):
+    """
+    View to add a new user to the current user's agency.
+
+    This view allows the admin to add new users by submitting a form. It handles
+    both GET requests for displaying the blank form and POST requests for creating
+    the new user. Upon successful addition, it sends a confirmation email for the
+    new user to set their password.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request from the client.
+
+    Returns:
+        HttpResponse: Renders the add_user template with the form, or redirects
+        to the manage users view on successful addition.
+    """
+    logger.info("Entering add_user view.")
+    start_time = time.time()
+
+    # Handle form submission for adding a new user
     if request.method == 'POST':
         user_form = UserForm(request.POST)
         if user_form.is_valid():
             new_user = user_form.save(commit=False)
             new_user.agency = request.user.agency
             new_user.save()
+            logger.info(f"New user '{new_user.username}' added to agency '{new_user.agency.name}'.")
 
             # Create the email confirmation object
             EmailAddress.objects.create(user=new_user, email=new_user.email, primary=True, verified=False)
+            logger.debug(f"Email confirmation object created for user '{new_user.username}'.")
 
             # Generate the token and uid for the confirmation link
             token = default_token_generator.make_token(new_user)
             uid = urlsafe_base64_encode(force_bytes(new_user.pk))
 
-            # Correct confirmation URL to match your defined URL pattern
+            # Construct the confirmation URL
             confirm_url = request.build_absolute_uri(
                 reverse('agencies:confirm_email_and_setup_password', args=[uid, token])
             )
+            logger.debug(f"Confirmation URL generated for user '{new_user.username}': {confirm_url}")
 
             # Send the custom confirmation email
             context = {
@@ -187,90 +380,181 @@ def add_user(request):
                 [new_user.email],
                 fail_silently=False,
             )
+            logger.info(f"Confirmation email sent to '{new_user.email}'.")
 
             messages.success(request, "User has been added successfully and an email has been sent to confirm and set up the password!")
             return redirect('agencies:manage_users')
         else:
+            logger.error(f"Form validation errors: {user_form.errors}")
             messages.error(request, "Please correct the errors below.")
+
+    # Initialize the form for GET requests
     else:
         user_form = UserForm()
+        logger.debug("Initialized form for adding a new user.")
 
+    logger.info(f"add_user completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'users/add_user.html', {'user_form': user_form})
 
 @login_required
 def edit_user(request, user_id):
+    """
+    View to edit user details.
+
+    This view allows admins to update a user's details. It handles both GET requests
+    for displaying the current user details and POST requests for updating the user
+    information. Special handling is included for email address changes, triggering
+    a verification email.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request from the client.
+        user_id (int): The ID of the user to be edited.
+
+    Returns:
+        HttpResponse: Renders the edit_user template with the form,
+        or redirects to the manage users view on successful update.
+    """
+    logger.info(f"Entering edit_user view for user_id={user_id}.")
+    start_time = time.time()
+
+    # Fetch the user to be edited
     user = get_object_or_404(CustomUser, id=user_id)
     original_email = user.email
-    
+    logger.debug(f"Fetched user: {user.username} with original email: {original_email}.")
+
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=user)
         if user_form.is_valid():
             updated_user = user_form.save(commit=False)
             new_email = updated_user.email
-            
+
+            # Check if the email address has changed
             if original_email != new_email:
+                logger.info(f"Email address change detected for user: {user.username}.")
+                # Mark the new email as unverified
                 EmailAddress.objects.filter(user=updated_user).delete()
                 email_address = EmailAddress.objects.create(user=updated_user, email=new_email, primary=True, verified=False)
                 send_email_confirmation(request, updated_user)
-                
+                logger.info(f"Verification email sent to new address: {new_email}.")
+
                 messages.info(request, "The email address has been changed. A verification email has been sent to the new address.")
-            
+
             updated_user.save()
+            logger.info(f"User details updated successfully for user: {user.username}.")
             messages.success(request, "User details updated successfully!")
             return redirect('agencies:manage_users')
         else:
+            logger.error(f"Form validation errors: {user_form.errors}.")
             messages.error(request, "Please correct the errors below.")
+
+    # Initialize the form for GET requests
     else:
         user_form = UserForm(instance=user)
+        logger.debug("Initialized form for editing user.")
 
+    logger.info(f"edit_user completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'users/edit_user.html', {
         'user_form': user_form,
         'edit_user': user
     })
 
+
 @login_required
 def delete_user(request, user_id):
+    """
+    View to delete a specific user.
+
+    This view allows admins to delete a user by confirming their username. It handles
+    the deletion upon POST request and redirects back to the manage users view.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request from the client.
+        user_id (int): The ID of the user to be deleted.
+
+    Returns:
+        HttpResponse: Redirects to the manage users view on successful deletion,
+        or renders the delete_user template for confirmation.
+    """
+    logger.info(f"Entering delete_user view for user_id={user_id}.")
+    start_time = time.time()
+
+    # Fetch the user to be deleted
     user = get_object_or_404(CustomUser, id=user_id)
+    logger.debug(f"Fetched user: {user.username} for deletion.")
 
     if request.method == 'POST':
         confirmation_name = request.POST.get('confirmation_name')
         if confirmation_name == user.username:
             user.delete()
+            logger.info(f"User '{user.username}' has been deleted successfully.")
             messages.success(request, "User has been deleted successfully!")
             return redirect('agencies:manage_users')
         else:
+            logger.warning(f"Username confirmation failed for deleting user '{user.username}'.")
             messages.error(request, "The username entered does not match. Please try again.")
 
+    logger.info(f"delete_user completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'users/delete_user.html', {
         'delete_user': user
     })
 
+
 def confirm_email_and_setup_password(request, uidb64, token):
+    """
+    View to confirm email and allow the user to set their password.
+
+    This view is used after a user clicks on an email confirmation link. It verifies
+    the token and allows the user to set a new password if the link is valid. If the
+    link is invalid or expired, an error message is displayed.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request from the client.
+        uidb64 (str): Base64 encoded user ID.
+        token (str): Token to verify the user's email.
+
+    Returns:
+        HttpResponse: Renders the setup_password template with the password form,
+        or redirects to the login view on success or error.
+    """
+    logger.info(f"Entering confirm_email_and_setup_password with uidb64={uidb64}.")
+    start_time = time.time()
+
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
-        user = get_object_or_404(User, pk=uid)
+        user = get_object_or_404(CustomUser, pk=uid)
+        logger.debug(f"Fetched user: {user.username} for email confirmation and password setup.")
 
         if default_token_generator.check_token(user, token):
             email_address = EmailAddress.objects.filter(user=user, email=user.email).first()
             if email_address and not email_address.verified:
                 email_address.verified = True
                 email_address.save()
+                logger.info(f"Email address '{email_address.email}' verified for user '{user.username}'.")
 
             if request.method == 'POST':
                 form = SetPasswordForm(user, request.POST)
                 if form.is_valid():
                     form.save()
+                    logger.info(f"Password set successfully for user '{user.username}'.")
                     messages.success(request, "Your password has been set successfully! You can now log in.")
                     return redirect('account_login')
+                else:
+                    logger.error(f"Password form validation failed: {form.errors}.")
+
+            # Initialize the form for GET requests
             else:
                 form = SetPasswordForm(user)
+                logger.debug("Initialized SetPasswordForm for setting a new password.")
 
+            logger.info(f"confirm_email_and_setup_password completed in {time.time() - start_time:.2f} seconds.")
             return render(request, 'account/setup_password.html', {'form': form})
 
         else:
+            logger.warning(f"Invalid or expired token for user '{user.username}'.")
             messages.error(request, "The confirmation link is invalid or has expired.")
             return redirect('account_login')
 
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+        logger.error("Invalid confirmation link.")
         messages.error(request, "The confirmation link is invalid.")
         return redirect('account_login')

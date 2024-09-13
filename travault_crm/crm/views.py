@@ -318,30 +318,21 @@ def edit_company_notes(request, pk):
 
 @login_required
 def add_transaction_fee(request, pk):
-    print(f"Entered add_transaction_fee with company pk={pk}")
     company = get_object_or_404(Company, pk=pk)
-    print(f"Fetched company: {company.company_name}")
 
     if request.method == 'POST':
-        print("Request method is POST")
-        print(f"POST data: {request.POST}")
 
         form = TransactionFeeForm(request.POST)
-        print(f"Initialised TransactionFeeForm with data: {form.data}")
 
         if form.is_valid():
-            print("Form is valid")
             fee = form.save(commit=False)
             fee.company = company
             fee.save()
-            print(f"Saved fee: {fee}. Current transaction fees: {company.transaction_fees.count()}")
-
             messages.success(request, f"Transaction fee has been successfully added to '{company.company_name}'.")
             
             # Redirect to the company detail view with 'notes' tab active
             return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='notes')
         else:
-            print(f"Form is invalid. Errors: {form.errors}")
             logger.error(f"Form errors: {form.errors}")
             messages.error(request, "There was an error adding the transaction fee. Please correct the errors below.")
 
@@ -356,7 +347,6 @@ def add_transaction_fee(request, pk):
             })
 
     # If not a POST request, redirect back to the notes tab
-    print(f"Unexpected request method: {request.method}, redirecting back to notes tab")
     return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='notes')
 
 

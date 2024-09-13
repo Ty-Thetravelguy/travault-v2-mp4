@@ -6,18 +6,32 @@ from .models import Agency, CustomUser
 import re
 
 class AgencyRegistrationForm(SignupForm):
+    """
+    Form for registering a new agency, extending the allauth SignupForm.
+
+    Fields:
+        - company_name: The name of the agency.
+        - company_address: The full address of the agency, expecting up to 6 lines.
+        - vat_number: The VAT number of the agency, must be exactly 9 digits.
+        - company_reg_number: The company registration number, either 8 digits or 2 letters followed by 6 digits.
+        - phone_number: The contact phone number for the agency.
+        - contact_full_name: The full name of the primary contact person.
+        - employees: The size range of the agency in terms of employees.
+        - business_focus: The main business focus of the agency.
+        - agree_terms: Checkbox to agree to the terms and conditions.
+    """
+
     company_name = forms.CharField(max_length=100, required=True)
     company_address = forms.CharField(
         widget=forms.Textarea(attrs={'rows': 6}),
         required=True,
-        help_text="Enter your address, with each line separated by a newline character. Please provide 6 lines."
+        help_text="Enter your address, with each line separated by a newline character. Please provide up to 6 lines."
     )
     vat_number = forms.CharField(max_length=9, required=True, label="VAT Number")
     company_reg_number = forms.CharField(max_length=8, required=True, label="Company Registration Number")
     phone_number = forms.CharField(max_length=20, required=True)
     contact_full_name = forms.CharField(max_length=100, required=True, label="Primary Contact Full Name",
                                         help_text="Enter the full name (first and last name) of the primary contact.")
-    # email and username are already included in SignupForm
     employees = forms.ChoiceField(choices=[
         ('', 'Select range'),
         ('1-10', '1-10'),
@@ -31,10 +45,12 @@ class AgencyRegistrationForm(SignupForm):
         ('leisure', 'Leisure Travel'),
         ('mixed', 'Mixed')
     ], required=True)
-    # password1 and password2 are already included in SignupForm
     agree_terms = forms.BooleanField(required=True)
 
     def __init__(self, *args, **kwargs):
+        """
+        Initializes the form and orders fields as specified.
+        """
         super().__init__(*args, **kwargs)
         # Reorder the fields exactly as specified
         field_order = [
@@ -45,12 +61,30 @@ class AgencyRegistrationForm(SignupForm):
         self.order_fields(field_order)
 
     def clean_company_name(self):
+        """
+        Validates the company name to ensure it is unique.
+
+        Raises:
+            ValidationError: If a company with the same name already exists.
+
+        Returns:
+            str: Cleaned data for the company_name field.
+        """
         company_name = self.cleaned_data.get('company_name')
-        if Agency.objects.filter(name=company_name).exists():
+        if Agency.objects.filter(agency_name=company_name).exists():  # Corrected field name
             raise forms.ValidationError("A company with this name already exists.")
         return company_name
 
     def clean_vat_number(self):
+        """
+        Validates the VAT number to ensure it is exactly 9 digits and unique.
+
+        Raises:
+            ValidationError: If the VAT number is not 9 digits or already exists.
+
+        Returns:
+            str: Cleaned data for the vat_number field.
+        """
         vat_number = self.cleaned_data.get('vat_number')
         if not vat_number.isdigit() or len(vat_number) != 9:
             raise forms.ValidationError("VAT number must be exactly 9 digits.")
@@ -59,6 +93,15 @@ class AgencyRegistrationForm(SignupForm):
         return vat_number
 
     def clean_company_reg_number(self):
+        """
+        Validates the company registration number to match expected formats and uniqueness.
+
+        Raises:
+            ValidationError: If the registration number does not match the pattern or already exists.
+
+        Returns:
+            str: Cleaned data for the company_reg_number field.
+        """
         reg_number = self.cleaned_data.get('company_reg_number')
         if not re.match(r'^\d{8}$|^[A-Z]{2}\d{6}$', reg_number):
             raise forms.ValidationError("Company registration number must be 8 digits or 2 letters followed by 6 digits.")
@@ -67,6 +110,15 @@ class AgencyRegistrationForm(SignupForm):
         return reg_number
 
     def clean_company_address(self):
+        """
+        Validates the company address to ensure it does not exceed 6 lines.
+
+        Raises:
+            ValidationError: If the address exceeds 6 lines.
+
+        Returns:
+            str: Cleaned data for the company_address field.
+        """
         address = self.cleaned_data.get('company_address')
         lines = [line for line in address.split('\n') if line.strip()]  # Ignore empty lines
         if len(lines) > 6:
@@ -74,6 +126,12 @@ class AgencyRegistrationForm(SignupForm):
         return address
 
     def save(self, request):
+        """
+        Saves the form data, creating a user and linking them to a new agency.
+
+        Returns:
+            user: The newly created user with linked agency.
+        """
         user = super(AgencyRegistrationForm, self).save(request)
         
         # Split the full name into first and last name
@@ -91,13 +149,12 @@ class AgencyRegistrationForm(SignupForm):
         else:
             user.user_type = 'admin'
         
-        # Save the user with updated names and role
-        user.save()
+        user.save()  # Save the user with updated names and role
         
         # Create the agency linked to the user
         address_lines = self.cleaned_data['company_address'].split('\n')
         agency = Agency.objects.create(
-            name=self.cleaned_data['company_name'],
+            agency_name=self.cleaned_data['company_name'],  # Corrected field name
             address='\n'.join(address_lines),
             phone=self.cleaned_data['phone_number'],
             email=user.email,
@@ -114,7 +171,18 @@ class AgencyRegistrationForm(SignupForm):
         
         return user
 
+
 class UserForm(forms.ModelForm):
+    """
+    Form for creating and updating CustomUser instances.
+
+    Fields:
+        - username: The username for the user.
+        - email: The email address of the user.
+        - first_name: The first name of the user.
+        - last_name: The last name of the user.
+        - user_type: The type of user (e.g., admin, agent).
+    """
     class Meta:
         model = CustomUser
         fields = ['username', 'email', 'first_name', 'last_name', 'user_type']
@@ -128,11 +196,25 @@ class UserForm(forms.ModelForm):
 
 
 class AgencyProfileForm(forms.ModelForm):
+    """
+    Form for updating an Agency's profile.
+
+    Fields:
+        - agency_name: The name of the agency.
+        - address: The address of the agency.
+        - vat_number: The VAT number of the agency.
+        - company_reg_number: The company registration number of the agency.
+        - phone: The contact phone number for the agency.
+        - email: The contact email for the agency.
+        - employees: The size range of the agency in terms of employees.
+        - business_focus: The main business focus of the agency.
+        - contact_name: The primary contact person's name for the agency.
+    """
     class Meta:
         model = Agency
         fields = ['agency_name', 'address', 'vat_number', 'company_reg_number', 'phone', 'email', 'employees', 'business_focus', 'contact_name']
         widgets = {
-            'agency_name': forms.TextInput(attrs={'class': 'form-control'}),  # Use agency_name
+            'agency_name': forms.TextInput(attrs={'class': 'form-control'}), 
             'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 6}),
             'vat_number': forms.TextInput(attrs={'class': 'form-control'}),
             'company_reg_number': forms.TextInput(attrs={'class': 'form-control'}),

@@ -33,7 +33,7 @@ def crm_index(request):
 @login_required
 def company_detail(request, pk, active_tab='details'):
     company = get_object_or_404(Company, pk=pk, agency=request.user.agency)
-    
+
     # Fetch all companies to keep the company list visible
     companies = Company.objects.filter(agency=request.user.agency)
 
@@ -52,14 +52,13 @@ def company_detail(request, pk, active_tab='details'):
     # Fetch company notes, handle if not exists
     try:
         company_notes = company.notes
-        logger.debug(f"Company notes found for company {company.pk}: {company_notes}")
+
     except CompanyNotes.DoesNotExist:
         company_notes = None
-        logger.debug(f"No company notes found for company {company.pk}")
 
     # Fetch transaction fees
     transaction_fees = company.transaction_fees.all()
-    
+
     # Create a blank form for adding fees
     fee_form = TransactionFeeForm()
 
@@ -79,8 +78,7 @@ def company_detail(request, pk, active_tab='details'):
         'edit_forms': edit_forms,  # Edit forms for existing transaction fees
         'active_tab': active_tab or 'details',  # Set a default tab if not provided
     }
-    
-    logger.debug(f"Context being passed to template: {context}")
+
     return render(request, 'crm/company_detail.html', context)
 
 @login_required
@@ -320,32 +318,48 @@ def edit_company_notes(request, pk):
 
 @login_required
 def add_transaction_fee(request, pk):
+    print(f"Entered add_transaction_fee with company pk={pk}")
     company = get_object_or_404(Company, pk=pk)
+    print(f"Fetched company: {company.company_name}")
+
     if request.method == 'POST':
+        print("Request method is POST")
+        print(f"POST data: {request.POST}")
+
         form = TransactionFeeForm(request.POST)
+        print(f"Initialised TransactionFeeForm with data: {form.data}")
+
         if form.is_valid():
+            print("Form is valid")
             fee = form.save(commit=False)
             fee.company = company
             fee.save()
+            print(f"Saved fee: {fee}. Current transaction fees: {company.transaction_fees.count()}")
+
             messages.success(request, f"Transaction fee has been successfully added to '{company.company_name}'.")
-            # Redirect to the correct tab
-            return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='fees')
+            
+            # Redirect to the company detail view with 'notes' tab active
+            return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='notes')
         else:
-            # Log form errors and render the template with errors
+            print(f"Form is invalid. Errors: {form.errors}")
             logger.error(f"Form errors: {form.errors}")
             messages.error(request, "There was an error adding the transaction fee. Please correct the errors below.")
-            # Return a rendered response with the correct context
+
+            # Render the response with form errors if submission fails
             return render(request, 'crm/company_detail.html', {
                 'company': company,
                 'form': form,
                 'transaction_fees': company.transaction_fees.all(),
                 'contacts': company.contacts.all(),
                 'company_notes': getattr(company, 'notes', None),
-                'active_tab': 'fees',
+                'active_tab': 'fees',  # Show the tab relevant to fees
             })
 
-    # If not a POST request, redirect back to the fees tab
-    return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='fees')
+    # If not a POST request, redirect back to the notes tab
+    print(f"Unexpected request method: {request.method}, redirecting back to notes tab")
+    return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='notes')
+
+
 
 
 @login_required

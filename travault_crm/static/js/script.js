@@ -1,15 +1,23 @@
+/**
+ * Initializes event listeners and adjusts the page layout on document load.
+ */
 document.addEventListener('DOMContentLoaded', function() {
+    // Select navbar and other elements
     const navbar = document.querySelector(".home-nav");
     const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
     const sections = document.querySelectorAll('section');
 
+    // Check if the current page is the home page
+    const isHomePage = window.location.pathname === '/';
 
-    const isHomePage = window.location.pathname === '/';  
-
+    /**
+     * Handles navigation link clicks for smooth scrolling or redirection.
+     */
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             const targetId = this.getAttribute('href');
 
+            // Smooth scrolling for links on the home page
             if (targetId.startsWith('#') && isHomePage) {
                 e.preventDefault();
                 const targetSection = document.querySelector(targetId);
@@ -21,14 +29,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         behavior: 'smooth'
                     });
                 }
-            } else if (targetId.startsWith('#') && !isHomePage) {
+            } 
+            // Redirect to home and scroll if not on home page
+            else if (targetId.startsWith('#') && !isHomePage) {
                 e.preventDefault();
-                window.location.href = '/' + targetId;  
+                window.location.href = '/' + targetId;
             }
         });
     });
 
-    // Combine scroll events
+    /**
+     * Combines scroll event handlers for navbar adjustment and link highlighting.
+     */
     window.onscroll = function() {
         if (isHomePage) {
             adjustNavbar();
@@ -36,6 +48,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    /**
+     * Adjusts the navbar style when scrolling past a certain point.
+     */
     function adjustNavbar() {
         if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
             navbar.classList.add("navbar-scrolled");
@@ -44,6 +59,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    /**
+     * Updates the active state of navbar links based on the current scroll position.
+     */
     function updateActiveLink() {
         let current = '';
         sections.forEach(section => {
@@ -64,6 +82,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    /**
+     * Hides alert messages after a timeout.
+     */
     const messages = document.querySelectorAll('.alert');
     messages.forEach(message => {
         setTimeout(() => {
@@ -72,7 +93,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     });
 
-
+    /**
+     * Filters supplier items by name based on input from a search field.
+     */
     document.getElementById('supplierNameFilter').addEventListener('keyup', function () {
         var filterValue = this.value.toLowerCase();
         document.querySelectorAll('.supplier-item').forEach(function (item) {
@@ -81,7 +104,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Filter suppliers by type
+    /**
+     * Filters supplier items by type based on selection from a dropdown menu.
+     */
     document.getElementById('supplierTypeFilter').addEventListener('change', function () {
         var filterValue = this.value;
         document.querySelectorAll('.supplier-item').forEach(function (item) {
@@ -94,7 +119,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Adjust tabs
+    /**
+     * Adjusts the appearance of tabs if they overflow their container.
+     */
     function adjustTabs() {
         document.querySelectorAll('.nav-tabs').forEach(function (tabsContainer) {
             if (tabsContainer.scrollWidth > tabsContainer.clientWidth) {
@@ -105,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Initial adjustment and listener for resizing
     adjustTabs();
     window.addEventListener('resize', adjustTabs);
 });
-

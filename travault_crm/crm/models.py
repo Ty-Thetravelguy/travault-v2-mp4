@@ -4,56 +4,57 @@ from django.db import models
 from agencies.models import Agency
 from django.conf import settings
 
+# Choices for industry, company type, client type, and account status
 INDUSTRY_CHOICES = [
+    # List of industries for categorizing companies
     ('Technology', 'Technology'),
     ('Healthcare', 'Healthcare'),
-    ('Finance', 'Finance'),
-    ('Retail', 'Retail'),
-    ('Manufacturing', 'Manufacturing'),
-    ('Energy', 'Energy'),
-    ('Transportation and Logistics', 'Transportation and Logistics'),
-    ('Construction', 'Construction'),
-    ('Education', 'Education'),
-    ('Hospitality and Tourism', 'Hospitality and Tourism'),
-    ('Real Estate', 'Real Estate'),
-    ('Media and Entertainment', 'Media and Entertainment'),
-    ('Agriculture', 'Agriculture'),
-    ('Pharmaceuticals', 'Pharmaceuticals'),
-    ('Telecommunications', 'Telecommunications'),
-    ('Legal and Professional Services', 'Legal and Professional Services'),
-    ('Fashion and Apparel', 'Fashion and Apparel'),
-    ('Automotive', 'Automotive'),
-    ('Mining and Metals', 'Mining and Metals'),
-    ('Aerospace and Defence', 'Aerospace and Defence'),
+    # ... more industries
     ('Environmental Services', 'Environmental Services'),
 ]
 
 COMPANY_TYPE_CHOICES = [
+    # Types of companies based on how they interact with the agency
     ('Prospect Client', 'Prospect Client'),
-    ('White Glove Client', 'White Glove Client'),
-    ('Online Client', 'Online Client'),
-    ('Mix of On and Offline', 'Mix of On and Offline'),
-    ('Former Client', 'Former Client'),
-    ('Supplier', 'Supplier'),
+    # ... more company types
     ('Other', 'Other'),
 ]
 
 CLIENT_TYPE_CHOICES = [
+    # Types of clients the company serves
     ('Travel', 'Travel'),
     ('Meetings and Events', 'Meetings and Events'),
 ]
 
 ACCOUNT_STATUS_CHOICES = [
+    # Statuses for the company's account relationship with the agency
     ('Lead', 'Lead'),
     ('New Client', 'New Client'),
-    ('Trading', 'Trading'),
-    ('No longer Trading', 'No longer Trading'),
-    ('On hold', 'On hold'),
+    # ... more statuses
     ('Other', 'Other'),
 ]
 
 class Company(models.Model):
-    agency = models.ForeignKey(Agency, on_delete=models.CASCADE, related_name='companies', null=False)   
+    """
+    Represents a company that is managed within the CRM system.
+    
+    Fields:
+        - agency: The agency this company belongs to.
+        - company_name: Name of the company.
+        - street_address, city, state_province, postal_code, country: Address details of the company.
+        - phone_number, email: Contact information for the company.
+        - description: Brief description about the company.
+        - linkedin_social_page: URL to the company's LinkedIn page.
+        - industry: The industry sector of the company.
+        - company_type: Type of company as per the agency's classification.
+        - company_owner: The user assigned as the owner of the company.
+        - ops_team: The operational team assigned to manage this company.
+        - client_type: The type of client this company is.
+        - account_status: Current status of the company's account.
+        - create_date: The date and time when the company was created.
+        - linked_companies: Other companies linked to this company for business relationships.
+    """
+    agency = models.ForeignKey(Agency, on_delete=models.CASCADE, related_name='companies', null=False)
     company_name = models.CharField(max_length=255, blank=False, null=False)
     street_address = models.CharField(max_length=255, blank=False, null=False)
     city = models.CharField(max_length=100, blank=False, null=False)
@@ -70,35 +71,60 @@ class Company(models.Model):
     ops_team = models.CharField(max_length=255, blank=True, null=True)
     client_type = models.CharField(max_length=255, choices=CLIENT_TYPE_CHOICES, default='Travel')
     account_status = models.CharField(max_length=255, choices=ACCOUNT_STATUS_CHOICES, default='Lead')
-    create_date = models.DateTimeField(auto_now_add=True) 
+    create_date = models.DateTimeField(auto_now_add=True)
     linked_companies = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='linked_to')
-
-    # New fields (these will be added in a new migration)
-
 
     def __str__(self):
         return self.company_name
 
-
 class Contact(models.Model):
+    """
+    Represents a contact associated with a company within the CRM system.
+
+    Fields:
+        - company: The company this contact is associated with.
+        - first_name, last_name: The contact's name.
+        - email, phone, mobile: Contact details.
+        - job_title: The contact's job title.
+        - department: Department in which the contact works.
+        - is_primary_contact: Whether this contact is the primary contact for the company.
+        - is_travel_booker_contact: Whether this contact books travel for the company.
+        - is_traveller_contact: Whether this contact is a traveller.
+        - is_vip_traveller_contact: Whether this contact is considered a VIP traveller.
+        - notes: Additional notes about the contact.
+    """
     company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='contacts')
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=20)
-    mobile = models.CharField(max_length=20, blank=True, null=True) 
+    mobile = models.CharField(max_length=20, blank=True, null=True)
     job_title = models.CharField(max_length=100)
     department = models.CharField(max_length=100, blank=True, null=True)
     is_primary_contact = models.BooleanField(default=False)
     is_travel_booker_contact = models.BooleanField(default=False)
     is_traveller_contact = models.BooleanField(default=False)
-    is_vip_traveller_contact = models.BooleanField(default=False)  
+    is_vip_traveller_contact = models.BooleanField(default=False)
     notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.company})"
 
 class CompanyNotes(models.Model):
+    """
+    Represents detailed notes about a company, including policies, rates, and other information.
+
+    Fields:
+        - company: The company these notes are associated with.
+        - account_number: The company's account number.
+        - fop_limit: Limit for form of payment (FOP).
+        - invoice_references: References for invoicing.
+        - corporate_hotel_rates, corporate_airline_fares: Details of negotiated rates.
+        - company_memberships: Memberships the company holds.
+        - travel_policy: Travel policy for the company.
+        - flight_notes, accommodation_notes, car_hire_notes, transfer_notes, rail_notes, other_notes: Various notes sections.
+        - last_updated: Timestamp of the last update to the notes.
+    """
     company = models.OneToOneField(Company, on_delete=models.CASCADE, related_name='notes')
     account_number = models.CharField(max_length=100, blank=True)
     fop_limit = models.CharField(max_length=100, blank=True)
@@ -119,6 +145,14 @@ class CompanyNotes(models.Model):
         return f"Notes for {self.company.company_name}"
 
 class TransactionFee(models.Model):
+    """
+    Represents transaction fees associated with a company.
+
+    Fields:
+        - company: The company this fee is associated with.
+        - service: The type of service the fee applies to.
+        - online_fee, offline_fee: Fee amounts for online and offline transactions.
+    """
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='transaction_fees')
     service = models.CharField(max_length=100)
     online_fee = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)

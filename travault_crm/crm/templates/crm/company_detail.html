@@ -60,7 +60,7 @@
                                                 target="_blank">{{ company.linkedin_social_page }}</a></p>
                                     </div>
                                     <div class="col-md-6">
-                                        <p><strong>Industry:</strong> {{ company.industry }}</p>
+                                        <p><strong>Industry:</strong> {{ company.get_industry_display }}</p>
                                         <p><strong>Company Type:</strong> {{ company.get_company_type_display }}</p>
                                         <p><strong>Company Owner:</strong> {{ company.company_owner }}</p>
                                         <p><strong>Ops Team:</strong> {{ company.ops_team }}</p>

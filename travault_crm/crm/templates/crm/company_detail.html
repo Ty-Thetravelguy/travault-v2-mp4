@@ -44,7 +44,7 @@
             <div class="tab-pane fade {% if active_tab == 'details' %}show active{% endif %}" id="details"
                 role="tabpanel" aria-labelledby="details-tab">
                 <div class="row pb-4">
-                    <div class="col-md-8">
+                    <div class="{% if company.linked_companies.exists %}col-md-8{% else %}col-md-12{% endif %}">
                         <div class="card shadow">
                             <div class="card-body">
                                 <div class="row">
@@ -56,8 +56,14 @@
                                         <p><strong>Country:</strong> {{ company.country }}</p>
                                         <p><strong>Phone Number:</strong> {{ company.phone_number }}</p>
                                         <p><strong>Email:</strong> {{ company.email }}</p>
-                                        <p><strong>LinkedIn:</strong> <a href="{{ company.linkedin_social_page }}"
-                                                target="_blank">{{ company.linkedin_social_page }}</a></p>
+                                        <p><strong>LinkedIn:</strong>
+                                            {% if company.linkedin_social_page %}
+                                            <a href="{{ company.linkedin_social_page }}"
+                                                target="_blank">{{ company.linkedin_social_page }}</a>
+                                            {% else %}
+                                            Not available
+                                            {% endif %}
+                                        </p>
                                     </div>
                                     <div class="col-md-6">
                                         <p><strong>Industry:</strong> {{ company.get_industry_display }}</p>
@@ -95,8 +101,10 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Linked Companies Column -->
+                    {% if company.linked_companies.exists %}
                     <div class="col-md-4">
-                        {% if company.linked_companies.exists %}
                         <div class="card shadow">
                             <div class="card-body">
                                 <h4 class="card-title">Linked Companies</h4>
@@ -111,8 +119,8 @@
                                 </ul>
                             </div>
                         </div>
-                        {% endif %}
                     </div>
+                    {% endif %}
                 </div>
             </div>
 

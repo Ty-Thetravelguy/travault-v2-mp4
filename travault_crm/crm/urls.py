@@ -12,8 +12,11 @@ urlpatterns = [
     path('company/<int:pk>/edit/', views.edit_company, name='edit_company'),
     path('company/<int:pk>/delete/', views.delete_company, name='delete_company'),
     path('company/<int:pk>/add-contact/', views.add_contact, name='add_contact'), 
-    path('company/<int:pk>/edit-notes/', views.edit_company_notes, name='edit_company_notes'),
+
     path('company/<int:pk>/add-notes/', views.add_company_notes, name='add_company_notes'),
+    path('company/<int:pk>/edit-notes/', views.edit_company_notes, name='edit_company_notes'),
+    path('company/<int:pk>/delete-notes/', views.delete_company_notes, name='delete_company_notes'),
+
     path('company/<int:company_pk>/activity-log/', activity_views.activity_log, name='activity_log'),
     path('fetch-company-data/', views.fetch_company_data, name='fetch_company_data'),
     path('search-companies/', views.search_companies, name='search_companies'),

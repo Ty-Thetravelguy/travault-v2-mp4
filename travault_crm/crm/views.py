@@ -732,6 +732,42 @@ def edit_company_notes(request, pk):
 
 
 @login_required
+def delete_company_notes(request, pk):
+    """
+    View to delete company notes. Only accessible by admin users.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request.
+        pk (int): The primary key of the company whose notes are to be deleted.
+
+    Returns:
+        HttpResponseRedirect: Redirects to the company details page after deletion.
+    """
+    company = get_object_or_404(Company, pk=pk)
+
+    # Check if the user is an admin
+    if request.user.user_type != 'admin':
+        messages.error(request, "You do not have permission to delete company notes.")
+        return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='notes')
+
+    if request.method == 'POST':
+        confirmation_name = request.POST.get('confirmation_name')
+        if confirmation_name == company.company_name:
+            try:
+                notes = company.notes
+                notes.delete()
+                messages.success(request, "Company notes deleted successfully.")
+            except CompanyNotes.DoesNotExist:
+                messages.error(request, "No notes found for this company.")
+            return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='notes')
+        else:
+            messages.error(request, "The company name you entered does not match. Please try again.")
+
+    # Render the confirmation page
+    return render(request, 'crm/confirm_delete_company_notes.html', {'company': company})
+
+
+@login_required
 def add_transaction_fee(request, pk):
     """
     View to add a new transaction fee to a company.

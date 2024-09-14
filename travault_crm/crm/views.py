@@ -13,8 +13,7 @@ from django.conf import settings
 from django.db.models import Case, When, BooleanField
 import logging
 import time
-from activity_log.models import ActivityLog
-from activity_log.forms import ActivityLogForm
+from activity_log.models import ActivityLog 
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -76,15 +75,6 @@ def crm_index(request):
     # Render the index page with the prepared context
     return render(request, 'crm/index.html', context)
 
-
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.db.models import Case, When, BooleanField
-import logging
-import time
-
-# Initialize the logger
-logger = logging.getLogger(__name__)
 
 @login_required
 def company_detail(request, pk, active_tab='details'):
@@ -161,21 +151,6 @@ def company_detail(request, pk, active_tab='details'):
 
     # Activity Log
     activities = ActivityLog.objects.filter(company=company)
-    activity_form = ActivityLogForm()
-    logger.debug(f"Fetched {activities.count()} activities for company pk={pk}.")
-
-    if request.method == 'POST' and active_tab == 'activity':
-        activity_form = ActivityLogForm(request.POST)
-        if activity_form.is_valid():
-            activity = activity_form.save(commit=False)
-            activity.company = company
-            activity.user = request.user
-            activity.save()
-            logger.info(f"New activity logged for company pk={pk}.")
-            messages.success(request, 'Activity logged successfully.')
-            return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='activity')
-        else:
-            logger.warning(f"Invalid activity form submission for company pk={pk}.")
 
     # Prepare the context for rendering the template
     context = {
@@ -189,7 +164,6 @@ def company_detail(request, pk, active_tab='details'):
         'fee_form': fee_form,
         'edit_forms': edit_forms,
         'activities': activities,
-        'activity_form': activity_form,
         'active_tab': active_tab or 'details',
     }
 

@@ -6,12 +6,11 @@ from crm.models import Company, Contact
 
 class ActivityLog(models.Model):
     ACTIVITY_TYPES = [
+        ('call', 'Call'),
         ('email', 'Email'),
         ('meeting', 'Meeting'),
-        ('call', 'Call'),
         ('ticket', 'Ticket'),
         ('deal', 'Deal'),
-        ('other', 'Other'),
     ]
 
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='activity_logs')
@@ -27,7 +26,3 @@ class ActivityLog(models.Model):
 
     def __str__(self):
         return f"{self.get_activity_type_display()} - {self.subject}"
-
-    @property
-    def agency(self):
-        return self.company.agency

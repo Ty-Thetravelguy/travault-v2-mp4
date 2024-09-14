@@ -457,46 +457,31 @@
                 </div>
             </div>
 
-
             <div class="tab-pane fade {% if active_tab == 'activity' %}show active{% endif %}" id="activity"
                 role="tabpanel" aria-labelledby="activity-tab">
                 <div class="card shadow">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h3 class="card-title">Activity Log</h3>
-                            <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#addActivityForm" aria-expanded="false" aria-controls="addActivityForm">
-                                Add Activity
-                            </button>
-                        </div>
-
-                        <!-- Add Activity Form -->
-                        <div class="collapse mb-4" id="addActivityForm">
-                            <form method="post"
-                                action="{% url 'crm:company_detail_with_tab' pk=company.pk active_tab='activity' %}">
-                                {% csrf_token %}
-                                <div class="mb-3">
-                                    <label for="{{ activity_form.activity_type.id_for_label }}"
-                                        class="form-label">Activity Type</label>
-                                    {{ activity_form.activity_type|add_class:"form-select" }}
-                                </div>
-                                <div class="mb-3">
-                                    <label for="{{ activity_form.subject.id_for_label }}"
-                                        class="form-label">Subject</label>
-                                    {{ activity_form.subject|add_class:"form-control" }}
-                                </div>
-                                <div class="mb-3">
-                                    <label for="{{ activity_form.description.id_for_label }}"
-                                        class="form-label">Description</label>
-                                    {{ activity_form.description|add_class:"form-control" }}
-                                </div>
-                                <div class="mb-3">
-                                    <label for="{{ activity_form.related_contact.id_for_label }}"
-                                        class="form-label">Related Contact</label>
-                                    {{ activity_form.related_contact|add_class:"form-select" }}
-                                </div>
-                                <button type="submit" class="btn btn-success">Log Activity</button>
-                            </form>
+                            <div class="dropdown">
+                                <button class="btn btn-link project-primary-color" type="button"
+                                    id="addActivityDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                                    title="Add Activity">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="addActivityDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'crm:log_call' pk=company.pk %}">Log a
+                                            call</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'crm:log_email' pk=company.pk %}">Log an
+                                            email</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'crm:log_meeting' pk=company.pk %}">Log a
+                                            meeting</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'crm:open_ticket' pk=company.pk %}">Open a
+                                            ticket</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'crm:start_deal' pk=company.pk %}">Start a
+                                            deal</a></li>
+                                </ul>
+                            </div>
                         </div>
 
                         <!-- Activity List -->
@@ -504,16 +489,7 @@
                         <div class="list-group">
                             {% for activity in activities %}
                             <div class="list-group-item list-group-item-action">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h5 class="mb-1">{{ activity.get_activity_type_display }} - {{ activity.subject }}
-                                    </h5>
-                                    <small>{{ activity.date|date:"F d, Y H:i" }}</small>
-                                </div>
-                                <p class="mb-1">{{ activity.description }}</p>
-                                <small>Logged by: {{ activity.user.get_full_name }}</small>
-                                {% if activity.related_contact %}
-                                <br><small>Related Contact: {{ activity.related_contact }}</small>
-                                {% endif %}
+                                <!-- Activity details -->
                             </div>
                             {% endfor %}
                         </div>
@@ -523,6 +499,8 @@
                     </div>
                 </div>
             </div>
+
+
         </div>
     </div>
 </div>

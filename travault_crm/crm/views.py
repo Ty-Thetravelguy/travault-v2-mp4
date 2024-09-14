@@ -13,6 +13,8 @@ from django.conf import settings
 from django.db.models import Case, When, BooleanField
 import logging
 import time
+from activity_log.models import ActivityLog
+from activity_log.forms import ActivityLogForm
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -90,8 +92,8 @@ def company_detail(request, pk, active_tab='details'):
     View for displaying the details of a specific company.
 
     This view fetches the details of a company based on the provided primary key (pk),
-    along with related data such as contacts, notes, and transaction fees. It allows
-    navigation between different tabs to display company-specific information.
+    along with related data such as contacts, notes, transaction fees, and activity logs.
+    It allows navigation between different tabs to display company-specific information.
 
     Args:
         request (HttpRequest): The incoming HTTP request from the client.
@@ -100,7 +102,7 @@ def company_detail(request, pk, active_tab='details'):
 
     Returns:
         HttpResponse: Renders the company_detail template with a context containing
-        the company details, related contacts, notes, transaction fees, and forms.
+        the company details, related contacts, notes, transaction fees, activity logs, and forms.
     """
     
     # Log entry into the view
@@ -157,6 +159,24 @@ def company_detail(request, pk, active_tab='details'):
     vip_travellers = contacts.filter(is_vip_traveller_contact=True)
     logger.debug(f"Filtered {travel_bookers.count()} travel bookers and {vip_travellers.count()} VIP travellers.")
 
+    # Activity Log
+    activities = ActivityLog.objects.filter(company=company)
+    activity_form = ActivityLogForm()
+    logger.debug(f"Fetched {activities.count()} activities for company pk={pk}.")
+
+    if request.method == 'POST' and active_tab == 'activity':
+        activity_form = ActivityLogForm(request.POST)
+        if activity_form.is_valid():
+            activity = activity_form.save(commit=False)
+            activity.company = company
+            activity.user = request.user
+            activity.save()
+            logger.info(f"New activity logged for company pk={pk}.")
+            messages.success(request, 'Activity logged successfully.')
+            return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='activity')
+        else:
+            logger.warning(f"Invalid activity form submission for company pk={pk}.")
+
     # Prepare the context for rendering the template
     context = {
         'company': company,
@@ -168,6 +188,8 @@ def company_detail(request, pk, active_tab='details'):
         'transaction_fees': transaction_fees,
         'fee_form': fee_form,
         'edit_forms': edit_forms,
+        'activities': activities,
+        'activity_form': activity_form,
         'active_tab': active_tab or 'details',
     }
 

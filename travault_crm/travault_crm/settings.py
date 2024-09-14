@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     'home',
     'agent_support',
     'crm',
+    'activity_log',
     'dashboard',
     'tickets',
 ]

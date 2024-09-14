@@ -2,13 +2,15 @@
 
 from django.urls import path
 from . import views
+from activity_log import views as activity_log_views
 
 app_name = 'crm'
 
 urlpatterns = [
     path('', views.crm_index, name='index'),
-    path('add_company/', views.add_company, name='add_company'),  # Moved to the top
-    path('company/<int:pk>/add-contact/', views.add_contact, name='add_contact'),  # Moved up
+    path('add_company/', views.add_company, name='add_company'),  
+    path('company/<int:pk>/add-contact/', views.add_contact, name='add_contact'), 
+    path('company/<int:company_pk>/activity-log/', activity_log_views.activity_log, name='activity_log'),
     path('fetch-company-data/', views.fetch_company_data, name='fetch_company_data'),
     path('search-companies/', views.search_companies, name='search_companies'),
     path('company/<int:pk>/add-transaction-fee/', views.add_transaction_fee, name='add_transaction_fee'),

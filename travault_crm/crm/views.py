@@ -667,8 +667,13 @@ def add_company_notes(request, pk):
         form = CompanyNotesForm()
         logger.debug("Initialized form for adding company notes.")
 
+    # Convert form fields to a list and group them into pairs
+    form_fields = list(form)
+    field_pairs = [form_fields[i:i+2] for i in range(0, len(form_fields), 2)]
+
     context = {
         'form': form,
+        'field_pairs': field_pairs,
         'company': company,
     }
 

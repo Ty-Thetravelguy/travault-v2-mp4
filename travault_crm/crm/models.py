@@ -6,17 +6,36 @@ from django.conf import settings
 
 # Choices for industry, company type, client type, and account status
 INDUSTRY_CHOICES = [
-    # List of industries for categorizing companies
-    ('Technology', 'Technology'),
-    ('Healthcare', 'Healthcare'),
-    # ... more industries
-    ('Environmental Services', 'Environmental Services'),
+    ('agriculture_forestry_fishing_hunting', 'Agriculture, Forestry, Fishing and Hunting'),
+    ('mining_quarrying_oil_gas', 'Mining, Quarrying, and Oil and Gas Extraction'),
+    ('pharmaceuticals_biotechnology', 'Pharmaceuticals and Biotechnology'),
+    ('manufacturing', 'Manufacturing'),
+    ('construction', 'Construction'),
+    ('wholesale_trade', 'Wholesale Trade'),
+    ('retail_trade', 'Retail Trade'),
+    ('transportation_warehousing', 'Transportation and Warehousing'),
+    ('information', 'Information'),
+    ('finance_insurance', 'Finance and Insurance'),
+    ('real_estate_rental_leasing', 'Real Estate and Rental and Leasing'),
+    ('professional_scientific_technical_services', 'Professional, Scientific, and Technical Services'),
+    ('management_companies_enterprises', 'Management of Companies and Enterprises'),
+    ('administrative_support_waste_management', 'Administrative and Support and Waste Management and Remediation Services'),
+    ('educational_services', 'Educational Services'),
+    ('health_care_social_assistance', 'Health Care and Social Assistance'),
+    ('arts_entertainment_recreation', 'Arts, Entertainment, and Recreation'),
+    ('accommodation_food_services', 'Accommodation and Food Services'),
+    ('other_services', 'Other Services (except Public Administration)'),
+    ('public_administration', 'Public Administration'),
 ]
 
 COMPANY_TYPE_CHOICES = [
-    # Types of companies based on how they interact with the agency
+    # Types of companies the agency manages
     ('Prospect Client', 'Prospect Client'),
-    # ... more company types
+    ('White Glove Client', 'White Glove Client'),
+    ('Online Client', 'Online Client'),
+    ('Mix of On and Offline', 'Mix of On and Offline'),
+    ('Former Client', 'Former Client'),
+    ('Supplier', 'Supplier'),
     ('Other', 'Other'),
 ]
 
@@ -30,7 +49,9 @@ ACCOUNT_STATUS_CHOICES = [
     # Statuses for the company's account relationship with the agency
     ('Lead', 'Lead'),
     ('New Client', 'New Client'),
-    # ... more statuses
+    ('Trading', 'Trading'),
+    ('No longer Trading', 'No longer Trading'),
+    ('On hold', 'On hold'),
     ('Other', 'Other'),
 ]
 

@@ -84,13 +84,10 @@
                                                 class="btn btn-green me-2">
                                                 <i class="fas fa-edit"></i> Edit
                                             </a>
-                                            <form action="{% url 'crm:delete_company' pk=company.id %}" method="post"
-                                                style="display: inline;">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-outline-danger">
-                                                    <i class="fas fa-trash-alt"></i> Delete
-                                                </button>
-                                            </form>
+                                            <a href="{% url 'crm:delete_company' pk=company.id %}"
+                                                class="btn btn-outline-danger">
+                                                <i class="fas fa-trash-alt"></i> Delete
+                                            </a>
                                             {% endif %}
                                         </div>
                                     </div>

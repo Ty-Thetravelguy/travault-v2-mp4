@@ -250,15 +250,15 @@ def delete_company(request, pk):
     logger.debug(f"Fetched company: {company.company_name} for deletion.")
 
     if request.method == 'POST':
+        # Delete the company after confirmation
         company.delete()
-        logger.info(f"Company '{company.company_name}' successfully deleted.")
         messages.success(request, f"Company '{company.company_name}' has been successfully deleted.")
         return redirect('crm:index')
 
     # Render a confirmation page for GET requests
     logger.info(f"delete_company completed in {time.time() - start_time:.2f} seconds.")
-    return render(request, 'crm/delete_company_confirm.html', {'company': company})
-
+    return render(request, 'crm/delete_company.html', {'company': company})
+    
 
 @login_required
 def add_company(request):

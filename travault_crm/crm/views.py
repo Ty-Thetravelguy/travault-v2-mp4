@@ -258,7 +258,7 @@ def delete_company(request, pk):
     # Render a confirmation page for GET requests
     logger.info(f"delete_company completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'crm/delete_company.html', {'company': company})
-    
+
 
 @login_required
 def add_company(request):
@@ -552,16 +552,9 @@ def confirm_delete_contact(request, pk):
     """
     View to confirm and delete a specific contact.
 
-    This view displays a confirmation page for deleting a contact. If the user confirms
-    by submitting a POST request, the contact is deleted from the database.
-
-    Args:
-        request (HttpRequest): The incoming HTTP request from the client.
-        pk (int): The primary key of the contact to be deleted.
-
-    Returns:
-        HttpResponse: Redirects to the company detail view on successful deletion,
-        or renders a confirmation page.
+    This view displays a confirmation page for deleting a contact. If the user
+    confirms the deletion by submitting a POST request with the correct contact name,
+    the contact is deleted from the database.
     """
     logger.info(f"Entering confirm_delete_contact view for contact pk={pk}.")
     start_time = time.time()
@@ -571,16 +564,22 @@ def confirm_delete_contact(request, pk):
     company = contact.company
     logger.debug(f"Fetched contact: {contact.first_name} {contact.last_name} for deletion confirmation.")
 
-    # Handle contact deletion upon POST request
     if request.method == 'POST':
-        contact.delete()
-        logger.info(f"Contact '{contact.first_name} {contact.last_name}' successfully deleted.")
-        messages.success(request, f"Contact '{contact.first_name} {contact.last_name}' has been successfully deleted.")
-        return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='contacts')
+        confirmation_name = request.POST.get("confirmation_name")
+        full_name = f"{contact.first_name} {contact.last_name}"
+        if confirmation_name == full_name:
+            contact.delete()
+            logger.info(f"Contact '{full_name}' successfully deleted.")
+            messages.success(request, f"Contact '{full_name}' has been successfully deleted.")
+            return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='contacts')
+        else:
+            logger.warning(f"Name confirmation failed for contact '{full_name}'.")
+            messages.error(request, "The contact name does not match.")
 
-    # Render a confirmation page for GET requests
+    # Render a confirmation page for GET requests or if name doesn't match
     logger.info(f"confirm_delete_contact completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'crm/confirm_delete_contact.html', {'contact': contact})
+
 
 
 @login_required

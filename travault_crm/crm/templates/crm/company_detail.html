@@ -228,9 +228,17 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                     <h3 class="card-title">Company Notes</h3>
+                                    {% if company_notes %}
+                                    <!-- Show Edit button if notes exist -->
                                     <a href="{% url 'crm:edit_company_notes' pk=company.pk %}" class="btn btn-green">
                                         <i class="fas fa-edit"></i> Edit Company Notes
                                     </a>
+                                    {% else %}
+                                    <!-- Show Add button if no notes exist -->
+                                    <a href="{% url 'crm:add_company_notes' pk=company.pk %}" class="btn btn-green">
+                                        <i class="fas fa-plus"></i> Add Company Notes
+                                    </a>
+                                    {% endif %}
                                 </div>
                                 {% if company_notes %}
                                 <div class="row">
@@ -272,11 +280,6 @@
 
                                 {% else %}
                                 <p>No company notes available.</p>
-                                <div class="mt-3">
-                                    <a href="{% url 'crm:add_company_notes' pk=company.pk %}" class="btn btn-green">
-                                        <i class="fas fa-plus"></i> Add Company Notes
-                                    </a>
-                                </div>
                                 {% endif %}
                             </div>
                         </div>

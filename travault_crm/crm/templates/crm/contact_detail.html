@@ -54,13 +54,10 @@
                             <a href="{% url 'crm:edit_contact' pk=contact.id %}" class="btn btn-green me-2">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
-                            <form action="{% url 'crm:confirm_delete_contact' pk=contact.id %}" method="post"
-                                style="display: inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-danger">
-                                    <i class="fas fa-trash-alt"></i> Delete
-                                </button>
-                            </form>
+                            <a href="{% url 'crm:confirm_delete_contact' pk=contact.id %}"
+                                class="btn btn-outline-danger">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </a>
                             {% endif %}
                         </div>
                     </div>

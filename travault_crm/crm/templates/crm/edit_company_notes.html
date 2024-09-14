@@ -17,7 +17,8 @@
             <div class="col-xl-10 col-lg-11 col-md-12">
                 <div class="row justify-content-end py-4">
                     <div class="col-auto">
-                        <a href="{% url 'crm:company_detail' pk=company.pk %}" class="btn btn-green">
+                        <a href="{% url 'crm:company_detail_with_tab' pk=company.pk active_tab='notes' %}"
+                            class="btn btn-green">
                             <i class="fas fa-arrow-left"></i> Go Back
                         </a>
                     </div>

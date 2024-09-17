@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid full-height-bg top-padding bg-gray-200">
+    <div class="container mt-5 roboto">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h1 class="project-primary-color mb-0">Meeting Details</h1>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2>{{ meeting.subject }}</h2>
+                        <p><strong>Date:</strong> {{ meeting.date }}</p>
+                        <p><strong>Time:</strong> {{ meeting.time }}</p>
+                        <p><strong>Duration:</strong> {{ meeting.duration }} minutes</p>
+                        <p><strong>Outcome:</strong> {{ meeting.outcome }}</p>
+                        <p><strong>Location:</strong> {{ meeting.location }}</p>
+                        <p><strong>Attendees:</strong>
+                            {% for attendee in meeting.attendees.all %}{{ attendee.first_name }}
+                            {{ attendee.last_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                        <h4>Details:</h4>
+                        <div>{{ meeting.details|safe }}</div>
+                        <div class="mt-3 text-center">
+                            <a href="{% url 'crm:company_detail_with_tab' pk=company.pk active_tab='activity_log' %}"
+                                class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Company
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

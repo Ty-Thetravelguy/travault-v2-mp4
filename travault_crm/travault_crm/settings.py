@@ -23,16 +23,14 @@ AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_S3_VERIFY = True
 
 # Media files configuration (S3)
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-#STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 MEDIA_ROOT = ''  # Leave empty when using S3
 
-class MediaStorage(S3Boto3Storage):
-    location = 'media'
-    file_overwrite = False
+DEFAULT_FILE_STORAGE = 'agencies.storage_backends.MediaStorage'
+CKEDITOR_5_FILE_STORAGE = 'agencies.storage_backends.MediaStorage'
 
-DEFAULT_FILE_STORAGE = 'path.to.your.settings.MediaStorage'
 
 # Additional S3 settings
 AWS_DEFAULT_ACL = None
@@ -75,6 +73,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'storages',
+    'django_ckeditor_5',
     
     # Local apps
     'home',
@@ -162,7 +161,14 @@ ACCOUNT_PASSWORD_RESET_FROM_KEY_DONE_TEMPLATE = 'account/password_reset_from_key
 
 AUTH_USER_MODEL = 'agencies.CustomUser'
 
-
+DJANGO_CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 'auto',
+        'width': '100%',
+        'remove_plugins': 'exportPdf',
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

@@ -5,15 +5,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.contrib import messages
-import requests
 from .models import Company, COMPANY_TYPE_CHOICES, Contact, CompanyNotes, TransactionFee
 from .forms import CompanyForm, ContactForm, CompanyNotesForm, TransactionFeeForm
 from urllib.parse import quote
 from django.conf import settings
 from django.db.models import Case, When, BooleanField
+from activity_log.models import Meeting
+import requests
 import logging
 import time
-from activity_log.models import ActivityLog 
+
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -149,8 +150,14 @@ def company_detail(request, pk, active_tab='details'):
     vip_travellers = contacts.filter(is_vip_traveller_contact=True)
     logger.debug(f"Filtered {travel_bookers.count()} travel bookers and {vip_travellers.count()} VIP travellers.")
 
-    # Activity Log
-    activities = ActivityLog.objects.filter(company=company)
+    # Fetch activities (meetings for now)
+    meetings = Meeting.objects.filter(
+    associated_companies=company,
+    agency=request.user.agency
+    )
+    # You can include other activity types as you implement them
+    activities = sorted(meetings, key=lambda x: (x.date, x.time), reverse=True)
+
 
     # Prepare the context for rendering the template
     context = {

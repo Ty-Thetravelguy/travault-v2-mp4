@@ -478,32 +478,41 @@
                                     <i class="fas fa-plus"></i>
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="addActivityDropdown">
-                                    <li><a class="dropdown-item" href="{% url 'crm:log_call' pk=company.pk %}">Log a
+                                    <li><a class="dropdown-item" href="#">Log a
                                             call</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'crm:log_email' pk=company.pk %}">Log an
+                                    <li><a class="dropdown-item" href="#">Log an
                                             email</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'crm:log_meeting' pk=company.pk %}">Log a
+                                    <li><a class="dropdown-item"
+                                            href="{% url 'activity_log:log_meeting' pk=company.pk %}">Log a
                                             meeting</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'crm:open_ticket' pk=company.pk %}">Open a
+                                    <li><a class="dropdown-item" href="#">Open a
                                             ticket</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'crm:start_deal' pk=company.pk %}">Start a
+                                    <li><a class="dropdown-item" href="#">Start a
                                             deal</a></li>
                                 </ul>
                             </div>
                         </div>
 
                         <!-- Activity List -->
-                        {% if activities %}
-                        <div class="list-group">
-                            {% for activity in activities %}
-                            <div class="list-group-item list-group-item-action">
-                                <!-- Activity details -->
+                        {% for activity in activities %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                {% if activity|instanceof:'Meeting' %}
+                                <h5 class="card-title">Meeting: {{ activity.subject }}</h5>
+                                <p class="card-text">
+                                    <strong>Date:</strong> {{ activity.date }}<br>
+                                    <strong>Time:</strong> {{ activity.time }}<br>
+                                    <strong>Outcome:</strong> {{ activity.outcome }}<br>
+                                    <strong>Created by:</strong> {{ activity.creator.get_full_name }}
+                                </p>
+                                <a href="{% url 'activity_log:view_meeting' pk=activity.id %}"
+                                    class="btn btn-sm btn-outline-primary">View Details</a>
+                                {% endif %}
                             </div>
-                            {% endfor %}
                         </div>
-                        {% else %}
+                        {% empty %}
                         <p>No activities logged yet.</p>
-                        {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
             </div>

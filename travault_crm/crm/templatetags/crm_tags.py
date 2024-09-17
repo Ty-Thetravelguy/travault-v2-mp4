@@ -27,3 +27,6 @@ def set_attr(field, attr_name_value):
 def get_item(dictionary, key):
     return dictionary.get(key)
 
+@register.filter
+def instanceof(obj, class_name):
+    return obj.__class__.__name__ == class_name

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid full-height-bg top-padding bg-gray-200">
+    <div class="container mt-5 roboto">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h1 class="project-primary-color mb-0">Log a Meeting for {{ company.company_name }}</h1>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <form method="post" action="#">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="id_subject" class="form-label">Subject</label>
+                                {{ form.subject }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_attendees" class="form-label">Attendees</label>
+                                {{ form.attendees }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_outcome" class="form-label">Outcome</label>
+                                {{ form.outcome }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_location" class="form-label">Location</label>
+                                {{ form.location }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_date" class="form-label">Date</label>
+                                {{ form.date }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_time" class="form-label">Time</label>
+                                {{ form.time }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_duration" class="form-label">Duration</label>
+                                {{ form.duration }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_details" class="form-label">Details</label>
+                                {{ form.details }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_to_do_task_date" class="form-label">To-Do Task Reminder Date</label>
+                                {{ form.to_do_task_date }}
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg">Log Meeting</button>
+                            </div>
+                        </form>
+                        <div class="mt-3 text-center">
+                            <a href="{% url 'crm:company_detail_with_tab' pk=company.pk active_tab='activity_log' %}"
+                                class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Company
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block postload_js %}
+
+{% endblock %}

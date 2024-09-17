@@ -66,7 +66,8 @@ class Agency(models.Model):
     ]
 
     agency_name = models.CharField(max_length=255)  # Name of the agency
-    address = models.TextField()  # Physical address of the agency
+    name = models.CharField(max_length=255)
+    address = models.CharField(max_length=255)
     phone = models.CharField(max_length=20)  # Contact phone number for the agency
     email = models.EmailField()  # Contact email for the agency
     website = models.URLField(blank=True, null=True)  # Optional website URL for the agency

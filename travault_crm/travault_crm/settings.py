@@ -161,7 +161,7 @@ ACCOUNT_PASSWORD_RESET_FROM_KEY_DONE_TEMPLATE = 'account/password_reset_from_key
 
 AUTH_USER_MODEL = 'agencies.CustomUser'
 
-DJANGO_CKEDITOR_5_CONFIGS = {
+CKEDITOR_5_CONFIGS = {
     'default': {
         'toolbar': 'full',
         'height': 'auto',

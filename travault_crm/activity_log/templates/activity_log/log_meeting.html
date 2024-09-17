@@ -45,8 +45,10 @@
                                 {{ form.duration }}
                             </div>
                             <div class="mb-3">
-                                <label for="id_details" class="form-label">Details</label>
-                                {{ form.details }}
+                                <div class="form-group">
+                                    {{ form.details.label_tag }}
+                                    {{ form.details }}
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="id_to_do_task_date" class="form-label">To-Do Task Reminder Date</label>
@@ -70,6 +72,6 @@
 </div>
 {% endblock %}
 
-{% block postload_js %}
-
-{% endblock %}
+<!-- {% block postload_js %}
+<script src="{% static 'js/crm_script.js' %}"></script>
+{% endblock %} -->

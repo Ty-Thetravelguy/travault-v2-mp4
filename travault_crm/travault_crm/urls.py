@@ -14,8 +14,6 @@ urlpatterns = [
     path('agent_support/', include(('agent_support.urls', 'agent_support'), namespace='agent_support')),  
     path('crm/', include(('crm.urls', 'crm'), namespace='crm')),
     path('activity/', include('activity_log.urls', namespace='activity_log')),
-    path('django_ckeditor_5/', include('django_ckeditor_5.urls')),
-
 ] 
 
 if settings.DEBUG:

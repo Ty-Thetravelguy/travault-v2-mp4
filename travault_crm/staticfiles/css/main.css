@@ -1,0 +1,596 @@
+
+
+
+/******************** General  ********************/
+
+html, body {
+    height: 100%;
+}
+.full-height-bg {
+    min-height: 100vh;
+}
+
+.project-primary-color {
+    color: #001f3f;
+}
+
+.project-secondary-color {
+    color: #00ab8b;
+}
+
+#message-container {
+    max-width: 600px;
+    margin: 0;
+    left: auto;
+    right: 20px;
+    top: 100px; 
+    z-index: 1030;
+}
+
+#message-container .alert {
+    margin-bottom: 0.5rem;
+}
+
+/******************** Images  ********************/
+
+.hero-bg-img {
+    background-image: url('/static/images/travel-data-img-2560px.jpg');
+    background-size: cover;
+    background-position: center; 
+    background-repeat: no-repeat; 
+    height: 80vh;
+}
+
+.banna-img-1 {
+    background-image: url('/static/images/data-wave-img-2560px.jpg');
+    background-size: cover;
+    background-position: center; 
+    background-repeat: no-repeat; 
+    height: 50vh;
+}
+
+.banna-img-2 {
+    background-image: url('/static/images/data-spider-web-img-2560px.jpg');
+    background-size: cover;
+    background-position: center; 
+    background-repeat: no-repeat; 
+    height: 50vh;
+}
+
+/******************** Fonts & Icons ********************/
+
+.roboto {
+    font-family: 'Roboto', sans-serif;
+}
+
+.Lato {
+    font-family: 'Lato', sans-serif;
+}
+
+.btn-link {
+    font-size: 30px;
+    text-decoration: none;
+}
+
+
+
+/******************** Navbar & Icons ********************/
+.logo {
+    min-width: 150px; 
+    min-height: 80px; 
+    transition: all 0.3s ease;
+}
+
+.home-nav {
+    background-color: #001f3f;
+    transition: all 0.3s ease;
+}
+
+.home-nav-text {
+    font-family: Lato;
+    color: #fafafa;
+    margin-top: 10px;
+}
+
+.dropdown-toggle {
+    font-family: Lato;
+    color: #fafafa;
+    margin: 10px 20px 10px 0;
+    font-size: 20px;
+}
+
+
+.navbar-nav .nav-link.active {
+    font-size: 25px;
+    color: #FAFAFA;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
+    color: #afc0ec;   
+}
+
+.navbar-nav .nav-link:hover {
+    color: #afc0ec; 
+}
+
+.dropdown-item:hover {
+    background-color: #afc0ec; /* Change this to your desired background color */
+    color: #000; /* Change this to your desired text color */
+}
+
+.navbar-scrolled .logo {
+    min-width: 80px;
+    min-height: 40px;
+}
+
+.navbar-scrolled {
+    padding: 10px 0;
+}
+
+.navbar-scrolled .navbar .nav-link.home-nav-text.active {
+    font-size: 20px; 
+}
+
+.navbar-toggler {
+    border-color: rgba(255,255,255,0.5);
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.5)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.nav-tabs {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.nav-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+/******************** Get started section / Buttons colors / Badge ********************/
+
+
+.btn-get-started,
+.btn-search,
+.btn-green {
+    color: #00ab8b ; 
+    background-color: #ffffff ; 
+    border-color: #00ab8b ; 
+    transition: background-color 0.3s ease, color 0.3s ease; 
+}
+
+.btn-get-started:hover,
+.btn-search:hover,
+.btn-green:hover {
+    background-color: #00ab8b ; 
+    color: #fafafa ; 
+    border-color: #00ab8b ; 
+}
+
+.btn-special {
+    color: #ffffff;
+    background-color: #00ab8b;
+    border-color: #00ab8b;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-special:hover {
+    background-color: #ffffff;
+    color: #00ab8b;
+    border-color: #00ab8b;
+}
+
+.badge.rounded-pill.text-bg-primary {
+    background-color: #e17d49 !important;
+    color: #fff !important; 
+}
+
+.badge.rounded-pill.text-bg-success {
+    background-color: #00ab8b !important;
+    color: #ffffff; 
+}
+
+.badge.rounded-pill.text-bg-info {
+    background-color: #7d8efe !important;
+    color: #ffffff !important; 
+}
+
+/******************** Features ********************/
+
+.bg-gray-200 {
+    background-color: #e9ecef; 
+}
+
+.feature-icon {
+    padding: 20px;
+}
+
+
+/******************** Contact Us ********************/
+
+.floating-contact-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+  }
+  
+.floating-contact-btn .btn {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #81d67a;
+    border-color: #81d67a;
+    color: white; 
+  }
+  
+.floating-contact-btn .btn:hover {
+    transform: scale(1.1);
+    transition: transform 0.3s ease;
+    background-color: #6ac763; 
+    border-color: #6ac763;
+  }
+
+  footer {
+    background-color: #343a40;  
+    color: #f8f9fa;
+    padding: 2rem 0;
+}
+
+footer h5 {
+    color: #ffffff;
+    margin-bottom: 1rem;
+}
+
+footer p {
+    font-size: 0.9rem;
+}
+
+footer .list-unstyled li {
+    margin-bottom: 0.5rem;
+}
+
+footer a {
+    color: #afc0ec;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.social-links {
+    margin-top: 1rem;
+}
+
+.social-links a {
+    color: #afc0ec;
+    margin-right: 1rem;
+    transition: color 0.3s ease;
+}
+
+.social-links a:hover {
+    color: #ffffff;
+}
+
+/******************** Reg, Login & Logout  ********************/
+
+.top-padding {
+    padding-top: 6rem;
+}
+
+/******************** Dashboard  ********************/
+
+.card-button {
+    transition: transform 0.3s ease-in-out;
+    cursor: pointer;
+}
+.card-button:hover {
+    transform: scale(1.05);
+}
+
+.dashboard-cards {
+    margin-top: 90px;
+    padding-top: 20px;
+}
+
+.card-link {
+    text-decoration: none;
+    color: inherit;
+}
+.card-link:hover {
+    color: inherit;
+}
+
+/******************** Agent Support  ********************/
+
+
+.tabs-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.scrollable-tabs .nav-tabs {
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.scrollable-tabs .nav-tabs::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and Opera */
+}
+
+.supplier-info p {
+    margin-bottom: 1rem;
+}
+
+.supplier-info p:last-child {
+    margin-bottom: 0;
+}
+
+.supplier-info strong {
+    display: inline-block;
+    margin-bottom: 0;
+}
+
+.supplier-info br {
+    line-height: 1;
+}
+
+/******************** CRM  ********************/
+.crm-container {
+    width: 100%;
+    overflow-x: hidden; /* Hide horizontal scroll */
+    
+}
+
+.table-responsive {
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: auto; /* Allow horizontal scroll only for table */
+    margin-bottom: 13px;
+
+    /* Firefox scrollbar styling */
+    scrollbar-width: auto; /* 'thin' or 'auto' for thicker scrollbar */
+    scrollbar-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.05); /* Thumb and track colors */
+
+    /* Internet Explorer scrollbar styling */
+    -ms-overflow-style: auto; /* Use default or thicker scrollbar style */
+}
+
+/* WebKit browsers (Chrome, Safari, newer versions of Opera) */
+.table-responsive::-webkit-scrollbar {
+    width: 12px;  /* Vertical scrollbar width */
+    height: 12px; /* Horizontal scrollbar height */
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 6px; /* Rounder scrollbar thumb */
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.table {
+    width: 100%;
+    white-space: nowrap; /* Prevents text wrapping in cells */
+}
+
+.table th,
+.table td {
+    padding: 0.5rem;
+}
+
+.loading-spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9999;
+}
+
+.spinner {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-spinner p {
+    color: white;
+    margin-top: 10px;
+}
+
+.selected-companies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    margin-top: 0.5em;
+}
+
+.selected-company-badge {
+    display: inline-flex;
+    align-items: center;
+    background-color: #001f3f;
+    color: white;
+    padding: 0.5em 0.7em;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.btn-close-custom {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2em;
+    line-height: 1;
+    padding: 0;
+    margin-left: 0.5em;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.btn-close-custom:hover {
+    opacity: 1;
+}
+
+.linked-companies-container {
+    margin-bottom: 1em;
+}
+
+#linked-companies-search {
+    margin-bottom: 0.5em;
+}
+
+
+/******************** Media queires ********************/
+
+@media (max-width: 1440px) {
+    .hero-bg-img {
+        background-image: url('/static/images/travel-data-img-1440px.jpg');
+        height: 50vh;
+        margin-top: 5rem;
+    }
+    .banna-img-1 {
+        background-image: url('/static/images/data-wave-img-1440px.jpg');
+    }
+    .banna-img-2 {
+        background-image: url('/static/images/data-spider-web-img-1440px.jpg');
+    }
+}
+
+@media (max-width: 991px) {
+    .navbar-collapse {
+        background-color: #001f3f;
+    }
+
+    .table th,
+    .table td {
+        font-size: 12px;
+    }
+}
+
+
+@media (max-width: 768px) {
+    .hero-bg-img {
+        background-image: url('/static/images/travel-data-img-768px.jpg');
+        height: 30vh;
+    }
+    .banna-img-1 {
+        background-image: url('/static/images/data-wave-img-768px.jpg');
+        height: 30vh;
+    }
+    .banna-img-2 {
+        background-image: url('/static/images/data-spider-web-img-768px.jpg');
+        height: 30vh;
+    }
+    .feature-list .row {
+        text-align: center;
+    }
+    footer h5 {
+        margin-top: 1.5rem;
+    }
+    .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    h1.project-primary-color {
+        font-size: 1.75rem;
+    }
+
+    .btn-link {
+        font-size: 24px;
+        text-decoration: none;
+    }
+
+    .accordion-button {
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .accordion-body {
+        padding: 0.75rem;
+    }
+
+    .nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-tabs .nav-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .tab-content p {
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    #message-container {
+        max-width: 100%;
+        right: 0;
+        left: 0;
+        top: 80px;
+    }
+
+    #message-container .alert {
+        margin: 0 10px 0.5rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 425px) {
+    .hero-bg-img {
+        background-image: url('/static/images/travel-data-img-425px.jpg');
+        height: 20vh;
+    }
+    .banna-img-1 {
+        background-image: url('/static/images/data-wave-img-425px.jpg');
+        height: 20vh;
+    }
+    .banna-img-2 {
+        background-image: url('/static/images/data-spider-web-img-425px.jpg');
+        height: 20vh;
+    }
+    .custom-margin {
+        margin-left: 0 !important;
+    }
+}
+
+
+

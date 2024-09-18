@@ -1,21 +1,19 @@
+# activity_log/forms.py
+
 from django import forms
-from .models import Meeting
+from django.contrib.contenttypes.models import ContentType
+from .models import Meeting, MeetingAttendee
 from crm.models import Company, Contact
-from django_ckeditor_5.widgets import CKEditor5Widget
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class MeetingForm(forms.ModelForm):
     class Meta:
         model = Meeting
         fields = [
-            'subject',
-            'attendees',
-            'outcome',
-            'location',
-            'date',
-            'time',
-            'duration',
-            'details',  # Ensure 'details' is included
-            'to_do_task_date',
+            'subject', 'outcome', 'location', 'date', 'time',
+            'duration', 'details', 'to_do_task_date'
         ]
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
@@ -24,19 +22,11 @@ class MeetingForm(forms.ModelForm):
             'duration': forms.Select(attrs={'class': 'form-control'}),
             'outcome': forms.Select(attrs={'class': 'form-control'}),
             'location': forms.Select(attrs={'class': 'form-control'}),
-            'attendees': forms.SelectMultiple(attrs={'class': 'form-control'}),
             'subject': forms.TextInput(attrs={'class': 'form-control'}),
-            'details': CKEditor5Widget(config_name='default'),  # Use CKEditor5Widget
         }
 
     def __init__(self, *args, **kwargs):
-        company = kwargs.pop('company', None)
-        agency = kwargs.pop('agency', None)
+        self.company = kwargs.pop('company', None)  # Remove 'company' from kwargs
+        self.agency = kwargs.pop('agency', None)    # Remove 'agency' from kwargs
         super().__init__(*args, **kwargs)
-        if company:
-            # Limit attendees to contacts from the company and linked companies
-            linked_companies = company.linked_companies.all()
-            companies = [company] + list(linked_companies)
-            self.fields['attendees'].queryset = Contact.objects.filter(company__in=companies)
-        else:
-            self.fields['attendees'].queryset = Contact.objects.none()
+

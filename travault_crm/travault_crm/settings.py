@@ -29,8 +29,6 @@ MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 MEDIA_ROOT = ''  # Leave empty when using S3
 
 DEFAULT_FILE_STORAGE = 'agencies.storage_backends.MediaStorage'
-CKEDITOR_5_FILE_STORAGE = 'agencies.storage_backends.MediaStorage'
-
 
 # Additional S3 settings
 AWS_DEFAULT_ACL = None
@@ -73,7 +71,6 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'storages',
-    'django_ckeditor_5',
     
     # Local apps
     'home',
@@ -161,14 +158,7 @@ ACCOUNT_PASSWORD_RESET_FROM_KEY_DONE_TEMPLATE = 'account/password_reset_from_key
 
 AUTH_USER_MODEL = 'agencies.CustomUser'
 
-CKEDITOR_5_CONFIGS = {
-    'default': {
-        'toolbar': 'full',
-        'height': 'auto',
-        'width': '100%',
-        'remove_plugins': 'exportPdf',
-    },
-}
+
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

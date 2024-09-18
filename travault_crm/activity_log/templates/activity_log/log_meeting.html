@@ -22,7 +22,31 @@
                         <form method="post" action="#">
                             {% csrf_token %}
                             <input type="hidden" id="company-pk" value="{{ company.pk }}">
+
+                            <!-- Attendees Fields -->
+                            <div class="mb-3">
+                                <label for="id_company_contacts" class="form-label">Company Contacts</label>
+                                {{ form.company_contacts }}
+                                {% if form.company_contacts.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.company_contacts.errors|join:", " }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_agency_users" class="form-label">Agency Users</label>
+                                {{ form.agency_users }}
+                                {% if form.agency_users.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.agency_users.errors|join:", " }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Other fields -->
                             {% for field in form %}
+                            {% if field.name not in ['company_contacts', 'agency_users'] %}
                             <div class="mb-3">
                                 <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
                                 {{ field }}
@@ -32,7 +56,9 @@
                                 </div>
                                 {% endif %}
                             </div>
+                            {% endif %}
                             {% endfor %}
+
                             <div class="text-center">
                                 <button type="submit" class="btn btn-primary btn-lg">Log Meeting</button>
                             </div>
@@ -48,5 +74,5 @@
 {% block postload_js %}
 {{ block.super }}
 <script src="https://cdn.ckeditor.com/ckeditor5/38.1.0/classic/ckeditor.js"></script>
-<script src="{% static 'activity_log/js/activity_log_script.js' %}"></script> <!-- External JS file -->
+<script src="{% static 'activity_log/js/activity_log_script.js' %}"></script>
 {% endblock %}

@@ -1,37 +1,29 @@
 # activity_log/views.py
-
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
-from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 from .forms import MeetingForm
 from crm.models import Company, Contact
-from .models import Meeting
-from django.contrib import messages
-import datetime
-
-
+from django.db.models import Q
 
 User = get_user_model()
 
 @login_required
 def log_meeting(request, pk):
     company = get_object_or_404(Company, pk=pk)
-    agency = request.user.agency
-
+    
     if request.method == 'POST':
-        form = MeetingForm(request.POST, company=company, agency=agency)
+        form = MeetingForm(request.POST, company=company)
         if form.is_valid():
             meeting = form.save(commit=False)
             meeting.creator = request.user
-            meeting.agency = agency
+            meeting.company = company
             meeting.save()
-            meeting.associated_companies.add(company)
-            form.save_m2m()  # This will save the attendees
-            return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='activity_log')
+            form.save_m2m()  # Save the many-to-many attendees fields
+            return redirect('crm:company_detail', pk=company.pk)
     else:
-        form = MeetingForm(company=company, agency=agency)
+        form = MeetingForm(company=company)
     
     context = {
         'form': form,
@@ -43,15 +35,22 @@ def log_meeting(request, pk):
 def search_attendees(request):
     query = request.GET.get('q', '')
     company_pk = request.GET.get('company_pk')
+    
+    # Ensure we get the company
+    if company_pk:
+        company = Contact.objects.filter(company_id=company_pk)
+    else:
+        company = Contact.objects.none()
+
     agency = request.user.agency
 
-    company = Company.objects.get(pk=company_pk)
-    
+    # Search for contacts in the company
     contacts = Contact.objects.filter(
         Q(first_name__icontains=query) | Q(last_name__icontains=query),
-        company=company
+        company__pk=company_pk
     )[:10]
-    
+
+    # Search for users in the agency
     users = User.objects.filter(
         Q(first_name__icontains=query) | Q(last_name__icontains=query),
         agency=agency
@@ -64,6 +63,7 @@ def search_attendees(request):
             'name': f"{contact.first_name} {contact.last_name}",
             'model': 'contact'
         })
+
     for user in users:
         results.append({
             'pk': user.pk,

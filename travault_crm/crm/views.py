@@ -151,10 +151,8 @@ def company_detail(request, pk, active_tab='details'):
     logger.debug(f"Filtered {travel_bookers.count()} travel bookers and {vip_travellers.count()} VIP travellers.")
 
     # Fetch activities (meetings for now)
-    meetings = Meeting.objects.filter(
-    associated_companies=company,
-    agency=request.user.agency
-    )
+    meetings = Meeting.objects.filter(company=company)
+
     # You can include other activity types as you implement them
     activities = sorted(meetings, key=lambda x: (x.date, x.time), reverse=True)
 

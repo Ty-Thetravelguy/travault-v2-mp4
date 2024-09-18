@@ -7,60 +7,48 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid full-height-bg top-padding bg-gray-200">
-    <div class="container mt-5 roboto">
-        <div class="row mb-4">
-            <div class="col-12 text-center">
-                <h1 class="project-primary-color mb-0">Log a Meeting for {{ company.company_name }}</h1>
-            </div>
-        </div>
-
-        <div class="row justify-content-center">
+<section id="log-meeting" class="bg-gray-200">
+    <div class="container top-padding roboto">
+        <div class="row justify-content-center py-5">
             <div class="col-md-8">
                 <div class="card shadow">
                     <div class="card-body">
-                        <form method="post" action="#">
+                        <h2 class="card-title text-center mb-4">Log Meeting for {{ company.company_name }}</h2>
+                        <form method="post" action="#" id="logMeetingForm">
                             {% csrf_token %}
-                            <input type="hidden" id="company-pk" value="{{ company.pk }}">
-
-                            <!-- Attendees Fields -->
-                            <div class="mb-3">
-                                <label for="id_company_contacts" class="form-label">Company Contacts</label>
-                                {{ form.company_contacts }}
-                                {% if form.company_contacts.errors %}
-                                <div class="invalid-feedback">
-                                    {{ form.company_contacts.errors|join:", " }}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="id_agency_users" class="form-label">Agency Users</label>
-                                {{ form.agency_users }}
-                                {% if form.agency_users.errors %}
-                                <div class="invalid-feedback">
-                                    {{ form.agency_users.errors|join:", " }}
-                                </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Other fields -->
                             {% for field in form %}
-                            {% if field.name not in ['company_contacts', 'agency_users'] %}
                             <div class="mb-3">
+                                {% if field.name != 'attendees_input' %}
                                 <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                {{ field }}
+                                {% if field.name in 'outcome location duration' %}
+                                {{ field|add_class:"form-select" }}
+                                {% else %}
+                                {{ field|add_class:"form-control" }}
+                                {% endif %}
+                                <div class="form-text text-muted">{{ field.help_text }}</div>
                                 {% if field.errors %}
-                                <div class="invalid-feedback">
-                                    {{ field.errors|join:", " }}
+                                <div class="alert alert-danger">
+                                    {% for error in field.errors %}
+                                    <p>{{ error }}</p>
+                                    {% endfor %}
                                 </div>
                                 {% endif %}
+                                {% endif %}
                             </div>
-                            {% endif %}
                             {% endfor %}
 
+                            <div class="mb-3">
+                                <label for="id_attendees_input_display" class="form-label">Attendees</label>
+                                <input type="text" id="id_attendees_input_display" class="form-control">
+                                {{ form.attendees_input }}
+                                <!-- Hidden field -->
+                                <div class="form-text text-muted">Select contacts from company and users from agency
+                                </div>
+                            </div>
+
                             <div class="text-center">
-                                <button type="submit" class="btn btn-primary btn-lg">Log Meeting</button>
+                                <button type="submit" class="btn btn-get-started btn-lg" id="submitButton">Save
+                                    Meeting</button>
                             </div>
                         </form>
                     </div>
@@ -68,11 +56,19 @@
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+</section>
 
-{% block postload_js %}
-{{ block.super }}
-<script src="https://cdn.ckeditor.com/ckeditor5/38.1.0/classic/ckeditor.js"></script>
+<!-- Add the logMeetingData object here -->
+<script>
+    var logMeetingData = {
+        searchAttendeesUrl: "{% url 'activity_log:search_attendees' %}",
+        companyPk: "{{ company.pk }}"
+    };
+</script>
+
+<!-- Include CKEditor JS -->
+<script src="https://cdn.ckeditor.com/4.16.0/standard/ckeditor.js"></script>
+
+<!-- External JS file for log meeting form (with vanilla JS) -->
 <script src="{% static 'activity_log/js/activity_log_script.js' %}"></script>
 {% endblock %}

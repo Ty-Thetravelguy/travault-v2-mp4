@@ -1,4 +1,5 @@
-# activity_log/forms.py
+#activity_log/forms.py
+
 from django import forms
 from .models import Meeting
 from crm.models import Contact
@@ -7,27 +8,18 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class MeetingForm(forms.ModelForm):
-    # Attendees fields
-    company_contacts = forms.ModelMultipleChoiceField(
-        queryset=Contact.objects.none(),  # Empty queryset initially, will be filtered later
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
-        required=False
-    )
-    agency_users = forms.ModelMultipleChoiceField(
-        queryset=User.objects.all(),
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
-        required=False
-    )
+    attendees_input = forms.CharField(required=False, widget=forms.HiddenInput())
 
     class Meta:
         model = Meeting
         fields = [
             'subject', 'outcome', 'location', 'date', 'time',
-            'duration', 'details', 'to_do_task_date', 'company_contacts', 'agency_users'
+            'duration', 'details', 'to_do_task_date', 'attendees_input'
         ]
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'to_do_task_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'duration': forms.Select(attrs={'class': 'form-control'}),
             'outcome': forms.Select(attrs={'class': 'form-control'}),
             'location': forms.Select(attrs={'class': 'form-control'}),
@@ -36,8 +28,27 @@ class MeetingForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        company = kwargs.pop('company', None)  # Pop the company from the kwargs
+        self.company = kwargs.pop('company', None)  # Company context passed from view
         super().__init__(*args, **kwargs)
-        # Set the queryset for the company contacts based on the current company
-        if company:
-            self.fields['company_contacts'].queryset = Contact.objects.filter(company=company)
+        # No need to set queryset for attendees; handled via JavaScript and hidden field
+
+    def save(self, commit=True):
+        meeting = super().save(commit=False)
+        meeting.company = self.company  # Ensure the meeting is linked to the correct company
+        if commit:
+            meeting.save()
+            # Process attendees_input to add to attendees and company_contacts
+            attendees_data = self.cleaned_data.get('attendees_input', '')
+            if attendees_data:
+                attendees_ids = attendees_data.split(',')
+                for attendee_id in attendees_ids:
+                    if attendee_id.startswith('user_'):
+                        user_id = int(attendee_id.replace('user_', ''))
+                        user = User.objects.get(id=user_id)
+                        meeting.attendees.add(user)
+                    elif attendee_id.startswith('contact_'):
+                        contact_id = int(attendee_id.replace('contact_', ''))
+                        contact = Contact.objects.get(id=contact_id)
+                        meeting.company_contacts.add(contact)
+            meeting.save()
+        return meeting

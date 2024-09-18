@@ -153,6 +153,7 @@ def company_detail(request, pk, active_tab='details'):
     # Fetch activities (meetings for now)
     meetings = Meeting.objects.filter(company=company)
 
+
     # You can include other activity types as you implement them
     activities = sorted(meetings, key=lambda x: (x.date, x.time), reverse=True)
 

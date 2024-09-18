@@ -1,7 +1,7 @@
 # activity_log/models.py
 from django.db import models
+from crm.models import Company, Contact
 from django.contrib.auth import get_user_model
-from crm.models import Company, Contact  # Assuming Contact is your company contact model
 
 User = get_user_model()
 
@@ -22,16 +22,19 @@ class Meeting(models.Model):
     DURATION_CHOICES = [(i, f"{i} minutes") for i in range(15, 481, 15) if i % 15 == 0]
 
     subject = models.CharField(max_length=255)
-    attendees = models.ManyToManyField(User, related_name='attended_meetings')  # Change for user-attendee relation
-    associated_companies = models.ManyToManyField(Company, related_name='meetings')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='meetings')  # Link to one company
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_meetings')
     outcome = models.CharField(max_length=20, choices=OUTCOME_CHOICES)
     location = models.CharField(max_length=20, choices=LOCATION_CHOICES)
     date = models.DateField()
     time = models.TimeField()
     duration = models.IntegerField(choices=DURATION_CHOICES)
-    details = models.TextField('Details', default='')  # Change CKEditor5Field to TextField
+    details = models.TextField('Details', default='')
     to_do_task_date = models.DateField(null=True, blank=True)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_meetings')
+
+    attendees = models.ManyToManyField(User, related_name='attended_meetings')  # For agency users
+    company_contacts = models.ManyToManyField(Contact, related_name='meetings_attended')  # For company contacts
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

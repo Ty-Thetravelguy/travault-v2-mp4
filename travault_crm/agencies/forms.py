@@ -51,7 +51,7 @@ class AgencyRegistrationForm(SignupForm):
         """
         Initializes the form and orders fields as specified.
         """
-        super().__init__(*args, **kwargs)
+        super(AgencyRegistrationForm, self).__init__(*args, **kwargs)
         # Reorder the fields exactly as specified
         field_order = [
             'company_name', 'company_address', 'vat_number', 'company_reg_number', 'phone_number',
@@ -133,29 +133,11 @@ class AgencyRegistrationForm(SignupForm):
             user: The newly created user with linked agency.
         """
         user = super(AgencyRegistrationForm, self).save(request)
-        
-        # Split the full name into first and last name
-        full_name = self.cleaned_data['contact_full_name'].split()
-        if len(full_name) > 1:
-            user.first_name = full_name[0]
-            user.last_name = ' '.join(full_name[1:])
-        else:
-            user.first_name = full_name[0]
-            user.last_name = ''
-        
-        # Setting user role
-        if request.user.is_authenticated and request.user.user_type == 'admin':
-            user.user_type = 'agent'
-        else:
-            user.user_type = 'admin'
-        
-        user.save()  # Save the user with updated names and role
-        
-        # Create the agency linked to the user
-        address_lines = self.cleaned_data['company_address'].split('\n')
+
+        # Create the agency
         agency = Agency.objects.create(
-            agency_name=self.cleaned_data['company_name'],  # Corrected field name
-            address='\n'.join(address_lines),
+            agency_name=self.cleaned_data['company_name'],
+            address=self.cleaned_data['company_address'],
             phone=self.cleaned_data['phone_number'],
             email=user.email,
             vat_number=self.cleaned_data['vat_number'],
@@ -165,7 +147,15 @@ class AgencyRegistrationForm(SignupForm):
             contact_name=self.cleaned_data['contact_full_name']
         )
         
-        # Link the agency to the user
+        # Split the full name into first and last name
+        full_name = self.cleaned_data['contact_full_name'].split()
+        user.first_name = full_name[0]
+        user.last_name = ' '.join(full_name[1:]) if len(full_name) > 1 else ''
+        
+        # Set user type to admin for new registrations
+        user.user_type = 'admin'
+        
+        # Link the agency to the user and save
         user.agency = agency
         user.save()
         

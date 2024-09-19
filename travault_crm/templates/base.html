@@ -49,7 +49,7 @@
     <nav class="navbar navbar-expand-lg py-0 home-nav fixed-top">
         <div class="container-fluid">
             {% if user.is_authenticated %}
-            <a class="navbar-brand" href="{% url 'dashboard:dashboard' %}">
+            <a class="navbar-brand" href="{% url 'dashboard:index' %}">
                 <img src="{% static 'images/TraVault_transparent-logo_v2.png' %}" alt="TraVault Logo" height="30"
                     class="d-inline-block align-top logo">
             </a>
@@ -67,7 +67,7 @@
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
                     <li class="nav-item pt-1">
-                        <a class="nav-link home-nav-text" href="{% url 'dashboard:dashboard' %}">Dashboard</a>
+                        <a class="nav-link home-nav-text" href="{% url 'dashboard:index' %}">Dashboard</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">

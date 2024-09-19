@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_tags %}
+
+{% block head_title %}Verify Your Email{% endblock %}
+
+{% block content %}
+<section id="email-verification" class="bg-gray-200 full-height-bg">
+    <div class="container top-padding roboto">
+        <div class="row justify-content-center py-5">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="card-title text-center mb-4">Verify Your Email</h2>
+                        <div class="alert alert-info text-center">
+                            <p>Thank you for registering! Please check your email inbox and click the verification link
+                                to complete your registration.</p>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <p>Didn't receive the email? <a href="{% url 'account_email_verification_sent' %}">Resend
+                                    Email</a></p>
+                            <p><a href="{% url 'account_login' %}">Return to Login</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

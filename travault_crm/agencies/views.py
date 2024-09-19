@@ -8,19 +8,24 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 from django.http import HttpResponseRedirect
 from django.contrib import messages
+from .forms import AgencyRegistrationForm, UserForm, AgencyProfileForm
+from .models import CustomUser, Agency
 from allauth.account.views import (
+    SignupView,
     LoginView, 
     LogoutView, 
     PasswordResetView, 
     PasswordResetDoneView, 
     PasswordResetFromKeyView, 
-    PasswordResetFromKeyDoneView
+    PasswordResetFromKeyDoneView,
 )
-from .forms import AgencyRegistrationForm, UserForm, AgencyProfileForm
-from .models import CustomUser
+from allauth.account.utils import complete_signup
+from allauth.account import app_settings
 from allauth.account.models import EmailAddress
 from django.contrib.auth.forms import PasswordResetForm
 from allauth.account.utils import send_email_confirmation
+from allauth.account.utils import setup_user_email
+from allauth.account.adapter import get_adapter
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
@@ -29,81 +34,46 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import SetPasswordForm
+from django.db import transaction
+
+
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
 
-@method_decorator(csrf_protect, name='dispatch')
-class AgencyRegistrationView(CreateView):
-    """
-    View for registering a new agency.
-
-    This view handles the registration of a new agency using a form. It processes
-    both GET requests for displaying the registration form and POST requests for
-    creating a new agency record upon successful form submission.
-
-    Attributes:
-        template_name (str): The path to the template used for rendering the form.
-        form_class (Form): The form class used for agency registration.
-        success_url (str): The URL to redirect to upon successful registration.
-    """
+class AgencyRegistrationView(SignupView):
     template_name = 'agencies/registration.html'
     form_class = AgencyRegistrationForm
-    success_url = reverse_lazy('dashboard')
+    success_url = reverse_lazy('account_email_verification_sent')
 
     def get_form_kwargs(self):
-        """
-        Override the method to remove 'instance' from the form kwargs.
-
-        This ensures that the form does not accidentally get an instance passed
-        from the CreateView, which is not needed for registration forms.
-
-        Returns:
-            dict: The keyword arguments for initializing the form.
-        """
         kwargs = super().get_form_kwargs()
-        kwargs.pop('instance', None)
-        logger.debug("Removed 'instance' from form kwargs.")
+        kwargs.pop('instance', None)  # Remove 'instance' if it's present
         return kwargs
 
+    @transaction.atomic
     def form_valid(self, form):
-        """
-        Handle a valid form submission.
-
-        On successful form validation, this method saves the form, registers the agency,
-        and redirects the user to the success URL with a success message.
-
-        Args:
-            form (Form): The validated form with cleaned data.
-
-        Returns:
-            HttpResponseRedirect: A redirect response to the success URL.
-        """
         try:
-            self.object = form.save(self.request)
-            logger.info("Agency registration successful.")
-            messages.success(self.request, "Registration successful!")
-            return HttpResponseRedirect(self.get_success_url())
+            logger.debug("Form validation successful. About to save the form.")
+            user = form.save(self.request)
+            
+            messages.success(self.request, "Registration successful! Please check your email for verification.")
+            return complete_signup(
+                self.request,
+                user,
+                app_settings.EMAIL_VERIFICATION,
+                self.get_success_url()
+            )
         except Exception as e:
-            logger.error(f"Error during registration: {str(e)}")
+            logger.error(f"Error during agency registration: {str(e)}", exc_info=True)
             messages.error(self.request, "An error occurred during registration. Please try again.")
             return self.form_invalid(form)
 
-    def form_invalid(self, form):
-        """
-        Handle an invalid form submission.
+    def get_context_data(self, **kwargs):
+        ret = super().get_context_data(**kwargs)
+        ret.update(self.kwargs)
+        return ret
 
-        Logs form validation errors and returns the form with errors displayed.
-
-        Args:
-            form (Form): The form instance with errors.
-
-        Returns:
-            HttpResponse: A response rendering the form with errors.
-        """
-        logger.error(f"Form validation failed: {form.errors}")
-        messages.error(self.request, "Please correct the errors below.")
-        return super().form_invalid(form)
 
 
 class CustomLoginView(LoginView):

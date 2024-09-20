@@ -56,20 +56,23 @@ def search_attendees(request):
         agency=agency
     )[:10]
 
+    # Prepare results, contacts first, then users
     results = []
+
     for contact in contacts:
         results.append({
             'id': f'contact_{contact.pk}',
-            'text': f"{contact.first_name} {contact.last_name} (Contact)"
+            'name': f"{contact.first_name} {contact.last_name} (Contact)"
         })
 
     for user in users:
         results.append({
             'id': f'user_{user.pk}',
-            'text': f"{user.first_name} {user.last_name} (User)"
+            'name': f"{user.first_name} {user.last_name} (User)"
         })
 
     return JsonResponse({'results': results})
+
 
 @login_required
 def view_meeting(request, pk):

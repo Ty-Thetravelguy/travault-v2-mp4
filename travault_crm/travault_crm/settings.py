@@ -10,6 +10,8 @@ load_dotenv()
 # Access variables
 DIFFBOT_API_KEY = os.getenv('DIFFBOT_API_KEY')
 
+TINYMCE_API_KEY = os.getenv('TINYMCE_API_KEY')
+
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 BASE_DIR = Path(__file__).resolve().parent.parent

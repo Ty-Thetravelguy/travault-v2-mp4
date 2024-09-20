@@ -1,13 +1,26 @@
-.ck-editor__editable_inline {
-    min-height: 400px !important;
+
+.suggestions-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
 }
 
-.ck.ck-editor__main > .ck-editor__editable {
-    background-color: #ffffff;
-    border: 1px solid #ced4da !important;
+.suggestions-list li {
+    padding: 8px;
+    border: 1px solid #ccc;
+    cursor: pointer;
 }
 
-.ck.ck-editor__main > .ck-editor__editable.ck-focused {
-    border-color: #86b7fe !important;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+.suggestions-list li:hover {
+    background-color: #f0f0f0;
+}
+
+.badge {
+    background-color: #007bff; /* Adjust to match your theme */
+    color: white;
+    padding: 0.5em 1em;
+    margin-right: 5px;
+    border-radius: 10px;
+    font-size: 14px;
+    display: inline-block;
 }

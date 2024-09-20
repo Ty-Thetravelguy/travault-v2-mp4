@@ -27,8 +27,9 @@
                             <!-- Attendees -->
                             <div class="mb-3">
                                 <label for="id_attendees_input_display" class="form-label">Attendees</label>
+                                <input type="hidden" id="id_attendees_input" name="attendees_input" value="">
+                                <div id="selected-attendees" class="selected-companies mt-2"></div>
                                 <input type="text" id="id_attendees_input_display" class="form-control">
-                                {{ form.attendees_input }}
                                 <div class="form-text text-muted">Select contacts from company and agency staff members.
                                 </div>
                             </div>
@@ -86,9 +87,6 @@
         </div>
     </div>
 </section>
-
-<!-- Include CKEditor JS -->
-<script src="https://cdn.ckeditor.com/4.16.0/standard/ckeditor.js"></script>
 
 <!-- External JS file for log meeting form (with vanilla JS) -->
 <script src="{% static 'activity_log/js/activity_log_script.js' %}"></script>

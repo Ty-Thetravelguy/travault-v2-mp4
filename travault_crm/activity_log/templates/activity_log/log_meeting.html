@@ -90,6 +90,14 @@
 
 {% endblock %}
 {% block postload_js %}
+
+<script>
+    var logMeetingData = {
+        searchAttendeesUrl: "{% url 'activity_log:search_attendees' %}",
+        companyPk: "{{ company.pk }}"
+    };
+</script>
+
 <!-- Include CKEditor JS -->
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 

@@ -88,6 +88,42 @@
     </div>
 </section>
 
+{% endblock %}
+{% block postload_js %}
+<!-- Include CKEditor JS -->
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
+
+<!-- Initialize CKEditor on the 'details' field -->
+<script>
+    ClassicEditor
+        .create(document.querySelector('#id_details'), {
+            toolbar: {
+                items: [
+                    'heading', '|',
+                    'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
+                    'undo', 'redo'
+                ]
+            },
+            // Configure the height more robustly
+            ui: {
+                viewportOffset: {
+                    top: 30
+                } // Optional: Offset for better UI control if needed
+            }
+        })
+        .then(editor => {
+            // Apply the min-height using both methods to ensure stability
+            editor.ui.view.editable.element.style.minHeight = '300px'; // Set the height for the content area
+            editor.editing.view.change(writer => {
+                writer.setStyle('min-height', '300px', editor.editing.view.document.getRoot());
+            });
+        })
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+
 <!-- External JS file for log meeting form (with vanilla JS) -->
 <script src="{% static 'activity_log/js/activity_log_script.js' %}"></script>
 {% endblock %}

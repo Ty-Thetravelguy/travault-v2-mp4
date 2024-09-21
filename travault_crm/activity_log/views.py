@@ -3,6 +3,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.db.models import Q
 from .models import Meeting
 from .forms import MeetingForm
@@ -18,12 +19,20 @@ def log_meeting(request, pk):
     if request.method == 'POST':
         form = MeetingForm(request.POST, company=company)
         if form.is_valid():
-            meeting = form.save(commit=False)
-            meeting.creator = request.user
-            meeting.company = company  # Link the meeting to the company
-            meeting.save()
-            form.save_m2m()  # Save many-to-many relationships
-            return redirect('crm:company_detail', pk=company.pk)
+            try:
+                meeting = form.save(commit=False)
+                meeting.creator = request.user
+                meeting.save()
+                form.save_m2m()
+                messages.success(request, "Meeting logged successfully!")
+                return redirect('crm:company_detail', pk=company.pk)
+            except Exception as e:
+                form.add_error(None, "An unexpected error occurred. Please try again.")
+                messages.error(request, "An unexpected error occurred while saving the meeting.")
+                print("Error saving meeting:", e)  # Debugging statement
+        else:
+            messages.error(request, "There were errors in your submission. Please correct them below.")
+            print("Form is invalid:", form.errors)  # Debugging statement
     else:
         form = MeetingForm(company=company)
 
@@ -72,7 +81,6 @@ def search_attendees(request):
         })
 
     return JsonResponse({'results': results})
-
 
 @login_required
 def view_meeting(request, pk):

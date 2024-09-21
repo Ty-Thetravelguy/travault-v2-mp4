@@ -123,6 +123,7 @@ AUTHENTICATION_BACKENDS = [
 SITE_ID = 1
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'Your Project <noreply@travault.com>'  
 
 WSGI_APPLICATION = 'travault_crm.wsgi.application'
 
@@ -166,7 +167,17 @@ ACCOUNT_PASSWORD_RESET_FROM_KEY_DONE_TEMPLATE = 'account/password_reset_from_key
 
 AUTH_USER_MODEL = 'agencies.CustomUser'
 
+# Redis as the broker and result backend
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
+# Optional Celery settings
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC' 
+
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

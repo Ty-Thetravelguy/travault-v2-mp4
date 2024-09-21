@@ -29,8 +29,9 @@ class Meeting(models.Model):
     date = models.DateField()
     time = models.TimeField()
     duration = models.IntegerField(choices=DURATION_CHOICES)
-    details = models.TextField('Details', default='')
+    details = models.TextField('Details', default='', blank=True)
     to_do_task_date = models.DateField(null=True, blank=True)
+    to_do_task_message = models.TextField('To Do Task Message', null=True, blank=True)  # New Field
 
     attendees = models.ManyToManyField(User, related_name='attended_meetings')  # For agency users
     company_contacts = models.ManyToManyField(Contact, related_name='meetings_attended')  # For company contacts

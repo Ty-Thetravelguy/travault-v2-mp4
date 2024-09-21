@@ -1,4 +1,5 @@
 # activity_log/models.py
+
 from django.db import models
 from crm.models import Company, Contact
 from django.contrib.auth import get_user_model

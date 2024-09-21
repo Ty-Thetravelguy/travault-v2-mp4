@@ -1,3 +1,8 @@
+# activity_log/admin.py
 from django.contrib import admin
+from .models import Meeting
 
-# Register your models here.
+@admin.register(Meeting)
+class MeetingAdmin(admin.ModelAdmin):
+    list_display = ('subject', 'date', 'time', 'company', 'creator')
+    filter_horizontal = ('attendees', 'company_contacts')

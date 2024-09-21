@@ -21,12 +21,33 @@
                         <p><strong>Outcome:</strong> {{ meeting.outcome }}</p>
                         <p><strong>Location:</strong> {{ meeting.location }}</p>
                         <p><strong>Attendees:</strong>
-                            {% for attendee in meeting.attendees.all %}{{ attendee.first_name }}
-                            {{ attendee.last_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                            {% for attendee in meeting.attendees.all %}
+                            {{ attendee.first_name }} {{ attendee.last_name }} (User){% if not forloop.last %},
+                            {% endif %}
+                            {% endfor %}
+                            {% if meeting.attendees.exists and meeting.company_contacts.exists %}, {% endif %}
+                            {% for contact in meeting.company_contacts.all %}
+                            {{ contact.first_name }} {{ contact.last_name }} (Contact){% if not forloop.last %},
+                            {% endif %}
+                            {% endfor %}
+                        </p>
                         <h4>Details:</h4>
                         <div>{{ meeting.details|safe }}</div>
+
+                        {% if meeting.to_do_task_date or meeting.to_do_task_message %}
+                        <hr>
+                        <h4>To-Do Task:</h4>
+                        {% if meeting.to_do_task_date %}
+                        <p><strong>Date:</strong> {{ meeting.to_do_task_date }}</p>
+                        {% endif %}
+                        {% if meeting.to_do_task_message %}
+                        <p><strong>Message:</strong></p>
+                        <div>{{ meeting.to_do_task_message|linebreaks }}</div>
+                        {% endif %}
+                        {% endif %}
+
                         <div class="mt-3 text-center">
-                            <a href="{% url 'crm:company_detail_with_tab' pk=company.pk active_tab='activity_log' %}"
+                            <a href="{% url 'crm:company_detail_with_tab' pk=company.pk active_tab='activity' %}"
                                 class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Back to Company
                             </a>

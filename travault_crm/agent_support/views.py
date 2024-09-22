@@ -1,4 +1,5 @@
-import logging, time
+import logging
+import time
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -64,7 +65,7 @@ def add_agent_supplier(request):
             supplier = form.save(commit=False)
             supplier.agency = agency
             supplier.save()
-            logger.info(f"New agent supplier '{supplier.name}' added for agency '{agency.name}'.")
+            logger.info(f"New agent supplier '{supplier}' added for agency '{agency.name}'.")
             messages.success(request, "Agent supplier added successfully.")
             return redirect('agent_support:agent_support')
         else:

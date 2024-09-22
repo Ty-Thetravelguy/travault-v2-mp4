@@ -1,1 +1,33 @@
 ERROR 2024-09-21 10:09:30,538 forms Error saving meeting: name 'send_follow_up_email' is not defined
+ERROR 2024-09-22 10:04:59,299 log Internal Server Error: /agent_support/add_agent_supplier/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/agent_support/views.py", line 67, in add_agent_supplier
+    logger.info(f"New agent supplier '{supplier.name}' added for agency '{agency.name}'.")
+                                       ^^^^^^^^^^^^^
+AttributeError: 'AgentSupportSupplier' object has no attribute 'name'
+ERROR 2024-09-22 10:04:59,301 basehttp "POST /agent_support/add_agent_supplier/ HTTP/1.1" 500 91432
+ERROR 2024-09-22 10:10:30,777 log Internal Server Error: /agent_support/add_agent_supplier/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/agent_support/views.py", line 67, in add_agent_supplier
+    logger.info(f"New agent supplier '{supplier.name}' added for agency '{agency.name}'.")
+                                       ^^^^^^^^^^^^^
+AttributeError: 'AgentSupportSupplier' object has no attribute 'name'
+ERROR 2024-09-22 10:10:30,779 basehttp "POST /agent_support/add_agent_supplier/ HTTP/1.1" 500 91432

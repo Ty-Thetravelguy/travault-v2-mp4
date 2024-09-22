@@ -46,7 +46,7 @@ class AgentSupportSupplier(models.Model):
         process_4_text (str): Text description for the fourth process, can be blank.
         process_4_pdf (FileField): PDF file associated with the fourth process, can be blank.
         file (FileField): An additional file associated with the supplier, can be blank.
-    """
+        """
 
     SUPPLIER_TYPES = [
         ('air', 'Air'),

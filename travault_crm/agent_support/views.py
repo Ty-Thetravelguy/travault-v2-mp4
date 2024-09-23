@@ -125,3 +125,39 @@ def edit_agent_supplier(request, pk):
 
     logger.info(f"edit_agent_supplier completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'agent_support/edit_agent_supplier.html', {'form': form, 'supplier': supplier})
+
+
+@login_required
+def delete_agent_supplier(request, pk):
+    """
+    View to delete an agent support supplier after confirmation.
+
+    Only admin users can perform this action. The admin must type in
+    the supplier's name to confirm deletion.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request.
+        pk (int): Primary key of the supplier to delete.
+
+    Returns:
+        HttpResponse: Redirects to the agent support page on success,
+        or renders the confirmation template on failure.
+    """
+    supplier = get_object_or_404(AgentSupportSupplier, pk=pk, agency=request.user.agency)
+
+    # Check if the user is an admin
+    if request.user.user_type != 'admin':
+        messages.error(request, "You do not have permission to delete this supplier.")
+        return redirect('agent_support:agent_support')
+
+    if request.method == 'POST':
+        supplier_name_input = request.POST.get('supplier_name', '').strip()
+        if supplier_name_input == supplier.supplier_name:
+            supplier.delete()
+            messages.success(request, f"Supplier '{supplier.supplier_name}' deleted successfully.")
+            return redirect('agent_support:agent_support')
+        else:
+            messages.error(request, "The supplier name you entered does not match.")
+
+    # Render confirmation page for GET request or if POST fails
+    return render(request, 'agent_support/confirm_delete_agent_supplier.html', {'supplier': supplier})

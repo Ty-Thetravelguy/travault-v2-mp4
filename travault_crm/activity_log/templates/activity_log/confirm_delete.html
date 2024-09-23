@@ -1,0 +1,25 @@
+<!-- activity_log/templates/activity_log/confirm_delete.html -->
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid mt-5 full-height-bg top-padding bg-gray-200">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <h3 class="text-danger">Confirm Deletion</h3>
+                    <p>Are you sure you want to delete the meeting "<strong>{{ meeting.subject }}</strong>"?</p>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <a href="{% url 'crm:company_detail_with_tab' pk=company.pk active_tab='activity' %}"
+                            class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

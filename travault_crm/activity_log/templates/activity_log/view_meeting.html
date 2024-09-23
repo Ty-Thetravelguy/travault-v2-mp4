@@ -51,6 +51,13 @@
                                 class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Back to Company
                             </a>
+                            <!-- Delete Meeting Button -->
+                            {% if user.user_type == 'admin' %}
+                            <!-- Delete Meeting Button -->
+                            <a href="{% url 'activity_log:delete_meeting' pk=meeting.pk %}" class="btn btn-danger ml-2">
+                                <i class="fas fa-trash-alt"></i> Delete Meeting
+                            </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

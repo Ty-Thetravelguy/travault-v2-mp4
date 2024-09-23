@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.db.models import Q
 from .models import Meeting
@@ -88,3 +88,39 @@ def view_meeting(request, pk):
         'attendees': attendees
     }
     return render(request, 'activity_log/view_meeting.html', context)
+
+
+@login_required
+def delete_meeting(request, pk):
+    meeting = get_object_or_404(Meeting, pk=pk)
+    company = meeting.company  # Ensure Meeting has a ForeignKey to Company
+
+    # Check if the user is an admin within the agency
+    current_user = request.user
+    is_admin = User.objects.filter(
+        id=current_user.id,
+        user_type='admin',
+        agency=company.agency  # Ensure Company has a ForeignKey to Agency
+    ).exists()
+
+    if not is_admin:
+        messages.error(request, "You do not have permission to delete this meeting.")
+        return redirect('activity_log:view_meeting', pk=pk)
+
+    if request.method == 'POST':
+        try:
+            meeting.delete()
+            messages.success(request, "Meeting deleted successfully.")
+        except Exception as e:
+            messages.error(request, f"An error occurred while deleting the meeting: {str(e)}")
+            return redirect('activity_log:view_meeting', pk=pk)
+
+        # Redirect to activity tab
+        return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='activity')
+
+    # Render confirmation page for GET request
+    context = {
+        'meeting': meeting,
+        'company': company
+    }
+    return render(request, 'activity_log/confirm_delete.html', context)

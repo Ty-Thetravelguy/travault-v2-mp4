@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_log_tags %}
+
+{% block content %}
+<section id="log-call" class="bg-gray-200">
+    <div class="container top-padding roboto">
+        <div class="row justify-content-center py-5">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="card-title text-center mb-4">Log Call for {{ company.company_name }}</h2>
+                        <form method="post" action="#" id="logCallForm">
+                            {% csrf_token %}
+
+                            <!-- Subject -->
+                            <div class="mb-3">
+                                <label for="{{ form.subject.id_for_label }}" class="form-label">Subject</label>
+                                {{ form.subject|add_class:"form-control" }}
+                            </div>
+
+                            <!-- Contacts -->
+                            <div class="mb-3">
+                                <label for="id_contacts_input_display" class="form-label">Contacts</label>
+                                <input type="hidden" id="id_contacts_input" name="contacts_input" value="">
+                                <div id="selected-contacts" class="selected-companies mt-2"></div>
+                                <input type="text" id="id_contacts_input_display" class="form-control">
+                                <div class="form-text text-muted">Select contacts from the company.</div>
+                            </div>
+
+                            <!-- Outcome -->
+                            <div class="mb-3">
+                                <label for="{{ form.outcome.id_for_label }}" class="form-label">Outcome</label>
+                                {{ form.outcome|add_class:"form-select" }}
+                            </div>
+
+                            <!-- Date and Time -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.date.id_for_label }}" class="form-label">Date</label>
+                                    {{ form.date|add_class:"form-control" }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.time.id_for_label }}" class="form-label">Time</label>
+                                    {{ form.time|add_class:"form-control" }}
+                                </div>
+                            </div>
+
+                            <!-- Duration -->
+                            <div class="mb-3">
+                                <label for="{{ form.duration.id_for_label }}" class="form-label">Duration</label>
+                                {{ form.duration|add_class:"form-select" }}
+                            </div>
+
+                            <!-- Details -->
+                            <div class="mb-3">
+                                <label for="{{ form.details.id_for_label }}" class="form-label">Details</label>
+                                {{ form.details|add_class:"form-control" }}
+                            </div>
+
+                            <!-- To Do Task / Follow-up -->
+                            <div class="mb-3">
+                                <label for="{{ form.to_do_task_date.id_for_label }}" class="form-label">To Do Task /
+                                    Follow-up</label>
+                                {{ form.to_do_task_date|add_class:"form-control" }}
+                                <input type="hidden" id="id_to_do_task_message" name="to_do_task_message" value="">
+                            </div>
+
+                            <!-- Save Call Button -->
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-get-started btn-lg" id="submitButton">Save
+                                    Call</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal for To Do Task Message -->
+<div class="modal fade" id="toDoTaskModal" tabindex="-1" aria-labelledby="toDoTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="toDoTaskForm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Follow-Up Message</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="id_to_do_task_message_modal" class="form-label">Message</label>
+                        <textarea id="id_to_do_task_message_modal" name="to_do_task_message" class="form-control"
+                            rows="3" placeholder="Enter your follow-up message here..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveToDoTask">Save Message</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block postload_js %}
+
+<script>
+    var logCallData = {
+        searchContactsUrl: "{% url 'activity_log:search_contacts' %}",
+        companyPk: "{{ company.pk }}"
+    };
+</script>
+
+<!-- Include CKEditor JS -->
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
+<!-- External JS file for log call form (adjusted from your existing JS) -->
+<script src="{% static 'activity_log/js/activity_log_call_script.js' %}"></script>
+{% endblock %}

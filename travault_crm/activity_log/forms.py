@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, time
 from django import forms
-from .models import Meeting
+from .models import Meeting, Call, Email
 from crm.models import Contact
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -96,3 +96,67 @@ class MeetingForm(forms.ModelForm):
                 logger.error(f"Error saving meeting: {e}")
                 raise  # Re-raise the exception to be handled by the view
         return meeting
+
+
+class CallForm(forms.ModelForm):
+    contacts_input = forms.CharField(widget=forms.HiddenInput(), required=False)
+
+    class Meta:
+        model = Call  # This line requires the Call model to be imported
+        fields = ['subject', 'outcome', 'date', 'time', 'duration', 'details', 'to_do_task_date']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'time': forms.TimeInput(attrs={'type': 'time'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.company = kwargs.pop('company', None)
+        self.creator = kwargs.pop('creator', None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        call = super().save(commit=False)
+        call.company = self.company
+        call.creator = self.creator
+        if commit:
+            call.save()
+            # Handle contacts_input
+            contacts_input = self.cleaned_data.get('contacts_input', '')
+            if contacts_input:
+                contact_ids = contacts_input.split(',')
+                contacts = Contact.objects.filter(id__in=contact_ids)
+                call.contacts.set(contacts)
+            self.save_m2m()
+        return call
+
+
+class EmailForm(forms.ModelForm):
+    contacts_input = forms.CharField(widget=forms.HiddenInput(), required=False)
+
+    class Meta:
+        model = Email
+        fields = ['subject', 'outcome', 'date', 'time', 'details', 'to_do_task_date']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'time': forms.TimeInput(attrs={'type': 'time'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.company = kwargs.pop('company', None)
+        self.creator = kwargs.pop('creator', None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        email = super().save(commit=False)
+        email.company = self.company
+        email.creator = self.creator
+        if commit:
+            email.save()
+            # Handle contacts_input
+            contacts_input = self.cleaned_data.get('contacts_input', '')
+            if contacts_input:
+                contact_ids = contacts_input.split(',')
+                contacts = Contact.objects.filter(id__in=contact_ids)
+                email.contacts.set(contacts)
+            self.save_m2m()
+        return email

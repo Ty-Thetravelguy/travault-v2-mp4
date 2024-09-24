@@ -2,13 +2,14 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
+
     // -------------------
-    // Attendees Handling
+    // Contacts Handling
     // -------------------
-    const attendeesInput = document.getElementById('id_attendees_input_display');
-    const hiddenAttendeesInput = document.getElementById('id_attendees_input');  
-    const selectedAttendeesContainer = document.getElementById('selected-attendees');  // Container for attendee badges
-    let selectedAttendees = [];
+    const contactsInput = document.getElementById('id_contacts_input_display');
+    const hiddenContactsInput = document.getElementById('id_contacts_input');  
+    const selectedContactsContainer = document.getElementById('selected-contacts');  // Container for contact badges
+    let selectedContacts = [];
 
     // Debounce function to limit the rate of API calls
     function debounce(func, delay) {
@@ -19,101 +20,96 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
-    attendeesInput.addEventListener('input', debounce(function () {
-        const query = attendeesInput.value.trim();
+    contactsInput.addEventListener('input', debounce(function () {
+        const query = contactsInput.value.trim();
         if (query.length < 2) {
-            clearAttendeesList();
+            clearContactsList();
             return;
         }
 
-        fetch(`${logMeetingData.searchAttendeesUrl}?q=${encodeURIComponent(query)}&company_pk=${logMeetingData.companyPk}`)
+        fetch(`${logCallData.searchContactsUrl}?q=${encodeURIComponent(query)}&company_pk=${logCallData.companyPk}`)
             .then(response => response.json())
             .then(data => {
-                clearAttendeesList(); 
-                showAttendeesSuggestions(data.results);
+                clearContactsList(); 
+                showContactsSuggestions(data.results);
             })
             .catch(error => {
                 // Handle the error as needed
             });
     }, 300));  // 300ms debounce delay
 
-    function clearAttendeesList() {
-        const oldList = document.getElementById('attendees-suggestions');
+    function clearContactsList() {
+        const oldList = document.getElementById('contacts-suggestions');
         if (oldList) oldList.remove();
     }
 
-    function showAttendeesSuggestions(suggestions) {
+    function showContactsSuggestions(suggestions) {
         if (suggestions.length === 0) return;
 
         const suggestionList = document.createElement('ul');
-        suggestionList.id = 'attendees-suggestions';
+        suggestionList.id = 'contacts-suggestions';
         suggestionList.classList.add('list-group', 'position-absolute', 'w-100', 'z-index-1000');
 
-        suggestions.forEach(attendee => {
+        suggestions.forEach(contact => {
             const listItem = document.createElement('li');
-            listItem.textContent = attendee.name;
-            listItem.dataset.pk = attendee.id;  // 'contact_contact_1' or 'contact_user_19'
+            listItem.textContent = contact.name;
+            listItem.dataset.pk = contact.id;
             listItem.classList.add('list-group-item', 'list-group-item-action');
             listItem.style.cursor = 'pointer';
 
             listItem.addEventListener('click', function () {
-                selectAttendee(attendee);
+                selectContact(contact);
             });
 
             suggestionList.appendChild(listItem);
         });
 
-        // Position the suggestion list below the input field
-        attendeesInput.parentNode.style.position = 'relative';
-        attendeesInput.parentNode.appendChild(suggestionList);
+        contactsInput.parentNode.style.position = 'relative';
+        contactsInput.parentNode.appendChild(suggestionList);
     }
 
-    function selectAttendee(attendee) {
-        // Use the prefixed ID directly as returned from the server
-        const prefixedId = attendee.id;  // e.g., 'contact_contact_1' or 'contact_user_19'
+    function selectContact(contact) {
+        const id = contact.id;
 
-        if (!selectedAttendees.includes(prefixedId)) {
-            selectedAttendees.push(prefixedId);
-            updateHiddenAttendeesInput();
-            showSelectedAttendee(attendee);
+        if (!selectedContacts.includes(id)) {
+            selectedContacts.push(id);
+            updateHiddenContactsInput();
+            showSelectedContact(contact);
         }
 
-        attendeesInput.value = ''; // Clear the input field after selection
-        clearAttendeesList(); // Clear the suggestions after selection
+        contactsInput.value = ''; // Clear the input field after selection
+        clearContactsList(); // Clear the suggestions after selection
     }
 
-    function showSelectedAttendee(attendee) {
-        const attendeeBadge = document.createElement('span');
-        attendeeBadge.className = 'badge bg-primary me-2 mb-2 d-inline-flex align-items-center';
-        attendeeBadge.textContent = attendee.name;
+    function showSelectedContact(contact) {
+        const contactBadge = document.createElement('span');
+        contactBadge.className = 'badge bg-primary me-2 mb-2 d-inline-flex align-items-center';
+        contactBadge.textContent = contact.name;
 
-        // Use the prefixed ID directly
-        const prefixedId = attendee.id;  // e.g., 'contact_contact_1' or 'contact_user_19'
-        attendeeBadge.dataset.id = prefixedId; // Store the prefixed attendee ID
+        contactBadge.dataset.id = contact.id; // Store the contact ID
 
         const closeButton = document.createElement('button');
         closeButton.innerHTML = '&times;';
         closeButton.className = 'btn-close btn-close-white ms-2';
         closeButton.setAttribute('aria-label', 'Remove');
 
-        // Bind the prefixed attendee ID to the click event using a closure
         closeButton.addEventListener('click', (e) => {
             e.preventDefault();
-            const id = prefixedId; // Use the prefixed ID
-            const index = selectedAttendees.indexOf(id);
+            const id = contact.id;
+            const index = selectedContacts.indexOf(id);
             if (index !== -1) {
-                selectedAttendees.splice(index, 1);
-                updateHiddenAttendeesInput();
-                attendeeBadge.remove();
+                selectedContacts.splice(index, 1);
+                updateHiddenContactsInput();
+                contactBadge.remove();
             }
         });
 
-        attendeeBadge.appendChild(closeButton);
-        selectedAttendeesContainer.appendChild(attendeeBadge);
+        contactBadge.appendChild(closeButton);
+        selectedContactsContainer.appendChild(contactBadge);
     }
 
-    function updateHiddenAttendeesInput() {
-        hiddenAttendeesInput.value = selectedAttendees.join(',');
+    function updateHiddenContactsInput() {
+        hiddenContactsInput.value = selectedContacts.join(',');
     }
 
     // ------------------------------

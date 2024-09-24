@@ -1,6 +1,8 @@
 from django import template
 from django.forms import CheckboxInput, RadioSelect
 from django.utils.safestring import SafeString
+from activity_log.models import Meeting, Call, Email
+
 
 register = template.Library()
 
@@ -30,3 +32,15 @@ def get_item(dictionary, key):
 @register.filter
 def instanceof(obj, class_name):
     return obj.__class__.__name__ == class_name
+
+@register.filter
+def is_meeting(value):
+    return isinstance(value, Meeting)
+
+@register.filter
+def is_call(value):
+    return isinstance(value, Call)
+
+@register.filter
+def is_email(value):
+    return isinstance(value, Email)

@@ -45,3 +45,64 @@ class Meeting(models.Model):
 
     class Meta:
         ordering = ['-date', '-time']
+
+
+class Call(models.Model):
+    OUTCOME_CHOICES = [
+        ('Connected', 'Connected'),
+        ('Voicemail', 'Left Voicemail'),
+        ('No Answer', 'No Answer'),
+        ('Busy', 'Busy'),
+        ('Disconnected', 'Disconnected'),
+    ]
+    DURATION_CHOICES = [(i, f"{i} minutes") for i in range(1, 61)]
+
+    subject = models.CharField(max_length=255)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='calls')
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_calls')
+    outcome = models.CharField(max_length=20, choices=OUTCOME_CHOICES)
+    date = models.DateField()
+    time = models.TimeField()
+    duration = models.IntegerField(choices=DURATION_CHOICES)
+    details = models.TextField('Details', default='', blank=True)
+    to_do_task_date = models.DateField(null=True, blank=True)
+    to_do_task_message = models.TextField('To Do Task Message', null=True, blank=True)
+    contacts = models.ManyToManyField(Contact, related_name='calls_attended')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.subject} - {self.date}"
+
+    class Meta:
+        ordering = ['-date', '-time']
+
+class Email(models.Model):
+    OUTCOME_CHOICES = [
+        ('Sent', 'Sent'),
+        ('Received', 'Received'),
+        ('Bounced', 'Bounced'),
+        ('Opened', 'Opened'),
+        ('Clicked', 'Clicked'),
+    ]
+
+    subject = models.CharField(max_length=255)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='emails')
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_emails')
+    outcome = models.CharField(max_length=20, choices=OUTCOME_CHOICES)
+    date = models.DateField()
+    time = models.TimeField()
+    details = models.TextField('Details', default='', blank=True)
+    to_do_task_date = models.DateField(null=True, blank=True)
+    to_do_task_message = models.TextField('To Do Task Message', null=True, blank=True)
+    contacts = models.ManyToManyField(Contact, related_name='emails_attended')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.subject} - {self.date}"
+    
+    class Meta:
+        ordering = ['-date', '-time']

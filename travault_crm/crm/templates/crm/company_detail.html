@@ -465,6 +465,7 @@
                 </div>
             </div>
 
+            <!-- Activity Log Tab -->
             <div class="tab-pane fade {% if active_tab == 'activity' %}show active{% endif %}" id="activity"
                 role="tabpanel" aria-labelledby="activity-tab">
                 <div class="card shadow">
@@ -477,17 +478,15 @@
                                     <i class="fas fa-plus me-1"></i> Add Activity
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="addActivityDropdown">
-                                    <li><a class="dropdown-item" href="#"><i class="fas fa-phone me-2"></i>Log a
-                                            call</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="fas fa-envelope me-2"></i>Log an
-                                            email</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'activity_log:log_call' pk=company.pk %}">
+                                            <i class="fas fa-phone me-2"></i>Log a call</a></li>
                                     <li><a class="dropdown-item"
-                                            href="{% url 'activity_log:log_meeting' pk=company.pk %}"><i
-                                                class="fas fa-users me-2"></i>Log a meeting</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="fas fa-ticket-alt me-2"></i>Open a
-                                            ticket</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="fas fa-handshake me-2"></i>Start a
-                                            deal</a></li>
+                                            href="{% url 'activity_log:log_email' pk=company.pk %}">
+                                            <i class="fas fa-envelope me-2"></i>Log an email</a></li>
+                                    <li><a class="dropdown-item"
+                                            href="{% url 'activity_log:log_meeting' pk=company.pk %}">
+                                            <i class="fas fa-users me-2"></i>Log a meeting</a></li>
+                                    <!-- ... (other actions) ... -->
                                 </ul>
                             </div>
                         </div>
@@ -495,32 +494,56 @@
                         {% if activities %}
                         <ul class="list-group list-group-flush">
                             {% for activity in activities %}
+                            {% with is_meeting=activity|is_meeting is_call=activity|is_call is_email=activity|is_email %}
                             <li class="list-group-item py-3">
                                 <div class="row align-items-center">
+                                    <!-- Icon Column -->
                                     <div class="col-auto">
                                         <div class="bg-light rounded-circle p-2">
+                                            {% if is_meeting %}
                                             <i class="fas fa-calendar-alt text-primary"></i>
+                                            {% elif is_call %}
+                                            <i class="fas fa-phone text-success"></i>
+                                            {% elif is_email %}
+                                            <i class="fas fa-envelope text-warning"></i>
+                                            {% endif %}
                                         </div>
                                     </div>
+                                    <!-- Details Column -->
                                     <div class="col">
+                                        {% if is_meeting %}
                                         <h5 class="mb-1">Meeting: {{ activity.subject }}</h5>
-                                        <p class="mb-0 text-muted small">
-                                            <span class="me-2"><i class="fas fa-clock me-1"></i>{{ activity.date }} at
-                                                {{ activity.time }}</span>
-                                            <span class="me-2"><i
-                                                    class="fas fa-check-circle me-1"></i>{{ activity.outcome }}</span>
-                                            <span><i
-                                                    class="fas fa-user me-1"></i>{{ activity.creator.get_full_name }}</span>
-                                        </p>
+                                        <p class="mb-0">{{ activity.date }} at {{ activity.time }}</p>
+                                        {% elif is_call %}
+                                        <h5 class="mb-1">Call: {{ activity.subject }}</h5>
+                                        <p class="mb-0">{{ activity.date }} at {{ activity.time }}</p>
+                                        {% elif is_email %}
+                                        <h5 class="mb-1">Email: {{ activity.subject }}</h5>
+                                        <p class="mb-0">{{ activity.date }} at {{ activity.time }}</p>
+                                        {% endif %}
                                     </div>
+                                    <!-- Action Column -->
                                     <div class="col-auto">
+                                        {% if is_meeting %}
                                         <a href="{% url 'activity_log:view_meeting' pk=activity.id %}"
                                             class="btn btn-sm btn-outline-secondary">
                                             <i class="fas fa-eye me-1"></i> View
                                         </a>
+                                        {% elif is_call %}
+                                        <a href="{% url 'activity_log:view_call' pk=activity.id %}"
+                                            class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-eye me-1"></i> View
+                                        </a>
+                                        {% elif is_email %}
+                                        <a href="{% url 'activity_log:view_email' pk=activity.id %}"
+                                            class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-eye me-1"></i> View
+                                        </a>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </li>
+                            {% endwith %}
                             {% endfor %}
                         </ul>
                         {% else %}
@@ -529,6 +552,7 @@
                     </div>
                 </div>
             </div>
+            <!-- End of Activity Log Tab -->
 
 
         </div>

@@ -10,7 +10,7 @@ from .forms import CompanyForm, ContactForm, CompanyNotesForm, TransactionFeeFor
 from urllib.parse import quote
 from django.conf import settings
 from django.db.models import Case, When, BooleanField
-from activity_log.models import Meeting
+from activity_log.models import Meeting, Call, Email
 import requests
 import logging
 import time
@@ -150,8 +150,17 @@ def company_detail(request, pk, active_tab='details'):
     vip_travellers = contacts.filter(is_vip_traveller_contact=True)
     logger.debug(f"Filtered {travel_bookers.count()} travel bookers and {vip_travellers.count()} VIP travellers.")
 
-    # Fetch activities (meetings for now)
+    # Fetch activities (meetings, calls, emails)
     meetings = Meeting.objects.filter(company=company)
+    calls = Call.objects.filter(company=company)
+    emails = Email.objects.filter(company=company)
+
+    # Combine and sort activities
+    activities = sorted(
+        list(meetings) + list(calls) + list(emails),
+        key=lambda x: (x.date, x.time),
+        reverse=True
+    )
 
 
     # You can include other activity types as you implement them

@@ -8,8 +8,10 @@ from django.utils import timezone
 from datetime import datetime, time  # Ensure these are imported
 from .tasks import send_follow_up_email  # Import the task
 
+
 User = get_user_model()
 logger = logging.getLogger('activity_log')  # Use the logger defined in LOGGING
+
 
 class MeetingForm(forms.ModelForm):
     attendees_input = forms.CharField(required=False, widget=forms.HiddenInput())
@@ -100,13 +102,18 @@ class MeetingForm(forms.ModelForm):
 
 class CallForm(forms.ModelForm):
     contacts_input = forms.CharField(widget=forms.HiddenInput(), required=False)
-
+    to_do_task_message = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Enter your follow-up message here...'})
+    )
+    
     class Meta:
-        model = Call  # This line requires the Call model to be imported
-        fields = ['subject', 'outcome', 'date', 'time', 'duration', 'details', 'to_do_task_date']
+        model = Call
+        fields = ['subject', 'outcome', 'date', 'time', 'details', 'to_do_task_date', 'to_do_task_message']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
-            'time': forms.TimeInput(attrs={'type': 'time'}),
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'to_do_task_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -120,25 +127,43 @@ class CallForm(forms.ModelForm):
         call.creator = self.creator
         if commit:
             call.save()
-            # Handle contacts_input
             contacts_input = self.cleaned_data.get('contacts_input', '')
             if contacts_input:
                 contact_ids = contacts_input.split(',')
                 contacts = Contact.objects.filter(id__in=contact_ids)
                 call.contacts.set(contacts)
             self.save_m2m()
+            
+            # Schedule the email if to_do_task_date is set
+            if call.to_do_task_date and call.to_do_task_message:
+                task_datetime = timezone.make_aware(
+                    datetime.combine(call.to_do_task_date, time(9, 0)),
+                    timezone.get_current_timezone()
+                )
+                now = timezone.now()
+                delay = (task_datetime - now).total_seconds()
+
+                if delay > 0:
+                    send_follow_up_email.apply_async((call.id,), eta=task_datetime)
+                else:
+                    send_follow_up_email.delay(call.id)
         return call
 
 
 class EmailForm(forms.ModelForm):
     contacts_input = forms.CharField(widget=forms.HiddenInput(), required=False)
-
+    to_do_task_message = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'rows': 3, 'placeholder': 'Enter your follow-up message here...'})
+    )
+    
     class Meta:
         model = Email
-        fields = ['subject', 'outcome', 'date', 'time', 'details', 'to_do_task_date']
+        fields = ['subject', 'outcome', 'date', 'time', 'details', 'to_do_task_date', 'to_do_task_message']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
-            'time': forms.TimeInput(attrs={'type': 'time'}),
+            'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'to_do_task_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -152,11 +177,25 @@ class EmailForm(forms.ModelForm):
         email.creator = self.creator
         if commit:
             email.save()
-            # Handle contacts_input
             contacts_input = self.cleaned_data.get('contacts_input', '')
             if contacts_input:
                 contact_ids = contacts_input.split(',')
                 contacts = Contact.objects.filter(id__in=contact_ids)
                 email.contacts.set(contacts)
             self.save_m2m()
+            
+            # Schedule the email if to_do_task_date is set
+            if email.to_do_task_date and email.to_do_task_message:
+                task_datetime = timezone.make_aware(
+                    datetime.combine(email.to_do_task_date, time(9, 0)),
+                    timezone.get_current_timezone()
+                )
+                now = timezone.now()
+                delay = (task_datetime - now).total_seconds()
+
+                if delay > 0:
+                    send_follow_up_email.apply_async((email.id,), eta=task_datetime)
+                else:
+                    send_follow_up_email.delay(email.id)
         return email
+

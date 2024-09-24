@@ -33,6 +33,7 @@ def get_item(dictionary, key):
 def instanceof(obj, class_name):
     return obj.__class__.__name__ == class_name
 
+
 @register.filter
 def is_meeting(value):
     return isinstance(value, Meeting)

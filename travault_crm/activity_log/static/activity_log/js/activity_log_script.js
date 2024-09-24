@@ -1,17 +1,14 @@
-// activity_log/js/activity_log_script.js
-
 document.addEventListener('DOMContentLoaded', function () {
     // -------------------
     // Unified Data Variables
     // -------------------
-    // You can define data attributes in your forms to pass necessary URLs and data.
-    // For simplicity, we'll assume that each form includes a script block defining its own data.
-    // Alternatively, you can use data attributes on the form elements.
+    // This allows passing necessary URLs and data through forms (Meeting, Call, Email)
+    // Each form must include a script block defining its data.
 
     // -------------------
     // Attendees/Contacts Handling
     // -------------------
-    // Since you have multiple forms, we'll generalize the handling.
+    // Generalized handling for multiple forms
     const forms = document.querySelectorAll('form[id$="Form"]'); // Select all forms ending with 'Form'
 
     forms.forEach(form => {
@@ -167,13 +164,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     height: 300
                 })
                 .then(editor => {
-                    // Apply min-height
-                    editor.ui.view.editable.element.style.minHeight = '300px';
-                    editor.editing.view.change(writer => {
-                        writer.setStyle('min-height', '300px', editor.editing.view.document.getRoot());
-                    });
-
-                    // Store editor instance if needed
+                    // Store editor instance to update the textarea with CKEditor data before submission
                     form.editorInstance = editor;
                 })
                 .catch(error => {
@@ -197,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function () {
             toDoTaskDateInput.addEventListener('change', function() {
                 if (this.value) {
                     toDoTaskMessageInputModal.value = '';  // Clear previous message
-                    toDoTaskModal.show();
+                    toDoTaskModal.show();  // Show the modal
                 }
             });
 
@@ -205,7 +196,6 @@ document.addEventListener('DOMContentLoaded', function () {
             saveToDoTaskButton.addEventListener('click', function() {
                 const message = toDoTaskMessageInputModal.value.trim();
                 if (message) {
-                    // Set the hidden input in the main form
                     toDoTaskMessageInput.value = message;
                 } else {
                     toDoTaskMessageInput.value = '';
@@ -231,5 +221,4 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     });
-
 });

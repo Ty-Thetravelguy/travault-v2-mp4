@@ -2,6 +2,13 @@
 {% load static %}
 {% load custom_log_tags %}
 
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'activity_log/css/activity_style.css' %}">
+{% endblock %}
+
+
 {% block content %}
 <section id="log-email" class="bg-gray-200">
     <div class="container top-padding roboto">

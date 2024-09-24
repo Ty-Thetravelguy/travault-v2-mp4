@@ -3,10 +3,11 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.db.models import Q
-from .models import Meeting
-from .forms import MeetingForm
+from .models import Meeting, Call, Email
+from .forms import MeetingForm, CallForm, EmailForm
 from crm.models import Company, Contact
 from django.contrib.auth import get_user_model
+
 
 User = get_user_model()
 
@@ -125,20 +126,6 @@ def delete_meeting(request, pk):
     }
     return render(request, 'activity_log/confirm_delete.html', context)
 
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.db.models import Q
-from .models import Meeting, Call, Email
-from .forms import MeetingForm, CallForm, EmailForm
-from crm.models import Company, Contact
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
-
-# Existing views...
 
 @login_required
 def log_call(request, pk):

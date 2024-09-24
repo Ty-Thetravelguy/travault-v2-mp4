@@ -109,8 +109,8 @@
 {% block postload_js %}
 
 <script>
-    var logCallData = {
-        searchContactsUrl: "{% url 'activity_log:search_contacts' %}",
+    var logMeetingData = {
+        searchAttendeesUrl: "{% url 'activity_log:search_attendees' %}",
         companyPk: "{{ company.pk }}"
     };
 </script>

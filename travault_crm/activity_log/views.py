@@ -140,6 +140,7 @@ def log_call(request, pk):
                 return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='activity')
             except Exception as e:
                 form.add_error(None, f"An unexpected error occurred: {str(e)}")
+                messages.error(request, f"An unexpected error occurred while saving the call: {str(e)}")
         else:
             messages.error(request, "Please correct the errors below.")
     else:

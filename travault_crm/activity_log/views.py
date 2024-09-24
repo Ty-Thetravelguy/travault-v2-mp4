@@ -15,19 +15,19 @@ def log_meeting(request, pk):
     company = get_object_or_404(Company, pk=pk)
 
     if request.method == 'POST':
-        form = MeetingForm(request.POST, company=company, creator=request.user)  # Passing company and creator
+        form = MeetingForm(request.POST, company=company, creator=request.user)  
         if form.is_valid():
             try:
                 meeting = form.save()  # commit=True by default
                 messages.success(request, "Meeting logged successfully!")
-                return redirect('crm:company_detail', pk=company.pk)
+                return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='activity')
             except Exception as e:
                 form.add_error(None, f"An unexpected error occurred: {str(e)}")
                 messages.error(request, f"An unexpected error occurred while saving the meeting: {str(e)}")
         else:
             messages.error(request, "There were errors in your submission. Please correct them below.")
     else:
-        form = MeetingForm(company=company, creator=request.user)  # Passing company and creator
+        form = MeetingForm(company=company, creator=request.user)  
 
     context = {
         'form': form,

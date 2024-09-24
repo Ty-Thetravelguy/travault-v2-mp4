@@ -469,6 +469,17 @@ footer a:hover {
 }
 
 
+.list-group-item:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /******************** Media queires ********************/
 
 @media (max-width: 1440px) {

@@ -260,3 +260,5 @@ Traceback (most recent call last):
                ^^^^^^^
 NameError: name 'reverse' is not defined. Did you mean: 'reversed'?
 ERROR 2024-09-23 06:49:31,947 basehttp "POST /activity/meeting/5/delete/ HTTP/1.1" 500 87659
+ERROR 2024-09-24 04:34:11,519 forms Error saving meeting: Error 111 connecting to localhost:6379. Connection refused.
+ERROR 2024-09-24 04:35:27,031 forms Error saving meeting: Error 111 connecting to localhost:6379. Connection refused.

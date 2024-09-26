@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Attendees/Contacts Handling
     // -------------------
     // Generalized handling for multiple forms
+    // Generalized handling for multiple forms
     const forms = document.querySelectorAll('form[id$="Form"]'); // Select all forms ending with 'Form'
 
     forms.forEach(form => {
@@ -16,27 +17,37 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let searchAttendeesUrl;
         let companyPk;
+        let inputDisplayId;
+        let hiddenInputId;
+        let selectedContainerId;
 
         if (formId === 'logMeetingForm') {
             searchAttendeesUrl = logMeetingData.searchAttendeesUrl;
             companyPk = logMeetingData.companyPk;
+            inputDisplayId = '#id_attendees_input_display';
+            hiddenInputId = '#id_attendees_input';
+            selectedContainerId = '#selected-attendees';
         } else if (formId === 'logCallForm') {
             searchAttendeesUrl = logCallData.searchAttendeesUrl;
             companyPk = logCallData.companyPk;
+            inputDisplayId = '#id_contacts_input_display';
+            hiddenInputId = '#id_contacts_input';
+            selectedContainerId = '#selected-contacts';
         } else if (formId === 'logEmailForm') {
             searchAttendeesUrl = logEmailData.searchAttendeesUrl;
             companyPk = logEmailData.companyPk;
+            inputDisplayId = '#id_contacts_input_display';
+            hiddenInputId = '#id_contacts_input';
+            selectedContainerId = '#selected-contacts';
         }
 
         // If data is not defined, skip this form
         if (!searchAttendeesUrl || !companyPk) return;
 
-        // -------------------
-        // Contacts Handling
-        // -------------------
-        const contactsInputDisplay = form.querySelector('#id_contacts_input_display');
-        const hiddenContactsInput = form.querySelector('#id_contacts_input');  
-        const selectedContactsContainer = form.querySelector('#selected-contacts');  // Container for contact badges
+        // Now use inputDisplayId, hiddenInputId, selectedContainerId
+        const contactsInputDisplay = form.querySelector(inputDisplayId);
+        const hiddenContactsInput = form.querySelector(hiddenInputId);
+        const selectedContactsContainer = form.querySelector(selectedContainerId);
         let selectedContacts = [];
 
         if (contactsInputDisplay && hiddenContactsInput && selectedContactsContainer) {
@@ -164,7 +175,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     height: 300
                 })
                 .then(editor => {
-                    // Store editor instance to update the textarea with CKEditor data before submission
                     form.editorInstance = editor;
                 })
                 .catch(error => {
@@ -176,11 +186,11 @@ document.addEventListener('DOMContentLoaded', function () {
         // To Do Task Modal Handling
         // ------------------------------
         const toDoTaskDateInput = form.querySelector('#id_to_do_task_date');
-        const toDoTaskModalElement = form.querySelector('#toDoTaskModal');
-        const saveToDoTaskButton = form.querySelector('#saveToDoTask');
-        const toDoTaskMessageInputModal = form.querySelector('#id_to_do_task_message_modal');
-        const toDoTaskMessageInput = form.querySelector('#id_to_do_task_message');  // Hidden input in main form
-
+        const toDoTaskModalElement = document.querySelector('#toDoTaskModal'); // Changed
+        const saveToDoTaskButton = document.querySelector('#saveToDoTask'); // Changed
+        const toDoTaskMessageInputModal = document.querySelector('#id_to_do_task_message_modal'); // Changed
+        const toDoTaskMessageInput = form.querySelector('#id_to_do_task_message');
+        
         if (toDoTaskDateInput && toDoTaskModalElement && saveToDoTaskButton && toDoTaskMessageInputModal && toDoTaskMessageInput) {
             const toDoTaskModal = new bootstrap.Modal(toDoTaskModalElement);
 
@@ -207,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
             form.addEventListener('submit', function(event) {
                 // Update the textarea with CKEditor's data
                 if (form.editorInstance) {
-                    document.querySelector('#id_details').value = form.editorInstance.getData();
+                    form.querySelector('#id_details').value = form.editorInstance.getData(); // Use form.querySelector
                 }
 
                 // Existing To-Do Task Validation

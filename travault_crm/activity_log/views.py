@@ -1,3 +1,4 @@
+#activity_log/views.py
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -64,13 +65,13 @@ def search_attendees(request):
 
     for contact in contacts:
         results.append({
-            'id': f'contact_contact_{contact.pk}',  # Correct prefix
+            'id': f'contact_contact_{contact.pk}',
             'name': f"{contact.first_name} {contact.last_name} (Contact)"
         })
 
     for user in users:
         results.append({
-            'id': f'contact_user_{user.pk}',  # Correct prefix
+            'id': f'contact_user_{user.pk}',
             'name': f"{user.first_name} {user.last_name} (User)"
         })
 

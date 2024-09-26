@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             function showSelectedContact(contact, formId) {
                 const contactBadge = document.createElement('span');
-                contactBadge.className = 'badge bg-primary me-2 mb-2 d-inline-flex align-items-center';
+                contactBadge.className = 'badge me-2 mb-2 d-inline-flex align-items-center';
                 contactBadge.textContent = contact.name;
 
                 contactBadge.dataset.id = contact.id; // Store the contact ID
@@ -176,6 +176,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .then(editor => {
                     form.editorInstance = editor;
+                    editor.editing.view.change(writer => {
+                        writer.setStyle('min-height', '400px', editor.editing.view.document.getRoot());
+                    });
                 })
                 .catch(error => {
                     console.error('CKEditor initialization error:', error);

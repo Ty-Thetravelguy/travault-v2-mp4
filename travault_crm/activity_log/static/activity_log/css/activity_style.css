@@ -1,26 +1,12 @@
 
-.suggestions-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-}
 
-.suggestions-list li {
-    padding: 8px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-}
 
-.suggestions-list li:hover {
-    background-color: #f0f0f0;
-}
-
-.badge {
-    background-color: #007bff; /* Adjust to match your theme */
+/* .badge {
+    background-color: #001f3f !important; 
     color: white;
     padding: 0.5em 1em;
     margin-right: 5px;
     border-radius: 10px;
     font-size: 14px;
     display: inline-block;
-}
+} */

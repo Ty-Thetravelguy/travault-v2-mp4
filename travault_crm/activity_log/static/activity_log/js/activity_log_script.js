@@ -8,8 +8,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // -------------------
     // Attendees/Contacts Handling
     // -------------------
-    // Generalized handling for multiple forms
-    // Generalized handling for multiple forms
     const forms = document.querySelectorAll('form[id$="Form"]'); // Select all forms ending with 'Form'
 
     forms.forEach(form => {
@@ -54,29 +52,32 @@ document.addEventListener('DOMContentLoaded', function () {
             // Debounce function to limit the rate of API calls
             function debounce(func, delay) {
                 let timeout;
-                return function(...args) {
+                return function (...args) {
                     clearTimeout(timeout);
                     timeout = setTimeout(() => func.apply(this, args), delay);
                 };
             }
 
-            contactsInputDisplay.addEventListener('input', debounce(function () {
-                const query = contactsInputDisplay.value.trim();
-                if (query.length < 2) {
-                    clearContactsList();
-                    return;
-                }
+            contactsInputDisplay.addEventListener(
+                'input',
+                debounce(function () {
+                    const query = contactsInputDisplay.value.trim();
+                    if (query.length < 2) {
+                        clearContactsList();
+                        return;
+                    }
 
-                fetch(`${searchAttendeesUrl}?q=${encodeURIComponent(query)}&company_pk=${companyPk}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        clearContactsList(); 
-                        showContactsSuggestions(data.results, formId);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching attendees:', error);
-                    });
-            }, 300));  // 300ms debounce delay
+                    fetch(`${searchAttendeesUrl}?q=${encodeURIComponent(query)}&company_pk=${companyPk}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            clearContactsList();
+                            showContactsSuggestions(data.results, formId);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching attendees:', error);
+                        });
+                }, 300)
+            ); // 300ms debounce delay
 
             function clearContactsList() {
                 const oldList = form.querySelector('#contacts-suggestions');
@@ -133,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 closeButton.className = 'btn-close btn-close-white ms-2';
                 closeButton.setAttribute('aria-label', 'Remove');
 
-                closeButton.addEventListener('click', (e) => {
+                closeButton.addEventListener('click', e => {
                     e.preventDefault();
                     const id = contact.id;
                     const index = selectedContacts.indexOf(id);
@@ -157,28 +158,35 @@ document.addEventListener('DOMContentLoaded', function () {
         // CKEditor Initialization
         // ------------------------------
         const detailsField = form.querySelector('#id_details');
+        let editorInstance; // Declare editorInstance in the outer scope
         if (detailsField) {
             ClassicEditor
                 .create(detailsField, {
                     toolbar: {
                         items: [
-                            'heading', '|',
-                            'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
-                            'undo', 'redo'
-                        ]
+                            'heading',
+                            '|',
+                            'bold',
+                            'italic',
+                            'link',
+                            'bulletedList',
+                            'numberedList',
+                            'blockQuote',
+                            '|',
+                            'undo',
+                            'redo',
+                        ],
                     },
                     ui: {
                         viewportOffset: {
-                            top: 30
-                        }
+                            top: 30,
+                        },
                     },
-                    height: 300
+                    height: 300,
                 })
                 .then(editor => {
-                    form.editorInstance = editor;
-                    editor.editing.view.change(writer => {
-                        writer.setStyle('min-height', '400px', editor.editing.view.document.getRoot());
-                    });
+                    // CKEditor is initialized and 'editor' is available here
+                    editorInstance = editor; // Store the editor instance
                 })
                 .catch(error => {
                     console.error('CKEditor initialization error:', error);
@@ -189,24 +197,31 @@ document.addEventListener('DOMContentLoaded', function () {
         // To Do Task Modal Handling
         // ------------------------------
         const toDoTaskDateInput = form.querySelector('#id_to_do_task_date');
-        const toDoTaskModalElement = document.querySelector('#toDoTaskModal'); // Changed
-        const saveToDoTaskButton = document.querySelector('#saveToDoTask'); // Changed
-        const toDoTaskMessageInputModal = document.querySelector('#id_to_do_task_message_modal'); // Changed
+        const toDoTaskModalElement = document.querySelector('#toDoTaskModal');
+        const saveToDoTaskButton = document.querySelector('#saveToDoTask');
+        const toDoTaskMessageInputModal = document.querySelector('#id_to_do_task_message_modal');
         const toDoTaskMessageInput = form.querySelector('#id_to_do_task_message');
-        
-        if (toDoTaskDateInput && toDoTaskModalElement && saveToDoTaskButton && toDoTaskMessageInputModal && toDoTaskMessageInput) {
-            const toDoTaskModal = new bootstrap.Modal(toDoTaskModalElement);
+
+        let toDoTaskModal; // Declare variable to store the modal instance
+        if (
+            toDoTaskDateInput &&
+            toDoTaskModalElement &&
+            saveToDoTaskButton &&
+            toDoTaskMessageInputModal &&
+            toDoTaskMessageInput
+        ) {
+            toDoTaskModal = new bootstrap.Modal(toDoTaskModalElement);
 
             // Show modal when a to_do_task_date is selected
-            toDoTaskDateInput.addEventListener('change', function() {
+            toDoTaskDateInput.addEventListener('change', function () {
                 if (this.value) {
-                    toDoTaskMessageInputModal.value = '';  // Clear previous message
-                    toDoTaskModal.show();  // Show the modal
+                    toDoTaskMessageInputModal.value = ''; // Clear previous message
+                    toDoTaskModal.show(); // Show the modal
                 }
             });
 
             // Save the message from the modal to the hidden input in the main form
-            saveToDoTaskButton.addEventListener('click', function() {
+            saveToDoTaskButton.addEventListener('click', function () {
                 const message = toDoTaskMessageInputModal.value.trim();
                 if (message) {
                     toDoTaskMessageInput.value = message;
@@ -215,23 +230,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 toDoTaskModal.hide();
             });
+        }
 
-            // Add a submit event listener to the form
-            form.addEventListener('submit', function(event) {
-                // Update the textarea with CKEditor's data
-                if (form.editorInstance) {
-                    form.querySelector('#id_details').value = form.editorInstance.getData(); // Use form.querySelector
-                }
+        // ------------------------------
+        // Form Submission Handling
+        // ------------------------------
+        form.addEventListener('submit', function (event) {
+            // Update the textarea with CKEditor's data
+            if (editorInstance) {
+                detailsField.value = editorInstance.getData();
+            }
 
-                // Existing To-Do Task Validation
+            // Existing To-Do Task Validation
+            if (toDoTaskDateInput && toDoTaskMessageInput && toDoTaskModal) {
                 const toDoTaskDate = toDoTaskDateInput.value;
                 const toDoTaskMessage = toDoTaskMessageInput.value.trim();
+
                 if (toDoTaskDate && !toDoTaskMessage) {
                     event.preventDefault();
                     alert('Please enter a follow-up message for your task.');
                     toDoTaskModal.show();
                 }
-            });
-        }
+            }
+        });
     });
 });

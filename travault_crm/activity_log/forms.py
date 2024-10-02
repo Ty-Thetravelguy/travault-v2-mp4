@@ -109,11 +109,12 @@ class CallForm(forms.ModelForm):
     
     class Meta:
         model = Call
-        fields = ['subject', 'outcome', 'date', 'time', 'details', 'to_do_task_date', 'to_do_task_message']
+        fields = ['subject', 'outcome', 'date', 'time', 'duration', 'details', 'to_do_task_date', 'to_do_task_message']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
             'to_do_task_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'duration': forms.Select(attrs={'class': 'form-select'}),
         }
 
     def __init__(self, *args, **kwargs):

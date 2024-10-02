@@ -4,13 +4,18 @@
 {% block content %}
 <div class="container-fluid bg-gray-200 full-height-bg top-padding">
     <div class="container py-3">
-        <h1 class="roboto text-center">CRM</h1>
-        <a href="{% url 'crm:add_company' %}" class="btn btn-link project-primary-color d-flex justify-content-end"
-            title="Add Company">
-            <i class="fas fa-plus"></i>
-        </a>
+        <div class="row align-items-center">
+            <div class="col-4"></div>
+            <div class="col-4 text-center">
+                <h1 class="roboto display-2">The Vault</h1>
+            </div>
+            <div class="col-4 text-end">
+                <a href="{% url 'crm:add_company' %}" class="btn btn-link project-primary-color" title="Add Company">
+                    <i class="fas fa-plus"></i>
+                </a>
+            </div>
+        </div>
     </div>
-
     <div class="crm-container py-2 mt-4">
         <!-- Filtering Options -->
         <div class="row mb-3">

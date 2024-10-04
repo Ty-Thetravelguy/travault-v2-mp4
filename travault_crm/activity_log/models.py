@@ -34,8 +34,8 @@ class Meeting(models.Model):
     to_do_task_date = models.DateField(null=True, blank=True)
     to_do_task_message = models.TextField('To Do Task Message', null=True, blank=True)  # New Field
 
-    attendees = models.ManyToManyField(User, related_name='attended_meetings')  # For agency users
-    company_contacts = models.ManyToManyField(Contact, related_name='meetings_attended')  # For company contacts
+    contacts = models.ManyToManyField(Contact, related_name='meeting_attended')
+    users = models.ManyToManyField(User, blank=True, related_name='meeting_users')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -68,6 +68,7 @@ class Call(models.Model):
     to_do_task_date = models.DateField(null=True, blank=True)
     to_do_task_message = models.TextField('To Do Task Message', null=True, blank=True)
     contacts = models.ManyToManyField(Contact, related_name='calls_attended')
+    users = models.ManyToManyField(User, blank=True, related_name='call_users')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -97,6 +98,7 @@ class Email(models.Model):
     to_do_task_date = models.DateField(null=True, blank=True)
     to_do_task_message = models.TextField('To Do Task Message', null=True, blank=True)
     contacts = models.ManyToManyField(Contact, related_name='emails_attended')
+    users = models.ManyToManyField(User, blank=True, related_name='email_users')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

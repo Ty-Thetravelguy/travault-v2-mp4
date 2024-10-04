@@ -235,7 +235,10 @@ document.addEventListener('DOMContentLoaded', function () {
         // ------------------------------
         // Form Submission Handling
         // ------------------------------
-        form.addEventListener('submit', function (event) {
+        
+form.addEventListener('submit', function (event) {
+    console.log("Form data before submission:", new FormData(form));
+    
             // Update the textarea with CKEditor's data
             if (editorInstance) {
                 detailsField.value = editorInstance.getData();

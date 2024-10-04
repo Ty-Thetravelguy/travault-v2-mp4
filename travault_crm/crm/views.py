@@ -162,11 +162,6 @@ def company_detail(request, pk, active_tab='details'):
         reverse=True
     )
 
-
-    # You can include other activity types as you implement them
-    activities = sorted(meetings, key=lambda x: (x.date, x.time), reverse=True)
-
-
     # Prepare the context for rendering the template
     context = {
         'company': company,

@@ -17,25 +17,69 @@ def log_meeting(request, pk):
     company = get_object_or_404(Company, pk=pk)
 
     if request.method == 'POST':
+        print("Request POST data:", request.POST)
+        print("User:", request.user)            
         form = MeetingForm(request.POST, company=company, creator=request.user)  
         if form.is_valid():
-            try:
-                meeting = form.save()  # commit=True by default
-                messages.success(request, "Meeting logged successfully!")
-                return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='activity')
-            except Exception as e:
-                form.add_error(None, f"An unexpected error occurred: {str(e)}")
-                messages.error(request, f"An unexpected error occurred while saving the meeting: {str(e)}")
+            print("Form is valid")
+            print("Form cleaned data:", form.cleaned_data)
+            
+            # Parse the contacts_input field from the form data
+            contacts_input = form.cleaned_data.get('contacts_input', '')
+            
+            # Check if contacts_input is not empty
+            if contacts_input:
+                contact_ids = contacts_input.split(',')
+            else:
+                contact_ids = []
+
+            # Initialize lists to hold Contact and User objects
+            contacts = []
+            users = []
+
+            # Loop through the contact_ids to determine if they are Contacts or Users
+            for contact_id in contact_ids:
+                if 'contact_contact_' in contact_id:
+                    contact_pk = contact_id.replace('contact_contact_', '')
+                    try:
+                        contact = Contact.objects.get(pk=contact_pk)
+                        contacts.append(contact)
+                    except Contact.DoesNotExist:
+                        form.add_error(None, f"Contact with ID {contact_pk} not found.")
+                elif 'contact_user_' in contact_id:
+                    user_pk = contact_id.replace('contact_user_', '')
+                    try:
+                        user = User.objects.get(pk=user_pk)
+                        users.append(user)
+                    except User.DoesNotExist:
+                        form.add_error(None, f"User with ID {user_pk} not found.")
+
+            # Only proceed with saving if no errors were added
+            if not form.errors:
+                try:
+                    meeting = form.save(commit=False)
+                    meeting.save()
+
+                    # Assuming you have Many-to-Many fields for contacts and users in your Meeting model
+                    meeting.contacts.add(*contacts)
+                    meeting.users.add(*users)
+
+                    messages.success(request, "Meeting logged successfully!")
+                    print("Meeting saved successfully:", meeting)
+                    return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='activity')
+                except Exception as e:
+                    print("Error while saving meeting:", str(e))
+                    form.add_error(None, f"An unexpected error occurred: {str(e)}")
+            else:
+                print("Form errors found:", form.errors)
         else:
-            messages.error(request, "There were errors in your submission. Please correct them below.")
+            messages.error(request, "Please correct the errors below.")
     else:
         form = MeetingForm(company=company, creator=request.user)  
 
-    context = {
-        'form': form,
-        'company': company,
-    }
-    return render(request, 'activity_log/log_meeting.html', context)
+    return render(request, 'activity_log/log_meeting.html', {'form': form, 'company': company})
+
+
 
 @login_required
 def search_attendees(request):
@@ -82,7 +126,7 @@ def view_meeting(request, pk):
     meeting = get_object_or_404(Meeting, pk=pk)
     company = meeting.company
 
-    attendees = list(meeting.attendees.all()) + list(meeting.company_contacts.all())
+    attendees = list(meeting.contacts.all()) + list(meeting.users.all())
 
     context = {
         'meeting': meeting,
@@ -122,10 +166,11 @@ def delete_meeting(request, pk):
 
     # Render confirmation page for GET request
     context = {
-        'meeting': meeting,
-        'company': company
+        'activity': meeting,
+        'company': company,
+        'activity_type': 'meeting', 
     }
-    return render(request, 'activity_log/confirm_delete.html', context)
+    return render(request, 'activity_log/confirm_delete_activity.html', context)
 
 
 @login_required
@@ -133,20 +178,66 @@ def log_call(request, pk):
     company = get_object_or_404(Company, pk=pk)
 
     if request.method == 'POST':
+        print("Request POST data:", request.POST)
+        print("User:", request.user)
+        
         form = CallForm(request.POST, company=company, creator=request.user)
+        print("Form validation check")
+        
         if form.is_valid():
-            try:
-                call = form.save()
-                messages.success(request, "Call logged successfully!")
-                return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='activity')
-            except Exception as e:
-                form.add_error(None, f"An unexpected error occurred: {str(e)}")
+            print("Form is valid")
+            print("Form cleaned data:", form.cleaned_data)
+            
+            # Parse the contacts_input field from the form data
+            contacts_input = form.cleaned_data.get('contacts_input')
+            contact_ids = contacts_input.split(',')
+
+            # Initialize lists to hold Contact and User objects
+            contacts = []
+            users = []
+
+            # Loop through the contact_ids to determine if they are Contacts or Users
+            for contact_id in contact_ids:
+                if 'contact_contact_' in contact_id:
+                    contact_pk = contact_id.replace('contact_contact_', '')
+                    try:
+                        contact = Contact.objects.get(pk=contact_pk)
+                        contacts.append(contact)
+                    except Contact.DoesNotExist:
+                        form.add_error(None, f"Contact with ID {contact_pk} not found.")
+                elif 'contact_user_' in contact_id:
+                    user_pk = contact_id.replace('contact_user_', '')
+                    try:
+                        user = User.objects.get(pk=user_pk)
+                        users.append(user)
+                    except User.DoesNotExist:
+                        form.add_error(None, f"User with ID {user_pk} not found.")
+
+            # Only proceed with saving if no errors were added
+            if not form.errors:
+                try:
+                    call = form.save(commit=False)
+                    call.save()
+
+                    # Assuming you have Many-to-Many fields for contacts and users in your Call model
+                    call.contacts.add(*contacts)
+                    call.users.add(*users)
+
+                    messages.success(request, "Call logged successfully!")
+                    print("Call saved successfully:", call)
+                    return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='activity')
+                except Exception as e:
+                    print("Error while saving call:", str(e))
+                    form.add_error(None, f"An unexpected error occurred: {str(e)}")
+            else:
+                print("Form errors found:", form.errors)
         else:
             messages.error(request, "Please correct the errors below.")
     else:
         form = CallForm(company=company, creator=request.user)
 
     return render(request, 'activity_log/log_call.html', {'form': form, 'company': company})
+
 
 
 @login_required
@@ -200,20 +291,64 @@ def log_email(request, pk):
     company = get_object_or_404(Company, pk=pk)
 
     if request.method == 'POST':
+        print("Request POST data:", request.POST)
+        print("User:", request.user)
+        
         form = EmailForm(request.POST, company=company, creator=request.user)
         if form.is_valid():
-            try:
-                email = form.save()
-                messages.success(request, "Email logged successfully!")
-                return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='activity')
-            except Exception as e:
-                form.add_error(None, f"An unexpected error occurred: {str(e)}")
+            print("Form is valid")
+            print("Form cleaned data:", form.cleaned_data)
+            
+            # Parse the contacts_input field from the form data
+            contacts_input = form.cleaned_data.get('contacts_input')
+            contact_ids = contacts_input.split(',')
+
+            # Initialize lists to hold Contact and User objects
+            contacts = []
+            users = []
+
+            # Loop through the contact_ids to determine if they are Contacts or Users
+            for contact_id in contact_ids:
+                if 'contact_contact_' in contact_id:
+                    contact_pk = contact_id.replace('contact_contact_', '')
+                    try:
+                        contact = Contact.objects.get(pk=contact_pk)
+                        contacts.append(contact)
+                    except Contact.DoesNotExist:
+                        form.add_error(None, f"Contact with ID {contact_pk} not found.")
+                elif 'contact_user_' in contact_id:
+                    user_pk = contact_id.replace('contact_user_', '')
+                    try:
+                        user = User.objects.get(pk=user_pk)
+                        users.append(user)
+                    except User.DoesNotExist:
+                        form.add_error(None, f"User with ID {user_pk} not found.")
+
+            # Only proceed with saving if no errors were added
+            if not form.errors:
+                try:
+                    email = form.save(commit=False)
+                    email.save()
+
+                    # Assuming you have Many-to-Many fields for contacts and users in your Email model
+                    email.contacts.add(*contacts)
+                    email.users.add(*users)
+
+                    messages.success(request, "Email logged successfully!")
+                    print("Email saved successfully:", email)
+                    return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='activity')
+                except Exception as e:
+                    print("Error while saving email:", str(e))
+                    form.add_error(None, f"An unexpected error occurred: {str(e)}")
+            else:
+                print("Form errors found:", form.errors)
         else:
             messages.error(request, "Please correct the errors below.")
     else:
         form = EmailForm(company=company, creator=request.user)
 
     return render(request, 'activity_log/log_email.html', {'form': form, 'company': company})
+
 
 @login_required
 def view_email(request, pk):

@@ -517,23 +517,6 @@
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h3 class="card-title mb-0">Activity Log</h3>
-                            <div class="dropdown">
-                                <button class="btn btn-outline-primary btn-sm" type="button" id="addActivityDropdown"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-plus me-1"></i> Add Activity
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="addActivityDropdown">
-                                    <li><a class="dropdown-item" href="{% url 'activity_log:log_call' pk=company.pk %}">
-                                            <i class="fas fa-phone me-2"></i>Log a call</a></li>
-                                    <li><a class="dropdown-item"
-                                            href="{% url 'activity_log:log_email' pk=company.pk %}">
-                                            <i class="fas fa-envelope me-2"></i>Log an email</a></li>
-                                    <li><a class="dropdown-item"
-                                            href="{% url 'activity_log:log_meeting' pk=company.pk %}">
-                                            <i class="fas fa-users me-2"></i>Log a meeting</a></li>
-                                    <!-- ... (other actions) ... -->
-                                </ul>
-                            </div>
                         </div>
 
                         {% if activities %}

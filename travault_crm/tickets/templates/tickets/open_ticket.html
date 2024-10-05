@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+{% load ticket_tags %}
+
+{% block content %}
+<section id="log-ticket" class="bg-gray-200">
+    <div class="container top-padding roboto">
+        <div class="row justify-content-center py-5">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="card-title text-center mb-4">Log a Ticket for {{ company.company_name }}</h2>
+                        <form method="post" id="logTicketForm">
+                            {% csrf_token %}
+
+                            <!-- Company Field (pre-filled and read-only) -->
+                            <div class="mb-3">
+                                <label for="{{ form.company.id_for_label }}" class="form-label">Company</label>
+                                {{ form.company|add_class:"form-control" }}
+                            </div>
+
+                            <!-- Contact Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.contact.id_for_label }}" class="form-label">Contact</label>
+                                {{ form.contact|add_class:"form-select" }}
+                            </div>
+
+                            <!-- Priority Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.priority.id_for_label }}" class="form-label">Priority</label>
+                                {{ form.priority|add_class:"form-select" }}
+                            </div>
+
+                            <!-- Description Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                                {{ form.description|add_class:"form-control" }}
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-get-started btn-lg" id="submitButton">Save Ticket</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

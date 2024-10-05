@@ -57,7 +57,11 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="#">Log a ticket</a></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'open_ticket' company.pk %}">
+                                <i class="fas fa-ticket-alt me-2"></i> Log a Ticket
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>

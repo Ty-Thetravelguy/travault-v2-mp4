@@ -14,6 +14,7 @@ urlpatterns = [
     path('agent_support/', include(('agent_support.urls', 'agent_support'), namespace='agent_support')),  
     path('crm/', include(('crm.urls', 'crm'), namespace='crm')),
     path('activity/', include('activity_log.urls', namespace='activity_log')),
+    path('tickets/', include('tickets.urls')),
 ] 
 
 if settings.DEBUG:

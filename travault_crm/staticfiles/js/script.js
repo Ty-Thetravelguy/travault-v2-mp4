@@ -96,27 +96,39 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * Filters supplier items by name based on input from a search field.
      */
-    document.getElementById('supplierNameFilter').addEventListener('keyup', function () {
-        var filterValue = this.value.toLowerCase();
-        document.querySelectorAll('.supplier-item').forEach(function (item) {
-            var supplierName = item.getAttribute('data-supplier-name').toLowerCase();
-            item.style.display = supplierName.indexOf(filterValue) > -1 ? '' : 'none';
-        });
+    document.addEventListener('DOMContentLoaded', function () {
+        var supplierFilter = document.getElementById('supplierNameFilter');
+        
+        if (supplierFilter) {  // Only add event listener if element exists
+            supplierFilter.addEventListener('keyup', function () {
+                var filterValue = this.value.toLowerCase();
+                document.querySelectorAll('.supplier-item').forEach(function (item) {
+                    var supplierName = item.getAttribute('data-supplier-name').toLowerCase();
+                    item.style.display = supplierName.indexOf(filterValue) > -1 ? '' : 'none';
+                });
+            });
+        }
     });
 
     /**
      * Filters supplier items by type based on selection from a dropdown menu.
      */
-    document.getElementById('supplierTypeFilter').addEventListener('change', function () {
-        var filterValue = this.value;
-        document.querySelectorAll('.supplier-item').forEach(function (item) {
-            var supplierType = item.getAttribute('data-supplier-type');
-            if (filterValue === "" || supplierType === filterValue) {
-                item.style.display = '';
-            } else {
-                item.style.display = 'none';
-            }
-        });
+    document.addEventListener('DOMContentLoaded', function () {
+        var supplierTypeFilter = document.getElementById('supplierTypeFilter');
+        
+        if (supplierTypeFilter) {  // Only add event listener if the element exists
+            supplierTypeFilter.addEventListener('change', function () {
+                var filterValue = this.value;
+                document.querySelectorAll('.supplier-item').forEach(function (item) {
+                    var supplierType = item.getAttribute('data-supplier-type');
+                    if (filterValue === "" || supplierType === filterValue) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
     });
 
     /**

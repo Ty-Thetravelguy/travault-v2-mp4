@@ -31,6 +31,24 @@
                                 {{ form.priority|add_class:"form-select" }}
                             </div>
 
+                            <!-- Category Type Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.category_type.id_for_label }}" class="form-label">Category Type</label>
+                                {{ form.category_type|add_class:"form-select" }}
+                            </div>
+
+                            <!-- Category Field (Initially disabled) -->
+                            <div class="mb-3">
+                                <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+                                {{ form.category|add_class:"form-select category-field" }}
+                            </div>
+
+                            <!-- Subject -->
+                            <div class="mb-3">
+                                <label for="{{ form.subject.id_for_label }}" class="form-label">Subject</label>
+                                {{ form.subject|add_class:"form-control" }}
+                            </div>
+
                             <!-- Description Field -->
                             <div class="mb-3">
                                 <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
@@ -48,4 +66,7 @@
         </div>
     </div>
 </section>
+{% block postload_js %}
+<script src="{% static 'tickets/js/ticket_js.js' %}"></script>
+{% endblock %}
 {% endblock %}

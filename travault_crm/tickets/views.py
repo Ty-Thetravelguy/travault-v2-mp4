@@ -6,6 +6,10 @@ from crm.models import Company, Contact
 from django.shortcuts import get_object_or_404
 
 @login_required
+def view_tickets(request):
+    return render(request, 'tickets/view_tickets.html')
+
+@login_required
 def open_ticket(request, company_id):
     # Fetch the company by its ID
     company = get_object_or_404(Company, id=company_id)

@@ -1,74 +1,12 @@
-/* Style the CKEditor to match other form inputs */
-.ck-editor__editable {
-    min-height: 100px;
-    border: 1px solid #ced4da !important;
-    border-radius: 0.25rem !important;
-}
 
-.ck-editor__editable:focus {
-    border-color: #86b7fe !important;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
-}
 
-.ck.ck-editor__main>.ck-editor__editable:not(.ck-focused) {
-    border-color: #ced4da !important;
-}
 
-/* Style the CKEditor to match other form inputs */
-.django-ckeditor-5-widget {
-    width: 100%;
-}
-
-.django-ckeditor-5-widget .ck-editor__main {
-    border: 1px solid #ced4da;
-    border-radius: 0.25rem;
-}
-
-.django-ckeditor-5-widget .ck-editor__editable {
-    min-height: 200px;
-    padding: 0.375rem 0.75rem;
-}
-
-.django-ckeditor-5-widget .ck-toolbar {
-    border: 1px solid #ced4da;
-    border-bottom: none;
-    border-radius: 0.25rem 0.25rem 0 0;
-}
-
-.django-ckeditor-5-widget .ck-content {
-    border: none;
-}
-
-.django-ckeditor-5-widget .ck.ck-editor__editable:not(.ck-editor__nested-editable).ck-focused {
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-    border-color: #80bdff;
-}
-
-.ck-content {
-    font-family: inherit;
-}
-
-.ck-content h1, .ck-content h2, .ck-content h3, .ck-content h4, .ck-content h5, .ck-content h6 {
-    font-family: inherit;
-    line-height: 1.2;
-    margin-top: 0;
-}
-
-.ck-content p {
-    margin-bottom: 1em;
-}
-
-.ck-content ul, .ck-content ol {
-    padding-left: 2em;
-    margin-bottom: 1em;
-}
-
-.ck-content blockquote {
-    border-left: 5px solid #ccc;
-    font-style: italic;
-    margin-left: 0;
-    margin-right: 0;
-    overflow: hidden;
-    padding-left: 1.5em;
-    padding-right: 1.5em;
-}
+/* .badge {
+    background-color: #001f3f !important; 
+    color: white;
+    padding: 0.5em 1em;
+    margin-right: 5px;
+    border-radius: 10px;
+    font-size: 14px;
+    display: inline-block;
+} */

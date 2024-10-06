@@ -86,9 +86,22 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    addSubjectButton.addEventListener('click', function() {
+    let isProcessing = false;
+
+    function addSubjectHandler(event) {
+        console.log('Add subject button clicked');
+        event.preventDefault();
+        event.stopPropagation();
+    
+        if (isProcessing) {
+            console.log('Already processing a request');
+            return;
+        }
+    
         var newSubject = subjectField.value.trim();
         if (newSubject) {
+            isProcessing = true;
+            console.log('Sending fetch request');
             fetch('/tickets/create-ticket-subject/', {
                 method: 'POST',
                 headers: {
@@ -99,10 +112,41 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
+                console.log('Fetch request successful');
                 subjectField.value = data.subject;
                 subjectSuggestions.innerHTML = '';
-                alert('New subject added successfully!');
+                showAlert('New subject added successfully!');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                isProcessing = false;
             });
         }
+    }
+    
+    // Remove these lines:
+    // addSubjectButton.addEventListener('click', addSubjectHandler);
+    // addSubjectButton.removeEventListener('click', addSubjectHandler);
+    
+    // Add only one event listener:
+    addSubjectButton.addEventListener('click', addSubjectHandler);
+    
+    let alertShown = false;
+    
+    function showAlert(message) {
+        if (!alertShown) {
+            alertShown = true;
+            alert(message);
+            setTimeout(() => {
+                alertShown = false;
+            }, 1000);
+        }
+    }
+
+    // Debug: Log all clicks on the form
+    document.querySelector('form').addEventListener('click', function(event) {
+        console.log('Clicked element:', event.target);
     });
 });

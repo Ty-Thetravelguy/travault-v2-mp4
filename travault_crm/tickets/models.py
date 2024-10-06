@@ -3,6 +3,11 @@ from agencies.models import Agency
 from django.db import models
 from django.conf import settings 
 
+class TicketSubject(models.Model):
+    subject = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.subject
 
 class Ticket(models.Model):
     PRIORITY_CHOICES = [
@@ -39,7 +44,7 @@ class Ticket(models.Model):
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES)
     category_type = models.CharField(max_length=10, choices=CATEGORY_TYPE_CHOICES)
     category = models.CharField(max_length=50)
-    subject = models.CharField(max_length=100) 
+    subject = models.ForeignKey(TicketSubject, on_delete=models.CASCADE)
     description = models.TextField()
     status = models.CharField(max_length=20, default='open')
     created_at = models.DateTimeField(auto_now_add=True)

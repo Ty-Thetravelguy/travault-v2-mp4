@@ -33,7 +33,8 @@
 
                             <!-- Category Type Field -->
                             <div class="mb-3">
-                                <label for="{{ form.category_type.id_for_label }}" class="form-label">Category Type</label>
+                                <label for="{{ form.category_type.id_for_label }}" class="form-label">Category
+                                    Type</label>
                                 {{ form.category_type|add_class:"form-select" }}
                             </div>
 
@@ -43,10 +44,15 @@
                                 {{ form.category|add_class:"form-select category-field" }}
                             </div>
 
-                            <!-- Subject -->
+                            <!-- Subject Field -->
                             <div class="mb-3">
-                                <label for="{{ form.subject.id_for_label }}" class="form-label">Subject</label>
-                                {{ form.subject|add_class:"form-control" }}
+                                <label for="id_subject" class="form-label">Subject</label>
+                                <div class="input-group">
+                                    <input type="text" id="id_subject" name="subject" class="form-control"
+                                        autocomplete="off">
+                                    <button type="button" id="add_subject" class="btn btn-outline-secondary">+</button>
+                                </div>
+                                <div id="subject_suggestions" class="list-group mt-2"></div>
                             </div>
 
                             <!-- Description Field -->
@@ -57,7 +63,8 @@
 
                             <!-- Submit Button -->
                             <div class="text-center">
-                                <button type="submit" class="btn btn-get-started btn-lg" id="submitButton">Save Ticket</button>
+                                <button type="submit" class="btn btn-get-started btn-lg" id="submitButton">Save
+                                    Ticket</button>
                             </div>
                         </form>
                     </div>

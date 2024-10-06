@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-
+    // Category field functionality
     var categoryTypeField = document.getElementById('id_category_type');
     var categoryField = document.getElementById('id_category');
 
@@ -51,4 +51,58 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize the category field state on page load
     updateCategoryField();
+
+    // New code for subject field autocomplete
+    var subjectField = document.getElementById('id_subject');
+    var subjectSuggestions = document.getElementById('subject_suggestions');
+    var addSubjectButton = document.getElementById('add_subject');
+
+    subjectField.addEventListener('input', function() {
+        var query = this.value;
+        if (query.length > 2) {
+            fetchSubjects(query);
+        } else {
+            subjectSuggestions.innerHTML = '';
+        }
+    });
+
+    function fetchSubjects(query) {
+        fetch(`/tickets/ticket-subject-autocomplete/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                subjectSuggestions.innerHTML = '';
+                data.forEach(subject => {
+                    var item = document.createElement('a');
+                    item.href = '#';
+                    item.className = 'list-group-item list-group-item-action';
+                    item.textContent = subject.text;
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        subjectField.value = subject.text;
+                        subjectSuggestions.innerHTML = '';
+                    });
+                    subjectSuggestions.appendChild(item);
+                });
+            });
+    }
+
+    addSubjectButton.addEventListener('click', function() {
+        var newSubject = subjectField.value.trim();
+        if (newSubject) {
+            fetch('/tickets/create-ticket-subject/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: `subject=${encodeURIComponent(newSubject)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                subjectField.value = data.subject;
+                subjectSuggestions.innerHTML = '';
+                alert('New subject added successfully!');
+            });
+        }
+    });
 });

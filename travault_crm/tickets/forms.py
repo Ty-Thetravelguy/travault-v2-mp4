@@ -21,3 +21,7 @@ class TicketForm(forms.ModelForm):
         self.fields['category'].widget.attrs['disabled'] = 'disabled'
         # Add a custom class to identify this field in JavaScript
         self.fields['category'].widget.attrs['class'] = 'category-field form-select'
+
+        self.fields['subject'].widget.attrs.update({
+            'class': 'form-control select2-bootstrap-5-theme'
+        })

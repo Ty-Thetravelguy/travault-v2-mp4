@@ -72,6 +72,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'storages',
+    'dal',
+    'dal_select2',
     
     # Local apps
     'home',

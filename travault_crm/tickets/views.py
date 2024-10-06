@@ -13,6 +13,20 @@ from django.views.decorators.http import require_POST
 def view_tickets(request):
     return render(request, 'tickets/view_tickets.html')
 
+class TicketSubjectAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return TicketSubject.objects.none()
+
+        qs = TicketSubject.objects.all()
+
+        if self.q:
+            qs = qs.filter(subject__icontains=self.q)
+
+        return qs
+
+ticket_subject_autocomplete = TicketSubjectAutocomplete.as_view()
+
 @login_required
 def ticket_subject_autocomplete(request):
     query = request.GET.get('q', '')
@@ -25,27 +39,35 @@ def ticket_subject_autocomplete(request):
 def create_ticket_subject(request):
     subject = request.POST.get('subject')
     new_subject, created = TicketSubject.objects.get_or_create(subject=subject)
-    return JsonResponse({'id': new_subject.id, 'subject': new_subject.subject})
+    return JsonResponse({
+        'id': new_subject.id, 
+        'subject': new_subject.subject,
+        'created': created  # This tells the frontend if a new subject was created
+    })
 
 
 @login_required
 def open_ticket(request, company_id):
-    # Fetch the company by its ID
     company = get_object_or_404(Company, id=company_id)
     
     if request.method == 'POST':
+        print("POST data:", request.POST)
+        print("POST request received")
         form = TicketForm(request.POST)
         if form.is_valid():
+            print("Form is valid")
             ticket = form.save(commit=False)
-            ticket.company = company  # Automatically associate the ticket with the selected company
-            ticket.owner = request.user  # Assign the ticket to the current user
-            ticket.agency = request.user.agency  # Assign the ticket to the user's agency
+            ticket.company = company
+            ticket.owner = request.user
+            ticket.agency = request.user.agency
             ticket.save()
-            return redirect('ticket_detail', pk=ticket.pk)
+            print(f"Ticket saved with id: {ticket.id}")
+            return redirect('tickets:ticket_detail', pk=ticket.id)
+        else:
+            print("Form errors:", form.errors)
     else:
-        # Pre-fill the company field in the form
         form = TicketForm(initial={'company': company})
-
+    
     return render(request, 'tickets/open_ticket.html', {'form': form, 'company': company})
 
 def ticket_list(request):

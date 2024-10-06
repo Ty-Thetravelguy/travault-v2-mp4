@@ -52,10 +52,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize the category field state on page load
     updateCategoryField();
 
-    // New code for subject field autocomplete
+    // Subject field functionality
     var subjectField = document.getElementById('id_subject');
     var subjectSuggestions = document.getElementById('subject_suggestions');
     var addSubjectButton = document.getElementById('add_subject');
+
+    if (!subjectField || !addSubjectButton) {
+        console.error('Subject field or Add Subject button not found.');
+        return;
+    }
 
     subjectField.addEventListener('input', function() {
         var query = this.value;
@@ -79,6 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     item.addEventListener('click', function(e) {
                         e.preventDefault();
                         subjectField.value = subject.text;
+                        subjectField.dataset.subjectId = subject.id;  // Store the ID
                         subjectSuggestions.innerHTML = '';
                     });
                     subjectSuggestions.appendChild(item);
@@ -92,12 +98,12 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Add subject button clicked');
         event.preventDefault();
         event.stopPropagation();
-    
+
         if (isProcessing) {
             console.log('Already processing a request');
             return;
         }
-    
+
         var newSubject = subjectField.value.trim();
         if (newSubject) {
             isProcessing = true;
@@ -114,6 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 console.log('Fetch request successful');
                 subjectField.value = data.subject;
+                subjectField.dataset.subjectId = data.id;  // Store the ID
                 subjectSuggestions.innerHTML = '';
                 showAlert('New subject added successfully!');
             })
@@ -125,12 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-    
-    // Remove these lines:
-    // addSubjectButton.addEventListener('click', addSubjectHandler);
-    // addSubjectButton.removeEventListener('click', addSubjectHandler);
-    
-    // Add only one event listener:
+
     addSubjectButton.addEventListener('click', addSubjectHandler);
     
     let alertShown = false;

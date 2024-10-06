@@ -2840,3 +2840,186 @@ Traceback (most recent call last):
     raise NoReverseMatch(msg)
 django.urls.exceptions.NoReverseMatch: Reverse for 'ticket_detail' not found. 'ticket_detail' is not a valid view function or pattern name.
 ERROR 2024-10-05 15:34:55,415 basehttp "POST /tickets/open/1/ HTTP/1.1" 500 107464
+ERROR 2024-10-06 11:52:00,827 log Internal Server Error: /tickets/view/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/tickets/views.py", line 14, in view_tickets
+    return render(request, 'tickets/view_tickets.html')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/base.py", line 1008, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/base.py", line 969, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/base.py", line 1008, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/base.py", line 969, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/base.py", line 1008, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/base.py", line 969, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/urls/base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/urls/resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'open_ticket' with no arguments not found. 1 pattern(s) tried: ['tickets/open/(?P<company_id>[0-9]+)/\\Z']
+ERROR 2024-10-06 11:52:00,829 basehttp "GET /tickets/view/ HTTP/1.1" 500 175593
+ERROR 2024-10-06 12:39:44,633 log Internal Server Error: /tickets/open/1/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/tickets/views.py", line 57, in open_ticket
+    if form.is_valid():
+       ^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/forms/forms.py", line 197, in is_valid
+    return self.is_bound and not self.errors
+                                 ^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/forms/forms.py", line 192, in errors
+    self.full_clean()
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/forms/forms.py", line 327, in full_clean
+    self._post_clean()
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/forms/models.py", line 491, in _post_clean
+    self.instance = construct_instance(
+                    ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/forms/models.py", line 87, in construct_instance
+    f.save_form_data(instance, cleaned_data[f.name])
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/db/models/fields/__init__.py", line 1093, in save_form_data
+    setattr(instance, self.name, data)
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/db/models/fields/related_descriptors.py", line 287, in __set__
+    raise ValueError(
+ValueError: Cannot assign "'Atriis: Booking test 21'": "Ticket.subject" must be a "TicketSubject" instance.
+ERROR 2024-10-06 12:39:44,635 basehttp "POST /tickets/open/1/ HTTP/1.1" 500 118929
+ERROR 2024-10-06 12:40:23,713 log Internal Server Error: /tickets/open/1/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/tickets/views.py", line 57, in open_ticket
+    if form.is_valid():
+       ^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/forms/forms.py", line 197, in is_valid
+    return self.is_bound and not self.errors
+                                 ^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/forms/forms.py", line 192, in errors
+    self.full_clean()
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/forms/forms.py", line 327, in full_clean
+    self._post_clean()
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/forms/models.py", line 491, in _post_clean
+    self.instance = construct_instance(
+                    ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/forms/models.py", line 87, in construct_instance
+    f.save_form_data(instance, cleaned_data[f.name])
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/db/models/fields/__init__.py", line 1093, in save_form_data
+    setattr(instance, self.name, data)
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/db/models/fields/related_descriptors.py", line 287, in __set__
+    raise ValueError(
+ValueError: Cannot assign "'Atriis: Booking test 21'": "Ticket.subject" must be a "TicketSubject" instance.
+ERROR 2024-10-06 12:40:23,715 basehttp "POST /tickets/open/1/ HTTP/1.1" 500 118929
+ERROR 2024-10-06 12:40:40,238 log Internal Server Error: /tickets/open/1/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/tickets/views.py", line 57, in open_ticket
+    if form.is_valid():
+       ^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/forms/forms.py", line 197, in is_valid
+    return self.is_bound and not self.errors
+                                 ^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/forms/forms.py", line 192, in errors
+    self.full_clean()
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/forms/forms.py", line 327, in full_clean
+    self._post_clean()
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/forms/models.py", line 491, in _post_clean
+    self.instance = construct_instance(
+                    ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/forms/models.py", line 87, in construct_instance
+    f.save_form_data(instance, cleaned_data[f.name])
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/db/models/fields/__init__.py", line 1093, in save_form_data
+    setattr(instance, self.name, data)
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/db/models/fields/related_descriptors.py", line 287, in __set__
+    raise ValueError(
+ValueError: Cannot assign "'gdrgreger'": "Ticket.subject" must be a "TicketSubject" instance.
+ERROR 2024-10-06 12:40:40,238 basehttp "POST /tickets/open/1/ HTTP/1.1" 500 118859
+ERROR 2024-10-06 12:42:59,404 log Internal Server Error: /tickets/detail/6/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/tickets/views.py", line 81, in ticket_detail
+    return render(request, 'tickets/ticket_detail.html', {'ticket': ticket})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: tickets/ticket_detail.html
+ERROR 2024-10-06 12:42:59,405 basehttp "GET /tickets/detail/6/ HTTP/1.1" 500 99274

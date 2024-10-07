@@ -19,8 +19,15 @@
                             <span class="text-muted" style="font-size: 1rem;">Ticket number: #{{ ticket.pk }}</span>
                         </h2>
                         <p><strong>Company:</strong> {{ ticket.company.company_name }}</p>
-                        <p><strong>Contact:</strong> {{ ticket.contact.first_name }} {{ ticket.contact.last_name }}</p>
                         <p><strong>Priority:</strong> {{ ticket.get_priority_display }}</p>
+                        <p><strong>Contact:</strong> {{ ticket.contact.first_name }} {{ ticket.contact.last_name }}</p>
+                        <p><strong>Received From:</strong>
+                            {% if ticket.received_from %}
+                            {{ ticket.received_from.get_full_name|default:ticket.received_from.username }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </p>
                         <p><strong>Category Type:</strong> {{ ticket.get_category_type_display }}</p>
                         <p><strong>Category:</strong>
                             {% if ticket.category_type == 'client' %}

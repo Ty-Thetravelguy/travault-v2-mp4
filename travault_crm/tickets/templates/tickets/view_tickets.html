@@ -16,16 +16,76 @@
 
             <!-- Button to Open a New Ticket -->
             <div class="col-md-6 mb-3 text-center">
-                <a href="{% url 'tickets:open_ticket' %}" class="btn btn-success btn-lg w-100">
+                <a href="#" class="btn btn-success btn-lg w-100">
                     <i class="fas fa-ticket-alt me-2"></i>Open Ticket
                 </a>
             </div>
         </div>
 
-        <!-- Add space for listing or managing tickets here -->
-        <div class="row mt-5">
-            <h3 class="text-center">Your Tickets will appear here</h3>
+        <!-- Tickets Table -->
+        <div class="table-responsive mt-5">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Status <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Subject <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Received From <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Ticket No. <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Created Date <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Company <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Category Type <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Category <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Owner <span class="sort-icon">&#9650;&#9660;</span></th>
+                        <th>Last Updated <span class="sort-icon">&#9650;&#9660;</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr>
+                        <td>{{ ticket.status }}</td>
+                        <td>{{ ticket.subject }}</td>
+                        <td>
+                            {% if ticket.received_from %}
+                            {{ ticket.received_from.get_full_name|default:ticket.received_from.username }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                        <td><a href="{% url 'tickets:ticket_detail' pk=ticket.pk %}">#{{ ticket.pk }}</a></td>
+                        <td>{{ ticket.created_at|date:"d/m/Y H:i" }}</td>
+                        <td>{{ ticket.company.company_name }}</td>
+                        <td>{{ ticket.get_category_type_display }}</td>
+                        <td>{{ ticket.category }}</td>
+                        <td>{{ ticket.owner.get_full_name|default:ticket.owner.username }}</td>
+                        <td>{{ ticket.updated_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center">No tickets found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+
+        <!-- Pagination Controls (Placeholder) -->
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
+{% endblock %}
+
+{% block postload_js %}
+<script src="{% static 'js/tickets_script.js' %}"></script>
 {% endblock %}

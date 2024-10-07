@@ -18,7 +18,8 @@ from django.urls import reverse
 
 @login_required
 def view_tickets(request):
-    return render(request, 'tickets/view_tickets.html')
+    tickets = Ticket.objects.filter(agency=request.user.agency).order_by('-created_at')
+    return render(request, 'tickets/view_tickets.html', {'tickets': tickets})
 
 class TicketSubjectAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):

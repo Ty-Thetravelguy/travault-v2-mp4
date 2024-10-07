@@ -11,5 +11,7 @@ urlpatterns = [
     path('ticket-subject-autocomplete/', views.ticket_subject_autocomplete, name='ticket-subject-autocomplete'),
     path('create-ticket-subject/', views.create_ticket_subject, name='create-ticket-subject'),
     path('view/', views.view_tickets, name='view_tickets'),  # View tickets page
+    path('preview-email/<int:ticket_id>/', views.preview_ticket_email, name='preview_ticket_email'),
+
     # path('category/create/', views.create_category, name='create_category'),  # Create a ticket category
 ]

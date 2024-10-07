@@ -8,6 +8,11 @@ from dal import autocomplete
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib import messages
+from django.utils.html import strip_tags
+from django.conf import settings
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.urls import reverse
 
 
 
@@ -69,6 +74,21 @@ def open_ticket(request, company_id):
             ticket.owner = request.user
             ticket.agency = request.user.agency
             ticket.save()
+
+                        # Send email to the received_from user
+            if ticket.received_from:
+                subject = f'New Ticket Created: #{ticket.pk}'
+                ticket_url = request.build_absolute_uri(reverse('tickets:ticket_detail', args=[ticket.pk]))
+                html_message = render_to_string('tickets/email/ticket_created_email.html', {
+                    'ticket': ticket,
+                    'ticket_url': ticket_url
+                })
+                plain_message = strip_tags(html_message)
+                from_email = settings.DEFAULT_FROM_EMAIL
+                to_email = ticket.received_from.email
+
+                send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
+
             messages.success(request, f"Ticket #{ticket.id} has been successfully created.")
             return redirect('tickets:ticket_detail', pk=ticket.id)
         else:
@@ -87,3 +107,14 @@ def ticket_detail(request, pk):
     # Ensure the ticket belongs to the user's agency
     ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
     return render(request, 'tickets/ticket_detail.html', {'ticket': ticket})
+
+def preview_ticket_email(request, ticket_id):
+    ticket = Ticket.objects.get(pk=ticket_id)
+    ticket_url = request.build_absolute_uri(reverse('tickets:ticket_detail', args=[ticket.pk]))
+    
+    context = {
+        'ticket': ticket,
+        'ticket_url': ticket_url,
+    }
+    
+    return render(request, 'tickets/email/ticket_created_email.html', context)

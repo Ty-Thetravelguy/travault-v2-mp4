@@ -1,5 +1,5 @@
 from crm.models import Company, Contact 
-from agencies.models import Agency
+from agencies.models import Agency, CustomUser
 from django.db import models
 from django.conf import settings 
 
@@ -41,6 +41,13 @@ class Ticket(models.Model):
     contact = models.ForeignKey(Contact, null=True, blank=True, on_delete=models.SET_NULL) 
     agency = models.ForeignKey(Agency, on_delete=models.CASCADE) 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  
+    received_from = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='received_tickets'
+    )
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES)
     category_type = models.CharField(max_length=10, choices=CATEGORY_TYPE_CHOICES)
     category = models.CharField(max_length=50)

@@ -19,16 +19,23 @@
                                 {{ form.company|add_class:"form-control" }}
                             </div>
 
+                            <!-- Priority Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.priority.id_for_label }}" class="form-label">Priority</label>
+                                {{ form.priority|add_class:"form-select" }}
+                            </div>
+
                             <!-- Contact Field -->
                             <div class="mb-3">
                                 <label for="{{ form.contact.id_for_label }}" class="form-label">Contact</label>
                                 {{ form.contact|add_class:"form-select" }}
                             </div>
 
-                            <!-- Priority Field -->
+                            <!-- Received From Field -->
                             <div class="mb-3">
-                                <label for="{{ form.priority.id_for_label }}" class="form-label">Priority</label>
-                                {{ form.priority|add_class:"form-select" }}
+                                <label for="{{ form.received_from.id_for_label }}" class="form-label">Received
+                                    From</label>
+                                {{ form.received_from|add_class:"form-select" }}
                             </div>
 
                             <!-- Category Type Field -->

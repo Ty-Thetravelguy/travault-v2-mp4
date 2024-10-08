@@ -15,6 +15,8 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from .models import TicketSubject
 from django.db.models import Count
+from django.db.models import ProtectedError
+from django.db.models.functions import Lower
 
 
 @login_required
@@ -38,7 +40,7 @@ ticket_subject_autocomplete = TicketSubjectAutocomplete.as_view()
 
 @login_required
 def manage_subjects(request):
-    subjects = TicketSubject.objects.annotate(ticket_count=Count('ticket'))
+    subjects = TicketSubject.objects.annotate(ticket_count=Count('ticket')).order_by(Lower('subject'))
     return render(request, 'tickets/manage_subjects.html', {'subjects': subjects})
 
 @login_required
@@ -61,7 +63,8 @@ def create_ticket_subject(request):
         return JsonResponse({
             'id': new_subject.id, 
             'subject': new_subject.subject,
-            'created': created
+            'created': created,
+            'redirect': reverse('tickets:manage_subjects')
         })
     else:
         messages.error(request, "No subject provided. Please enter a subject.")
@@ -76,10 +79,13 @@ def update_subject(request, subject_id):
         if new_subject_name:
             subject.subject = new_subject_name
             subject.save()
+            messages.success(request, f"Subject updated successfully to '{new_subject_name}'.")
             return JsonResponse({'success': True})
         else:
+            messages.error(request, "No subject name provided.")
             return JsonResponse({'success': False, 'error': 'No subject name provided'}, status=400)
     except TicketSubject.DoesNotExist:
+        messages.error(request, "Subject not found.")
         return JsonResponse({'success': False, 'error': 'Subject not found'}, status=404)
 
 @login_required
@@ -87,10 +93,27 @@ def update_subject(request, subject_id):
 def delete_subject(request, subject_id):
     try:
         subject = TicketSubject.objects.get(id=subject_id)
+        
+        # Check if there are any tickets associated with this subject
+        if Ticket.objects.filter(subject=subject).exists():
+            return JsonResponse({
+                'success': False, 
+                'error': 'Cannot delete this subject as it has tickets associated with it.'
+            }, status=400)
+        
+        subject_name = subject.subject
         subject.delete()
+        messages.success(request, f"Subject '{subject_name}' has been deleted.")
         return JsonResponse({'success': True})
     except TicketSubject.DoesNotExist:
+        messages.error(request, "Subject not found.")
         return JsonResponse({'success': False, 'error': 'Subject not found'}, status=404)
+    except ProtectedError:
+        messages.error(request, "Cannot delete this subject as it is referenced by other parts of the system.")
+        return JsonResponse({
+            'success': False, 
+            'error': 'Cannot delete this subject as it is referenced by other parts of the system.'
+        }, status=400)
 
 @login_required
 def open_ticket(request, company_id):

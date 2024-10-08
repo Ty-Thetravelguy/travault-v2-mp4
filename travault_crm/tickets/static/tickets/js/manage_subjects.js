@@ -22,11 +22,14 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                if (data.created) {
-                    alert(`New subject '${data.subject}' added successfully!`);
-                    location.reload(); // Reload the page to update the list
-                } else {
-                    alert(`Subject '${data.subject}' already exists.`);
+                if (data.redirect) {
+                    // If you want to use the subject info before redirecting, you can do so here
+                    console.log(`Subject ${data.created ? 'created' : 'already exists'}: ${data.subject} (ID: ${data.id})`);
+                    
+                    // Redirect to refresh the page and show Django messages
+                    window.location.href = data.redirect;
+                } else if (data.error) {
+                    alert(data.error);
                 }
             })
             .catch(error => console.error('Error adding subject:', error));
@@ -56,11 +59,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Subject updated successfully!');
                     location.reload(); // Reload the page to update the list
-                } else {
-                    alert('Error updating subject.');
-                }
+                } 
             })
             .catch(error => console.error('Error updating subject:', error));
         }
@@ -68,8 +68,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Confirm delete subject
     confirmDeleteButton.addEventListener('click', function() {
-        console.log('Confirm delete button clicked');
-        console.log('Current subject ID:', currentSubjectId);
         if (currentSubjectId) {
             // Get the CSRF token from within the modal
             const csrfToken = confirmDeleteModal.querySelector('[name=csrfmiddlewaretoken]');
@@ -89,25 +87,28 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Subject deleted successfully!');
-                    location.reload(); // Reload the page to update the list
+                    location.reload(); // Reload the page to update the list and show success message
                 } else {
-                    alert('Error deleting subject.');
+                    // Display the error message
+                    alert(data.error || 'Error deleting subject.');
+                    // Close the modal
+                    const modal = bootstrap.Modal.getInstance(confirmDeleteModal);
+                    modal.hide();
                 }
             })
             .catch(error => {
-                console.error('Error deleting subject:', error);
-                alert('An error occurred while deleting the subject.');
+                console.error('Error:', error);
+                alert('An unexpected error occurred while deleting the subject.');
+                // Close the modal
+                const modal = bootstrap.Modal.getInstance(confirmDeleteModal);
+                modal.hide();
             });
-        } else {
-            console.error('No subject ID provided');
-        }
+        } 
     });
 
     // Open confirm delete modal
     confirmDeleteModal.addEventListener('show.bs.modal', function(event) {
         const button = event.relatedTarget;
         currentSubjectId = button.getAttribute('data-subject-id');
-        console.log('Preparing to delete subject with ID:', currentSubjectId);
     });
 });

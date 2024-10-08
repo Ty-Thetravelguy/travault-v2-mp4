@@ -10,6 +10,13 @@ class TicketSubject(models.Model):
         return self.subject
 
 class Ticket(models.Model):
+
+    STATUS_CHOICES = [
+        ('open', 'Open'),
+        ('in_progress', 'In Progress'),
+        ('closed', 'Closed'),
+    ]
+
     PRIORITY_CHOICES = [
         ('low', 'Low'),
         ('medium', 'Medium'),
@@ -36,6 +43,14 @@ class Ticket(models.Model):
         ('system_enhancement', 'System Enhancement'),
     ]
 
+    def get_category_display(self):
+        if self.category_type == 'client':
+            choices = dict(self.CATEGORY_CHOICES_CLIENT)
+        elif self.category_type == 'agency':
+            choices = dict(self.CATEGORY_CHOICES_AGENCY)
+        else:
+            return self.category
+        return choices.get(self.category, self.category)
     
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     contact = models.ForeignKey(Contact, null=True, blank=True, on_delete=models.SET_NULL) 
@@ -50,9 +65,9 @@ class Ticket(models.Model):
     )
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES)
     category_type = models.CharField(max_length=10, choices=CATEGORY_TYPE_CHOICES)
-    category = models.CharField(max_length=50)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES_CLIENT)
     subject = models.ForeignKey(TicketSubject, on_delete=models.CASCADE)
     description = models.TextField()
-    status = models.CharField(max_length=20, default='open')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

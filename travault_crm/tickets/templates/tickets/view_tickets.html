@@ -29,6 +29,7 @@
                     <thead class="table-light">
                         <tr>
                             <th style="width: 8%;">Status <span class="sort-icon">&#9650;&#9660;</span></th>
+                            <th style="width: 8%;">Priority <span class="sort-icon">&#9650;&#9660;</span></th>
                             <th style="width: 15%;">Subject <span class="sort-icon">&#9650;&#9660;</span></th>
                             <th style="width: 12%;">Received From <span class="sort-icon">&#9650;&#9660;</span></th>
                             <th style="width: 7%;">Ticket No. <span class="sort-icon">&#9650;&#9660;</span></th>
@@ -43,7 +44,8 @@
                     <tbody>
                         {% for ticket in tickets %}
                         <tr class="clickable-row" data-href="{% url 'tickets:ticket_detail' pk=ticket.pk %}">
-                            <td>{{ ticket.status }}</td>
+                            <td>{{ ticket.get_status_display }}</td>
+                            <td>{{ ticket.get_priority_display }}</td>
                             <td class="text-truncate">{{ ticket.subject }}</td>
                             <td class="text-truncate">
                                 {% if ticket.received_from %}
@@ -56,7 +58,7 @@
                             <td>{{ ticket.created_at|date:"d/m/Y H:i" }}</td>
                             <td class="text-truncate">{{ ticket.company.company_name }}</td>
                             <td>{{ ticket.get_category_type_display }}</td>
-                            <td>{{ ticket.category }}</td>
+                            <td>{{ ticket.get_category_display }}</td>
                             <td class="text-truncate">{{ ticket.owner.get_full_name|default:ticket.owner.username }}
                             </td>
                             <td>{{ ticket.updated_at|date:"d/m/Y H:i" }}</td>

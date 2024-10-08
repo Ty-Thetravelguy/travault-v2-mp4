@@ -2,6 +2,8 @@
 {% load static %}
 
 {% block content %}
+{% csrf_token %}
+
 <div class="container-fluid full-height-bg top-padding bg-gray-200">
     <div class="container mt-5 roboto">
         <div class="row mb-4">
@@ -35,15 +37,49 @@
 
                         <div class="row mb-2">
                             <div class="col-md-6">
-                                <strong>Owner:</strong> {{ ticket.owner.get_full_name|default:ticket.owner.username }}
+                                <strong>Owner:</strong>
+                                <select id="owner-select" class="form-select-sm">
+                                    {% for user in agency_users %}
+                                    <option value="{{ user.id }}" {% if user == ticket.owner %}selected{% endif %}>
+                                        {{ user.get_full_name|default:user.username }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
                             </div>
                             <div class="col-md-6">
                                 <strong>Assigned:</strong>
-                                {% if ticket.received_from %}
-                                {{ ticket.received_from.get_full_name|default:ticket.received_from.username }}
-                                {% else %}
-                                N/A
-                                {% endif %}
+                                <select id="received_from-select" class="form-select-sm">
+                                    <option value="">Not Assigned</option>
+                                    {% for user in agency_users %}
+                                    <option value="{{ user.id }}"
+                                        {% if user == ticket.received_from %}selected{% endif %}>
+                                        {{ user.get_full_name|default:user.username }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>Priority:</strong>
+                                <select id="priority-select" class="form-select-sm">
+                                    {% for value, display in ticket.PRIORITY_CHOICES %}
+                                    <option value="{{ value }}" {% if value == ticket.priority %}selected{% endif %}>
+                                        {{ display }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Status:</strong>
+                                <select id="status-select" class="form-select-sm">
+                                    {% for status in status_choices %}
+                                    <option value="{{ status }}" {% if status == ticket.status %}selected{% endif %}>
+                                        {{ status|title }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
 
@@ -76,15 +112,6 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <strong>Priority:</strong> {{ ticket.get_priority_display }}
-                            </div>
-                            <div class="col-md-6">
-                                <strong>Status:</strong> {{ ticket.status|title }}
-                            </div>
-                        </div>
-
                         <div class="row">
                             <div class="col-md-12">
                                 <h4>Description:</h4>
@@ -102,13 +129,16 @@
                                     <i class="fas fa-list"></i> Back to All Tickets
                                 </a>
                             </div>
-                            {% if user.user_type == 'admin' %}
                             <div>
+                                <a href="{% url 'tickets:edit_ticket' pk=ticket.pk %}" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i> Full Edit
+                                </a>
+                                {% if user.user_type == 'admin' %}
                                 <a href="{% url 'tickets:delete_ticket_confirm' pk=ticket.pk %}" class="btn btn-danger">
                                     <i class="fas fa-trash-alt"></i> Delete Ticket
                                 </a>
+                                {% endif %}
                             </div>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -116,4 +146,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'tickets/js/ticket_js.js' %}"></script>
 {% endblock %}

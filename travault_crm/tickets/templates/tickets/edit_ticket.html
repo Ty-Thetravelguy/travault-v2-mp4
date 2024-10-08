@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load static %}
+{% load ticket_tags %}
+
+{% block content %}
+<section id="edit-ticket" class="bg-gray-200">
+    <div class="container top-padding roboto">
+        <div class="row justify-content-center py-5">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="card-title text-center mb-4">Edit Ticket for {{ ticket.company.company_name }}</h2>
+                        <form method="post" id="editTicketForm">
+                            {% csrf_token %}
+
+                            <!-- Company Field (pre-filled and read-only) -->
+                            <div class="mb-3">
+                                <label for="{{ form.company.id_for_label }}" class="form-label">Company</label>
+                                {{ form.company|add_class:"form-control" }}
+                            </div>
+
+                            <!-- Priority Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.priority.id_for_label }}" class="form-label">Priority</label>
+                                {{ form.priority|add_class:"form-select" }}
+                            </div>
+
+                            <!-- Contact Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.contact.id_for_label }}" class="form-label">Contact</label>
+                                {{ form.contact|add_class:"form-select" }}
+                            </div>
+
+                            <!-- Received From Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.received_from.id_for_label }}" class="form-label">Received
+                                    From</label>
+                                {{ form.received_from|add_class:"form-select" }}
+                            </div>
+
+                            <!-- Category Type Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.category_type.id_for_label }}" class="form-label">Category
+                                    Type</label>
+                                {{ form.category_type|add_class:"form-select" }}
+                            </div>
+
+                            <!-- Category Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+                                {{ form.category|add_class:"form-select category-field" }}
+                            </div>
+
+                            <!-- Subject Field -->
+                            <div class="mb-3">
+                                <label for="id_subject" class="form-label">Subject</label>
+                                <div class="input-group">
+                                    <input type="text" id="id_subject" name="subject" class="form-control"
+                                        autocomplete="off" value="{{ ticket.subject.subject }}">
+                                    <button type="button" id="add_subject" class="btn btn-outline-secondary">+</button>
+                                </div>
+                                <div id="subject_suggestions" class="list-group mt-2"></div>
+                            </div>
+
+                            <!-- Description Field -->
+                            <div class="mb-3">
+                                <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                                {{ form.description|add_class:"form-control" }}
+                            </div>
+
+                            <!-- Submit and Cancel Buttons -->
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-get-started btn-lg" id="submitButton">Save
+                                    Changes</button>
+                                <a href="{% url 'tickets:ticket_detail' pk=ticket.pk %}"
+                                    class="btn btn-secondary btn-lg">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block postload_js %}
+<script src="{% static 'tickets/js/ticket_js.js' %}"></script>
+{% endblock %}

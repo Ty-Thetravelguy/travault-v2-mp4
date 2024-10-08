@@ -194,3 +194,51 @@ def delete_ticket_confirm(request, pk):
             messages.error(request, "Incorrect ticket number. Deletion cancelled.")
     
     return render(request, 'tickets/delete_ticket_confirm.html', {'ticket': ticket})
+
+@login_required
+@require_POST
+def update_ticket_field(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
+    field = request.POST.get('field')
+    value = request.POST.get('value')
+
+    if field not in ['owner', 'received_from', 'priority', 'status']:
+        return JsonResponse({'success': False, 'error': 'Invalid field'}, status=400)
+
+    try:
+        if field in ['owner', 'received_from']:
+            user = get_object_or_404(CustomUser, pk=value, agency=request.user.agency)
+            setattr(ticket, field, user)
+        else:
+            setattr(ticket, field, value)
+        
+        ticket.save()
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+@login_required
+def ticket_detail(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
+    agency_users = CustomUser.objects.filter(agency=request.user.agency)
+    status_choices = ['open', 'in_progress', 'closed']  # Add more as needed
+    context = {
+        'ticket': ticket,
+        'agency_users': agency_users,
+        'status_choices': status_choices,
+    }
+    return render(request, 'tickets/ticket_detail.html', context)
+
+@login_required
+def edit_ticket(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
+    if request.method == 'POST':
+        form = TicketForm(request.POST, instance=ticket, agency=request.user.agency)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Ticket updated successfully.')
+            return redirect('tickets:ticket_detail', pk=ticket.pk)
+    else:
+        form = TicketForm(instance=ticket, agency=request.user.agency)
+    
+    return render(request, 'tickets/edit_ticket.html', {'form': form, 'ticket': ticket})

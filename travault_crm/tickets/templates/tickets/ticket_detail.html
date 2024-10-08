@@ -14,40 +14,83 @@
             <div class="col-md-8">
                 <div class="card shadow">
                     <div class="card-body">
-                        <h2 class="d-flex justify-content-between align-items-center">
-                            {{ ticket.subject }}
-                            <span class="text-muted" style="font-size: 1rem;">Ticket number: #{{ ticket.pk }}</span>
-                        </h2>
-                        <p><strong>Company:</strong> {{ ticket.company.company_name }}</p>
-                        <p><strong>Priority:</strong> {{ ticket.get_priority_display }}</p>
-                        <p><strong>Contact:</strong> {{ ticket.contact.first_name }} {{ ticket.contact.last_name }}</p>
-                        <p><strong>Received From:</strong>
-                            {% if ticket.received_from %}
-                            {{ ticket.received_from.get_full_name|default:ticket.received_from.username }}
-                            {% else %}
-                            N/A
-                            {% endif %}
-                        </p>
-                        <p><strong>Category Type:</strong> {{ ticket.get_category_type_display }}</p>
-                        <p><strong>Category:</strong>
-                            {% if ticket.category_type == 'client' %}
-                            {% for value, display in ticket.CATEGORY_CHOICES_CLIENT %}
-                            {% if value == ticket.category %}{{ display }}{% endif %}
-                            {% endfor %}
-                            {% elif ticket.category_type == 'agency' %}
-                            {% for value, display in ticket.CATEGORY_CHOICES_AGENCY %}
-                            {% if value == ticket.category %}{{ display }}{% endif %}
-                            {% endfor %}
-                            {% else %}
-                            {{ ticket.category }}
-                            {% endif %}
-                        </p>
-                        <p><strong>Status:</strong> {{ ticket.status|title }}</p>
-                        <p><strong>Created:</strong> {{ ticket.created_at }}</p>
-                        <p><strong>Last Updated:</strong> {{ ticket.updated_at }}</p>
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <h2>{{ ticket.subject }}</h2>
+                            </div>
+                            <div class="col-md-4 text-md-end">
+                                <span class="text-muted">Ticket number: #{{ ticket.pk }}</span>
+                            </div>
+                        </div>
 
-                        <h4>Description:</h4>
-                        <div>{{ ticket.description|linebreaks }}</div>
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>Company:</strong> {{ ticket.company.company_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Company Contact:</strong> {{ ticket.contact.first_name }}
+                                {{ ticket.contact.last_name }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>Owner:</strong> {{ ticket.owner.get_full_name|default:ticket.owner.username }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Assigned:</strong>
+                                {% if ticket.received_from %}
+                                {{ ticket.received_from.get_full_name|default:ticket.received_from.username }}
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>Category Type:</strong> {{ ticket.get_category_type_display }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Category:</strong>
+                                {% if ticket.category_type == 'client' %}
+                                {% for value, display in ticket.CATEGORY_CHOICES_CLIENT %}
+                                {% if value == ticket.category %}{{ display }}{% endif %}
+                                {% endfor %}
+                                {% elif ticket.category_type == 'agency' %}
+                                {% for value, display in ticket.CATEGORY_CHOICES_AGENCY %}
+                                {% if value == ticket.category %}{{ display }}{% endif %}
+                                {% endfor %}
+                                {% else %}
+                                {{ ticket.category }}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <strong>Created:</strong> {{ ticket.created_at }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Last Updated:</strong> {{ ticket.updated_at }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <strong>Priority:</strong> {{ ticket.get_priority_display }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Status:</strong> {{ ticket.status|title }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4>Description:</h4>
+                                <div>{{ ticket.description|linebreaks }}</div>
+                            </div>
+                        </div>
 
                         <div class="mt-3 d-flex justify-content-between">
                             <div>

@@ -12,6 +12,8 @@ urlpatterns = [
     path('create-ticket-subject/', views.create_ticket_subject, name='create-ticket-subject'),
     path('view/', views.view_tickets, name='view_tickets'),  # View tickets page
     path('preview-email/<int:ticket_id>/', views.preview_ticket_email, name='preview_ticket_email'),
-
+    path('manage-subjects/', views.manage_subjects, name='manage_subjects'),
+    path('update-subject/<int:subject_id>/', views.update_subject, name='update_subject'),
+    path('delete-subject/<int:subject_id>/', views.delete_subject, name='delete_subject'),
     # path('category/create/', views.create_category, name='create_category'),  # Create a ticket category
 ]

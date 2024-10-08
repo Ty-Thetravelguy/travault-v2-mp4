@@ -13,7 +13,8 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.urls import reverse
-
+from .models import TicketSubject
+from django.db.models import Count
 
 
 @login_required
@@ -34,6 +35,11 @@ class TicketSubjectAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 ticket_subject_autocomplete = TicketSubjectAutocomplete.as_view()
+
+@login_required
+def manage_subjects(request):
+    subjects = TicketSubject.objects.annotate(ticket_count=Count('ticket'))
+    return render(request, 'tickets/manage_subjects.html', {'subjects': subjects})
 
 @login_required
 def ticket_subject_autocomplete(request):
@@ -61,6 +67,30 @@ def create_ticket_subject(request):
         messages.error(request, "No subject provided. Please enter a subject.")
         return JsonResponse({'error': 'No subject provided'}, status=400)
 
+@login_required
+@require_POST
+def update_subject(request, subject_id):
+    try:
+        subject = TicketSubject.objects.get(id=subject_id)
+        new_subject_name = request.POST.get('subject')
+        if new_subject_name:
+            subject.subject = new_subject_name
+            subject.save()
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'error': 'No subject name provided'}, status=400)
+    except TicketSubject.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Subject not found'}, status=404)
+
+@login_required
+@require_POST
+def delete_subject(request, subject_id):
+    try:
+        subject = TicketSubject.objects.get(id=subject_id)
+        subject.delete()
+        return JsonResponse({'success': True})
+    except TicketSubject.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Subject not found'}, status=404)
 
 @login_required
 def open_ticket(request, company_id):

@@ -1,10 +1,22 @@
 document.addEventListener('DOMContentLoaded', function() {
+    
+    function initializeClickableRows() {
+        const rows = document.querySelectorAll('.clickable-row');
+        rows.forEach(row => {
+            row.addEventListener('click', function() {
+                window.location.href = this.dataset.href;
+            });
+            row.style.cursor = 'pointer';
+        });
+    }
+
+    initializeClickableRows();
+
     // Category field functionality
     var categoryTypeField = document.getElementById('id_category_type');
     var categoryField = document.getElementById('id_category');
 
     if (!categoryTypeField || !categoryField) {
-        console.error('Category Type or Category field not found.');
         return;
     }
 
@@ -58,7 +70,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var addSubjectButton = document.getElementById('add_subject');
 
     if (!subjectField || !addSubjectButton) {
-        console.error('Subject field or Add Subject button not found.');
         return;
     }
 
@@ -95,19 +106,16 @@ document.addEventListener('DOMContentLoaded', function() {
     let isProcessing = false;
 
     function addSubjectHandler(event) {
-        console.log('Add subject button clicked');
         event.preventDefault();
         event.stopPropagation();
 
         if (isProcessing) {
-            console.log('Already processing a request');
             return;
         }
 
         var newSubject = subjectField.value.trim();
         if (newSubject) {
             isProcessing = true;
-            console.log('Sending fetch request');
             fetch('/tickets/create-ticket-subject/', {
                 method: 'POST',
                 headers: {
@@ -118,14 +126,12 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Fetch request successful');
                 subjectField.value = data.subject;
                 subjectField.dataset.subjectId = data.id;  // Store the ID
                 subjectSuggestions.innerHTML = '';
                 showAlert('New subject added successfully!');
             })
             .catch(error => {
-                console.error('Error:', error);
             })
             .finally(() => {
                 isProcessing = false;
@@ -149,6 +155,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Debug: Log all clicks on the form
     document.querySelector('form').addEventListener('click', function(event) {
-        console.log('Clicked element:', event.target);
     });
+
 });

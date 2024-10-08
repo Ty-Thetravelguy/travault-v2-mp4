@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid full-height-bg top-padding bg-gray-200">
+    <div class="container mt-5 roboto">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="text-danger">Confirm Ticket Deletion</h2>
+                        <p>Are you sure you want to delete ticket #{{ ticket.pk }}?</p>
+                        <p><strong>Subject:</strong> {{ ticket.subject }}</p>
+                        <p><strong>Company:</strong> {{ ticket.company.company_name }}</p>
+                        <p>This action cannot be undone.</p>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="confirmation" class="form-label">To confirm, please enter the ticket number
+                                    ({{ ticket.pk }}):</label>
+                                <input type="text" class="form-control" id="confirmation" name="confirmation" required>
+                            </div>
+                            <button type="submit" class="btn btn-danger">Delete Ticket</button>
+                            <a href="{% url 'tickets:ticket_detail' pk=ticket.pk %}"
+                                class="btn btn-secondary">Cancel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

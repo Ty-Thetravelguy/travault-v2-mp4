@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import TicketSubject,Ticket
 from .forms import TicketForm
-from crm.models import Company, Contact
+from crm.models import Company
 from django.shortcuts import get_object_or_404
 from dal import autocomplete
 from django.http import JsonResponse
@@ -17,6 +17,7 @@ from .models import TicketSubject
 from django.db.models import Count
 from django.db.models import ProtectedError
 from django.db.models.functions import Lower
+from agencies.models import CustomUser  # Import your custom user model
 
 
 @login_required
@@ -172,3 +173,24 @@ def preview_ticket_email(request, ticket_id):
     }
     
     return render(request, 'tickets/email/ticket_created_email.html', context)
+
+@login_required
+def delete_ticket_confirm(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
+    
+    # Check if the user is an admin
+    if request.user.user_type != 'admin':
+        messages.error(request, "You don't have permission to delete tickets.")
+        return redirect('tickets:ticket_detail', pk=ticket.pk)
+    
+    if request.method == 'POST':
+        confirmation = request.POST.get('confirmation')
+        if confirmation == str(ticket.pk):
+            ticket_number = ticket.pk 
+            ticket.delete()
+            messages.success(request, f"Ticket #{ticket_number} has been successfully deleted.")
+            return redirect('tickets:view_tickets')
+        else:
+            messages.error(request, "Incorrect ticket number. Deletion cancelled.")
+    
+    return render(request, 'tickets/delete_ticket_confirm.html', {'ticket': ticket})

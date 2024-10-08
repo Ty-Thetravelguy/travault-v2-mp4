@@ -61,7 +61,7 @@
                             </div>
                             {% if user.user_type == 'admin' %}
                             <div>
-                                <a href="#" class="btn btn-danger">
+                                <a href="{% url 'tickets:delete_ticket_confirm' pk=ticket.pk %}" class="btn btn-danger">
                                     <i class="fas fa-trash-alt"></i> Delete Ticket
                                 </a>
                             </div>

@@ -209,11 +209,17 @@ def update_ticket_field(request, pk):
         if field in ['owner', 'received_from']:
             user = get_object_or_404(CustomUser, pk=value, agency=request.user.agency)
             setattr(ticket, field, user)
+            field_value = user.get_full_name() or user.username
         else:
             setattr(ticket, field, value)
+            field_value = value
         
         ticket.save()
-        return JsonResponse({'success': True})
+        
+        message = f"Ticket #{ticket.pk} {field.replace('_', ' ')} updated to {field_value}."
+        messages.success(request, message)
+        
+        return JsonResponse({'success': True, 'message': message})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 

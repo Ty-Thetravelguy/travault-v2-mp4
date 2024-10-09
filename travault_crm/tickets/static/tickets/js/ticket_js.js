@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
             select.addEventListener('change', function() {
                 quickUpdateField(field, this.value);
             });
+            
         }
     });
 
@@ -41,10 +42,27 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 updateUI(field, value);
+                // Instead of reloading the page, add the message manually
+                const messageContainer = document.getElementById('message-container');
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                alertDiv.role = 'alert';
+                alertDiv.innerHTML = `
+                    ${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                messageContainer.appendChild(alertDiv);
+    
+                // Trigger the same behavior as in script.js
+                setTimeout(() => {
+                    alertDiv.classList.remove('show');
+                    setTimeout(() => alertDiv.remove(), 150);
+                }, 5000);
             }
         })
         .catch(error => {
-            // Handle error if needed
+            console.error('Error:', error);
+            displayDjangoMessage('An error occurred while updating the ticket.', 'error');
         });
     }
 

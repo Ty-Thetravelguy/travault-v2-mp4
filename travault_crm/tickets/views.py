@@ -282,6 +282,7 @@ def edit_ticket_action(request, action_id):
         if action_type and details:
             action.action_type = action_type
             action.details = details
+            action.updated_by = request.user
             action.save()
             messages.success(request, f"Action '{action.get_action_type_display()}' updated successfully.")
         else:

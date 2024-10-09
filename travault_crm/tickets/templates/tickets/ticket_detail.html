@@ -156,9 +156,19 @@
                                         <p class="card-text">{{ action.details|linebreaks }}</p>
                                     </div>
                                     <div class="card-footer text-muted">
-                                        <small class="float-start">Updated by:
-                                            {{ action.created_by.get_full_name }}</small>
-                                        <small class="float-end">{{ action.created_at|date:"F d, Y H:i" }}</small>
+                                        <small class="float-start">
+                                            Created by: {{ action.created_by.get_full_name }}
+                                            {% if action.updated_by %}
+                                            | Last updated by: {{ action.updated_by.get_full_name }}
+                                            {% endif %}
+                                        </small>
+                                        <small class="float-end">
+                                            {% if action.updated_at and action.updated_at != action.created_at %}
+                                            Updated: {{ action.updated_at|date:"F d, Y H:i" }}
+                                            {% else %}
+                                            Created: {{ action.created_at|date:"F d, Y H:i" }}
+                                            {% endif %}
+                                        </small>
                                     </div>
                                 </div>
                                 {% empty %}

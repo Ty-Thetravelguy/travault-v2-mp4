@@ -82,16 +82,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    /**
-     * Hides alert messages after a timeout.
-     */
-    const messages = document.querySelectorAll('.alert');
-    messages.forEach(message => {
-        setTimeout(() => {
-            message.classList.remove('show');
-            setTimeout(() => message.remove(), 150);
-        }, 5000);
-    });
 
     /**
      * Filters supplier items by name based on input from a search field.

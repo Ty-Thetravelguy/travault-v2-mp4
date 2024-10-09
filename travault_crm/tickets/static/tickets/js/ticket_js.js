@@ -208,4 +208,45 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 1000);
         }
     }
+    // Action modal functionality
+    const actionForm = document.getElementById('actionForm');
+    const saveActionBtn = document.getElementById('saveAction');
+
+    if (actionForm && saveActionBtn) {
+        saveActionBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            actionForm.submit();
+        });
+    }
+
+    // Edit Action Modal
+    const editActionModal = document.getElementById('editActionModal');
+    if (editActionModal) {
+        editActionModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const actionId = button.getAttribute('data-action-id');
+            const form = this.querySelector('#editActionForm');
+            form.action = form.action.replace(/\/0\//, `/${actionId}/`);
+            this.querySelector('#editActionId').value = actionId;
+            
+            // Populate form fields with current action data
+            const actionType = button.closest('.card').querySelector('.card-header').textContent.trim();
+            const actionDetails = button.closest('.card').querySelector('.card-body .card-text').textContent.trim();
+            this.querySelector('#editActionType').value = actionType.toLowerCase().replace(' ', '_');
+            this.querySelector('#editActionDetails').value = actionDetails;
+        });
+    }
+
+    // Delete Action Modal
+    const deleteActionModal = document.getElementById('deleteActionModal');
+    if (deleteActionModal) {
+        deleteActionModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const actionId = button.getAttribute('data-action-id');
+            const form = this.querySelector('#deleteActionForm');
+            form.action = form.action.replace(/\/0\//, `/${actionId}/`);
+            this.querySelector('#deleteActionId').value = actionId;
+            this.querySelector('#deleteActionIdConfirm').textContent = actionId;
+        });
+    }
 });

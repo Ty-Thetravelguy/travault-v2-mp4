@@ -6,9 +6,17 @@
 
 <div class="container-fluid full-height-bg top-padding bg-gray-200">
     <div class="container mt-5 roboto">
-        <div class="row mb-4">
-            <div class="col-12 text-center">
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-4 text-md-start">
+
+            </div>
+            <div class="col-md-4 text-center">
                 <h1 class="project-primary-color mb-0">Ticket Details</h1>
+            </div>
+            <div class="col-md-4 text-md-start">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#actionModal">
+                    Add Action
+                </button>
             </div>
         </div>
 
@@ -123,6 +131,41 @@
                             </div>
                         </div>
 
+                        <!-- Action -->
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <h4>Actions</h4>
+                                {% for action in actions %}
+                                <div class="card mb-3">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        {{ action.get_action_type_display }}
+                                        <div>
+                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                                data-bs-target="#editActionModal{{ action.id }}">
+                                                Edit
+                                            </button>
+                                            {% if user.user_type == 'admin' %}
+                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                                data-bs-target="#deleteActionModal{{ action.id }}">
+                                                Delete
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">{{ action.details|linebreaks }}</p>
+                                    </div>
+                                    <div class="card-footer text-muted">
+                                        <small class="float-start">Updated by:
+                                            {{ action.created_by.get_full_name }}</small>
+                                        <small class="float-end">{{ action.created_at|date:"F d, Y H:i" }}</small>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <p>No actions recorded yet.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
 
 
                         <div class="mt-3 d-flex justify-content-between">
@@ -146,6 +189,116 @@
                                 {% endif %}
                             </div>
                         </div>
+
+                        <!-- Action Modal -->
+                        <div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="actionModalLabel">Add Action</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="actionForm" method="post"
+                                            action="{% url 'tickets:add_ticket_action' pk=ticket.pk %}">
+                                            {% csrf_token %}
+                                            <div class="mb-3">
+                                                <label for="actionType" class="form-label">Action Type</label>
+                                                <select class="form-select" id="actionType" name="action_type" required>
+                                                    <option value="">Select an action type</option>
+                                                    {% for value, display in ticket_action_types %}
+                                                    <option value="{{ value }}">{{ display }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="actionDetails" class="form-label">Details</label>
+                                                <textarea class="form-control" id="actionDetails" name="details"
+                                                    rows="3" required></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary" id="saveAction">Save
+                                                Action</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Edit Action Modals -->
+                        {% for action in actions %}
+                        <div class="modal fade" id="editActionModal{{ action.id }}" tabindex="-1"
+                            aria-labelledby="editActionModalLabel{{ action.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="editActionModalLabel{{ action.id }}">Edit Action
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="post" action="{% url 'tickets:edit_ticket_action' action.id %}">
+                                            {% csrf_token %}
+                                            <div class="mb-3">
+                                                <label for="editActionType{{ action.id }}" class="form-label">Action
+                                                    Type</label>
+                                                <select class="form-select" id="editActionType{{ action.id }}"
+                                                    name="action_type" required>
+                                                    {% for value, display in ticket_action_types %}
+                                                    <option value="{{ value }}"
+                                                        {% if value == action.action_type %}selected{% endif %}>
+                                                        {{ display }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="editActionDetails{{ action.id }}"
+                                                    class="form-label">Details</label>
+                                                <textarea class="form-control" id="editActionDetails{{ action.id }}"
+                                                    name="details" rows="3" required>{{ action.details }}</textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <!-- Delete Action Modals (Admin Only) -->
+                        {% if user.user_type == 'admin' %}
+                        {% for action in actions %}
+                        <div class="modal fade" id="deleteActionModal{{ action.id }}" tabindex="-1"
+                            aria-labelledby="deleteActionModalLabel{{ action.id }}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteActionModalLabel{{ action.id }}">Delete Action
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to delete this action? This cannot be undone.</p>
+                                        <p>To confirm, please enter the action ID: {{ action.id }}</p>
+                                        <form method="post" action="{% url 'tickets:delete_ticket_action' action.id %}">
+                                            {% csrf_token %}
+                                            <div class="mb-3">
+                                                <input type="text" class="form-control" name="confirmation" required>
+                                            </div>
+                                            <button type="submit" class="btn btn-danger">Delete Action</button>
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Cancel</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+
                     </div>
                 </div>
             </div>

@@ -18,6 +18,8 @@ urlpatterns = [
     path('manage-subjects/', views.manage_subjects, name='manage_subjects'),
     path('update-subject/<int:subject_id>/', views.update_subject, name='update_subject'),
     path('delete-subject/<int:subject_id>/', views.delete_subject, name='delete_subject'),
-
+    path('<int:pk>/add-action/', views.add_ticket_action, name='add_ticket_action'),
+    path('action/<int:action_id>/edit/', views.edit_ticket_action, name='edit_ticket_action'),
+    path('action/<int:action_id>/delete/', views.delete_ticket_action, name='delete_ticket_action'),
     # path('category/create/', views.create_category, name='create_category'),  # Create a ticket category
 ]

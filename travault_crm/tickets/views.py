@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .models import TicketSubject,Ticket
+from .models import TicketSubject,Ticket, TicketAction
 from .forms import TicketForm
 from crm.models import Company
 from django.shortcuts import get_object_or_404
@@ -17,7 +17,7 @@ from .models import TicketSubject
 from django.db.models import Count
 from django.db.models import ProtectedError
 from django.db.models.functions import Lower
-from agencies.models import CustomUser  # Import your custom user model
+from agencies.models import CustomUser 
 
 
 @login_required
@@ -227,11 +227,14 @@ def update_ticket_field(request, pk):
 def ticket_detail(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
     agency_users = CustomUser.objects.filter(agency=request.user.agency)
-    status_choices = ['open', 'in_progress', 'closed']  # Add more as needed
+    status_choices = ['open', 'in_progress', 'closed'] 
+    actions = ticket.actions.all()
     context = {
         'ticket': ticket,
         'agency_users': agency_users,
         'status_choices': status_choices,
+        'actions': actions,
+        'ticket_action_types': TicketAction.ACTION_TYPES,
     }
     return render(request, 'tickets/ticket_detail.html', context)
 
@@ -248,3 +251,60 @@ def edit_ticket(request, pk):
         form = TicketForm(instance=ticket, agency=request.user.agency)
     
     return render(request, 'tickets/edit_ticket.html', {'form': form, 'ticket': ticket})
+
+@login_required
+@require_POST
+def add_ticket_action(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
+    action_type = request.POST.get('action_type')
+    details = request.POST.get('details')
+
+    if action_type and details:
+        TicketAction.objects.create(
+            ticket=ticket,
+            action_type=action_type,
+            details=details,
+            created_by=request.user
+        )
+        messages.success(request, f"Action '{dict(TicketAction.ACTION_TYPES)[action_type]}' added successfully.")
+    else:
+        messages.error(request, "Invalid data. Please provide action type and details.")
+
+    return redirect('tickets:ticket_detail', pk=pk)
+
+@login_required
+def edit_ticket_action(request, action_id):
+    action = get_object_or_404(TicketAction, id=action_id, ticket__agency=request.user.agency)
+    if request.method == 'POST':
+        action_type = request.POST.get('action_type')
+        details = request.POST.get('details')
+
+        if action_type and details:
+            action.action_type = action_type
+            action.details = details
+            action.save()
+            messages.success(request, f"Action '{action.get_action_type_display()}' updated successfully.")
+        else:
+            messages.error(request, "Invalid data. Please provide action type and details.")
+
+    return redirect('tickets:ticket_detail', pk=action.ticket.pk)
+
+@login_required
+def delete_ticket_action(request, action_id):
+    action = get_object_or_404(TicketAction, id=action_id, ticket__agency=request.user.agency)
+    
+    # Check if the user is an admin
+    if request.user.user_type != 'admin':
+        messages.error(request, "You don't have permission to delete actions.")
+        return redirect('tickets:ticket_detail', pk=action.ticket.pk)
+    
+    if request.method == 'POST':
+        confirmation = request.POST.get('confirmation')
+        if confirmation == str(action_id):
+            action_type = action.get_action_type_display()
+            action.delete()
+            messages.success(request, f"Action '{action_type}' has been successfully deleted.")
+        else:
+            messages.error(request, "Incorrect action ID. Deletion cancelled.")
+    
+    return redirect('tickets:ticket_detail', pk=action.ticket.pk)

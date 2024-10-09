@@ -2,6 +2,8 @@ from crm.models import Company, Contact
 from agencies.models import Agency, CustomUser
 from django.db import models
 from django.conf import settings 
+from django.utils import timezone
+
 
 class TicketSubject(models.Model):
     subject = models.CharField(max_length=100, unique=True)
@@ -71,3 +73,24 @@ class Ticket(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+class TicketAction(models.Model):
+    ACTION_TYPES = [
+        ('action_taken', 'Action Taken'),
+        ('update', 'Update'),
+        ('response', 'Response'),
+        ('outcome', 'Outcome'),
+    ]
+
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='actions')
+    action_type = models.CharField(max_length=20, choices=ACTION_TYPES)
+    details = models.TextField()
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.get_action_type_display()} for Ticket #{self.ticket.id}"

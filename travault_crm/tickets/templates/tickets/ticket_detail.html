@@ -134,45 +134,43 @@
                         <!-- Action -->
                         <div class="row mt-4">
                             <div class="col-md-12">
-                                <h4>Actions</h4>
+                                <h4 class="mb-3">Actions</h4>
                                 {% for action in actions %}
-                                <div class="card mb-3">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        {{ action.get_action_type_display }}
-                                        <div>
-                                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#editActionModal{{ action.id }}">
-                                                Edit
-                                            </button>
-                                            {% if user.user_type == 'admin' %}
-                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                                data-bs-target="#deleteActionModal{{ action.id }}">
-                                                Delete
-                                            </button>
-                                            {% endif %}
-                                        </div>
-                                    </div>
+                                <div class="card mb-3 border-left-accent">
                                     <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="card-title mb-0">{{ action.get_action_type_display }}</h5>
+                                            <div>
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editActionModal{{ action.id }}">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </button>
+                                                {% if user.user_type == 'admin' %}
+                                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteActionModal{{ action.id }}">
+                                                    <i class="fas fa-trash-alt"></i> Delete
+                                                </button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
                                         <p class="card-text">{{ action.details|linebreaks }}</p>
-                                    </div>
-                                    <div class="card-footer text-muted">
-                                        <small class="float-start">
-                                            Created by: {{ action.created_by.get_full_name }}
-                                            {% if action.updated_by %}
-                                            | Last updated by: {{ action.updated_by.get_full_name }}
-                                            {% endif %}
-                                        </small>
-                                        <small class="float-end">
-                                            {% if action.updated_at and action.updated_at != action.created_at %}
-                                            Updated: {{ action.updated_at|date:"F d, Y H:i" }}
-                                            {% else %}
-                                            Created: {{ action.created_at|date:"F d, Y H:i" }}
-                                            {% endif %}
-                                        </small>
+                                        <div class="d-flex justify-content-between align-items-center text-muted">
+                                            <small>
+                                                Created by: {{ action.created_by.get_full_name }}
+                                                {% if action.updated_by %}
+                                                | Last updated by: {{ action.updated_by.get_full_name }}
+                                                {% endif %}
+                                            </small>
+                                            <small>
+                                                {% if action.updated_at and action.updated_at != action.created_at %}
+                                                Updated: {{ action.updated_at|date:"F d, Y H:i" }}
+                                                {% else %}
+                                                Created: {{ action.created_at|date:"F d, Y H:i" }}
+                                                {% endif %}
+                                            </small>
+                                        </div>
                                     </div>
                                 </div>
                                 {% empty %}
-                                <p>No actions recorded yet.</p>
+                                <p class="text-muted">No actions recorded yet.</p>
                                 {% endfor %}
                             </div>
                         </div>

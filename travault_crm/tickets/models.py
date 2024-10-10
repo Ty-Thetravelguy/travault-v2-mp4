@@ -85,9 +85,15 @@ class TicketAction(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='actions')
     action_type = models.CharField(max_length=20, choices=ACTION_TYPES)
     details = models.TextField()
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='created_actions')
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+        null=True, related_name='created_actions'
+    )
     created_at = models.DateTimeField(default=timezone.now)
-    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='updated_actions')
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,
+        null=True, related_name='updated_actions'
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

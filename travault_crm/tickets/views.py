@@ -18,6 +18,7 @@ from .utils import send_ticket_email
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
+from django.forms.models import model_to_dict
 
 
 
@@ -130,10 +131,11 @@ def open_ticket(request, company_id):
             ticket.agency = request.user.agency
             ticket.save()
 
+            messages.success(request, f"Ticket #{ticket.id} has been successfully created.")
+
             # Send email notification
             send_ticket_email(request, ticket, 'created')
 
-            messages.success(request, f"Ticket #{ticket.id} has been successfully created.")
             return redirect('tickets:ticket_detail', pk=ticket.id)
         else:
             messages.error(request, "There was an error creating the ticket. Please check the form and try again.")
@@ -184,37 +186,51 @@ def delete_ticket_confirm(request, pk):
     
     return render(request, 'tickets/delete_ticket_confirm.html', {'ticket': ticket})
 
-@login_required
 @require_POST
+@login_required
 def update_ticket_field(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
     field = request.POST.get('field')
     value = request.POST.get('value')
 
-    if field not in ['owner', 'received_from', 'priority', 'status']:
+    valid_fields = ['owner', 'received_from', 'priority', 'status']
+
+    if field not in valid_fields:
         return JsonResponse({'success': False, 'error': 'Invalid field'}, status=400)
 
     try:
+        old_value = getattr(ticket, field)
+        field_object = Ticket._meta.get_field(field)
+
         if field in ['owner', 'received_from']:
             user = get_object_or_404(CustomUser, pk=value, agency=request.user.agency)
             setattr(ticket, field, user)
-            new_value = user.get_full_name() or user.username
+            new_value_display = user.get_full_name() or user.username
+            old_value_display = old_value.get_full_name() if old_value else 'None'
         else:
             setattr(ticket, field, value)
-            new_value = value
-        
+            new_value_display = dict(field_object.choices).get(value, value)
+            old_value_display = dict(field_object.choices).get(old_value, old_value)
+
         ticket.save()
-        
-        update_message = f"The {field.replace('_', ' ')} has been updated to {new_value}."
-        
+
+        update_message = f"{field.replace('_', ' ').capitalize()} updated from '{old_value_display}' to '{new_value_display}'."
+
+        # Create a TicketAction for the update
+        TicketAction.objects.create(
+            ticket=ticket,
+            action_type='update',
+            details=update_message,
+            created_by=request.user
+        )
+
         # Send update email
-        additional_context = {
-            'update_message': update_message,
-        }
+        additional_context = {'update_message': update_message}
         send_ticket_email(request, ticket, 'updated', additional_context)
-        
+
         messages.success(request, update_message)
         return JsonResponse({'success': True, 'message': update_message})
+
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
@@ -237,26 +253,53 @@ def ticket_detail(request, pk):
 def edit_ticket(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
     if request.method == 'POST':
+        old_values = model_to_dict(ticket)
         form = TicketForm(request.POST, instance=ticket, agency=request.user.agency)
         if form.is_valid():
             updated_ticket = form.save()
             messages.success(request, 'Ticket updated successfully.')
-            
-            # Send update email
-            update_message = "The ticket has been updated. Please check the ticket for details."
-            additional_context = {
-                'update_message': update_message,
-            }
-            send_ticket_email(request, updated_ticket, 'updated', additional_context)
-            
+
+            # Compare old and new values
+            new_values = model_to_dict(updated_ticket)
+            changes = []
+            for field in form.changed_data:
+                old_value = old_values.get(field)
+                new_value = new_values.get(field)
+                if old_value != new_value:
+                    # Handle ForeignKey fields
+                    field_object = Ticket._meta.get_field(field)
+                    if isinstance(field_object, models.ForeignKey):
+                        old_value_display = str(field_object.related_model.objects.get(pk=old_value)) if old_value else 'None'
+                        new_value_display = str(field_object.related_model.objects.get(pk=new_value)) if new_value else 'None'
+                    else:
+                        old_value_display = dict(field_object.choices).get(old_value, old_value)
+                        new_value_display = dict(field_object.choices).get(new_value, new_value)
+
+                    changes.append(f"{field.replace('_', ' ').capitalize()} changed from '{old_value_display}' to '{new_value_display}'")
+
+            if changes:
+                update_message = "\n".join(changes)
+
+                # Create a TicketAction to record the update
+                TicketAction.objects.create(
+                    ticket=updated_ticket,
+                    action_type='update',
+                    details=update_message,
+                    created_by=request.user
+                )
+
+                # Send update email
+                additional_context = {'update_message': update_message}
+                send_ticket_email(request, updated_ticket, 'updated', additional_context)
+
             return redirect('tickets:ticket_detail', pk=updated_ticket.pk)
     else:
         form = TicketForm(instance=ticket, agency=request.user.agency)
-    
+
     return render(request, 'tickets/edit_ticket.html', {'form': form, 'ticket': ticket})
 
-@login_required
 @require_POST
+@login_required
 def add_ticket_action(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
     action_type = request.POST.get('action_type')
@@ -272,9 +315,7 @@ def add_ticket_action(request, pk):
         messages.success(request, f"Action '{dict(TicketAction.ACTION_TYPES)[action_type]}' added successfully.")
 
         # Send action added email
-        additional_context = {
-            'action': action,
-        }
+        additional_context = {'action': action}
         send_ticket_email(request, ticket, 'action_added', additional_context)
 
     else:
@@ -320,6 +361,34 @@ def delete_ticket_action(request, action_id):
     
     return redirect('tickets:ticket_detail', pk=action.ticket.pk)
 
+@login_required
 def view_email_in_browser(request, email_type, ticket_id):
     ticket = get_object_or_404(Ticket, pk=ticket_id)
-    return send_ticket_email(request, ticket, email_type, preview=True)
+
+    additional_context = {}
+
+    if email_type == 'created':
+        # No additional context required
+        pass
+
+    elif email_type == 'updated':
+        # Retrieve the latest update action
+        latest_action = ticket.actions.filter(action_type='update').order_by('-created_at').first()
+        if latest_action:
+            additional_context['update_message'] = latest_action.details
+        else:
+            additional_context['update_message'] = 'No update details available.'
+
+    elif email_type == 'action_added':
+        # Retrieve the latest action added
+        action = ticket.actions.filter(action_type='action_taken').order_by('-created_at').first()
+        if action:
+            additional_context['action'] = action
+        else:
+            messages.error(request, "No action available for this ticket.")
+            return redirect('tickets:ticket_detail', pk=ticket_id)
+    else:
+        messages.error(request, "Invalid email type.")
+        return redirect('tickets:ticket_detail', pk=ticket_id)
+
+    return send_ticket_email(request, ticket, email_type, additional_context=additional_context, preview=True)

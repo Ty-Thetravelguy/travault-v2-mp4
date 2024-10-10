@@ -42,16 +42,15 @@
         <h1>New Ticket Created: #{{ ticket.pk }}</h1>
         <p>A new ticket has been created and assigned to you:</p>
         <div class="ticket-info">
-            <p><strong>Ticket Number:</strong> #{{ ticket.pk }}</p>
+            <h1>New Ticket Created: #{{ ticket.pk }}</h1>
+            <p>A new ticket has been created and assigned to you.</p>
             <p><strong>Subject:</strong> {{ ticket.subject }}</p>
-            <p><strong>Company:</strong> {{ ticket.company.company_name }}</p>
+            <p><strong>Description:</strong> {{ ticket.description }}</p>
             <p><strong>Priority:</strong> {{ ticket.get_priority_display }}</p>
-            <p><strong>Category:</strong> {{ ticket.get_category_display }}</p>
-            <p><strong>Description:</strong> {{ ticket.description|truncatewords:50 }}</p>
-        </div>
-        <p>Please log in to the system to view the full details and take necessary action.</p>
-        <a href="{{ ticket_url }}" class="button">View Ticket</a>
-        <p><a href="{{ view_in_browser_url }}">View in Browser</a></p>
+            <p><strong>Status:</strong> {{ ticket.get_status_display }}</p>
+            <p>Please log in to the system to view the full details.</p>
+            <p><a href="{{ ticket_url }}">View Ticket</a></p>
+            <p><a href="{{ view_in_browser_url }}">View this email in your browser</a></p>
     </div>
 </body>
 

@@ -28,13 +28,15 @@
 <body>
     <div class="container">
         <h1>Ticket Updated: #{{ ticket.pk }}</h1>
-        <p>A ticket assigned to you has been updated:</p>
-        <p><strong>Ticket Number:</strong> #{{ ticket.pk }}</p>
-        <p><strong>Subject:</strong> {{ ticket.subject }}</p>
-        <p><strong>Update:</strong> {{ update_message }}</p>
-        <p>Please log in to the system to view the full details and take necessary action.</p>
-        <a href="{{ ticket_url }}" class="button">View Ticket</a>
-        <p><a href="{{ view_in_browser_url }}">View in Browser</a></p>
+        <p>The following updates were made to your ticket:</p>
+        {% if update_message %}
+            <p>{{ update_message|linebreaks }}</p>
+        {% else %}
+            <p>No update details available.</p>
+        {% endif %}
+        <p>Please log in to the system to view the full details.</p>
+        <p><a href="{{ ticket_url }}">View Ticket</a></p>
+        <p><a href="{{ view_in_browser_url }}">View this email in your browser</a></p>
     </div>
 </body>
 

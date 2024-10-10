@@ -17,14 +17,10 @@ def send_ticket_email(request, ticket, email_type, additional_context=None, prev
     ticket_url = request.build_absolute_uri(reverse('tickets:ticket_detail', args=[ticket.pk]))
     view_in_browser_url = request.build_absolute_uri(reverse('tickets:view_email_in_browser', args=[email_type, ticket.pk]))
     
-    # Fetch the latest action for the ticket if needed
-    latest_action = ticket.actions.order_by('-created_at').first()
-    
     context = {
         'ticket': ticket,
         'ticket_url': ticket_url,
         'view_in_browser_url': view_in_browser_url,
-        'action': latest_action,  # Ensure this is included
     }
     
     if additional_context:

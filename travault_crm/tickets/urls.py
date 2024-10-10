@@ -21,5 +21,5 @@ urlpatterns = [
     path('<int:pk>/add-action/', views.add_ticket_action, name='add_ticket_action'),
     path('action/<int:action_id>/edit/', views.edit_ticket_action, name='edit_ticket_action'),
     path('action/<int:action_id>/delete/', views.delete_ticket_action, name='delete_ticket_action'),
-    # path('category/create/', views.create_category, name='create_category'),  # Create a ticket category
+    path('view-email/<str:email_type>/<int:ticket_id>/', views.view_email_in_browser, name='view_email_in_browser'),
 ]

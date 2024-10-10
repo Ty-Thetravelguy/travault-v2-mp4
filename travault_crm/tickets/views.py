@@ -8,16 +8,17 @@ from dal import autocomplete
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib import messages
-from django.utils.html import strip_tags
-from django.conf import settings
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.urls import reverse
 from .models import TicketSubject
 from django.db.models import Count
 from django.db.models import ProtectedError
 from django.db.models.functions import Lower
 from agencies.models import CustomUser 
+from .utils import send_ticket_email
+from django.http import HttpResponse
+from django.template.loader import get_template
+from django.template import TemplateDoesNotExist
+
 
 
 @login_required
@@ -123,26 +124,14 @@ def open_ticket(request, company_id):
     if request.method == 'POST':
         form = TicketForm(request.POST, agency=request.user.agency)
         if form.is_valid():
-            print("Form is valid")
             ticket = form.save(commit=False)
             ticket.company = company
             ticket.owner = request.user
             ticket.agency = request.user.agency
             ticket.save()
 
-                        # Send email to the received_from user
-            if ticket.received_from:
-                subject = f'New Ticket Created: #{ticket.pk}'
-                ticket_url = request.build_absolute_uri(reverse('tickets:ticket_detail', args=[ticket.pk]))
-                html_message = render_to_string('tickets/email/ticket_created_email.html', {
-                    'ticket': ticket,
-                    'ticket_url': ticket_url
-                })
-                plain_message = strip_tags(html_message)
-                from_email = settings.DEFAULT_FROM_EMAIL
-                to_email = ticket.received_from.email
-
-                send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
+            # Send email notification
+            send_ticket_email(request, ticket, 'created')
 
             messages.success(request, f"Ticket #{ticket.id} has been successfully created.")
             return redirect('tickets:ticket_detail', pk=ticket.id)
@@ -209,17 +198,23 @@ def update_ticket_field(request, pk):
         if field in ['owner', 'received_from']:
             user = get_object_or_404(CustomUser, pk=value, agency=request.user.agency)
             setattr(ticket, field, user)
-            field_value = user.get_full_name() or user.username
+            new_value = user.get_full_name() or user.username
         else:
             setattr(ticket, field, value)
-            field_value = value
+            new_value = value
         
         ticket.save()
         
-        message = f"Ticket #{ticket.pk} {field.replace('_', ' ')} updated to {field_value}."
-        messages.success(request, message)
+        update_message = f"The {field.replace('_', ' ')} has been updated to {new_value}."
         
-        return JsonResponse({'success': True, 'message': message})
+        # Send update email
+        additional_context = {
+            'update_message': update_message,
+        }
+        send_ticket_email(request, ticket, 'updated', additional_context)
+        
+        messages.success(request, update_message)
+        return JsonResponse({'success': True, 'message': update_message})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
@@ -244,9 +239,17 @@ def edit_ticket(request, pk):
     if request.method == 'POST':
         form = TicketForm(request.POST, instance=ticket, agency=request.user.agency)
         if form.is_valid():
-            form.save()
+            updated_ticket = form.save()
             messages.success(request, 'Ticket updated successfully.')
-            return redirect('tickets:ticket_detail', pk=ticket.pk)
+            
+            # Send update email
+            update_message = "The ticket has been updated. Please check the ticket for details."
+            additional_context = {
+                'update_message': update_message,
+            }
+            send_ticket_email(request, updated_ticket, 'updated', additional_context)
+            
+            return redirect('tickets:ticket_detail', pk=updated_ticket.pk)
     else:
         form = TicketForm(instance=ticket, agency=request.user.agency)
     
@@ -260,13 +263,20 @@ def add_ticket_action(request, pk):
     details = request.POST.get('details')
 
     if action_type and details:
-        TicketAction.objects.create(
+        action = TicketAction.objects.create(
             ticket=ticket,
             action_type=action_type,
             details=details,
             created_by=request.user
         )
         messages.success(request, f"Action '{dict(TicketAction.ACTION_TYPES)[action_type]}' added successfully.")
+
+        # Send action added email
+        additional_context = {
+            'action': action,
+        }
+        send_ticket_email(request, ticket, 'action_added', additional_context)
+
     else:
         messages.error(request, "Invalid data. Please provide action type and details.")
 
@@ -309,3 +319,7 @@ def delete_ticket_action(request, action_id):
             messages.error(request, "Incorrect action ID. Deletion cancelled.")
     
     return redirect('tickets:ticket_detail', pk=action.ticket.pk)
+
+def view_email_in_browser(request, email_type, ticket_id):
+    ticket = get_object_or_404(Ticket, pk=ticket_id)
+    return send_ticket_email(request, ticket, email_type, preview=True)

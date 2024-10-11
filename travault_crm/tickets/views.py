@@ -19,7 +19,7 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
 from django.forms.models import model_to_dict
-
+from django.db import models  
 
 
 @login_required
@@ -189,6 +189,9 @@ def delete_ticket_confirm(request, pk):
 @require_POST
 @login_required
 def update_ticket_field(request, pk):
+    """
+    View to update a specific field of a ticket via AJAX.
+    """
     ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
     field = request.POST.get('field')
     value = request.POST.get('value')
@@ -205,32 +208,18 @@ def update_ticket_field(request, pk):
         if field in ['owner', 'received_from']:
             user = get_object_or_404(CustomUser, pk=value, agency=request.user.agency)
             setattr(ticket, field, user)
-            new_value_display = user.get_full_name() or user.username
-            old_value_display = old_value.get_full_name() if old_value else 'None'
         else:
             setattr(ticket, field, value)
-            new_value_display = dict(field_object.choices).get(value, value)
-            old_value_display = dict(field_object.choices).get(old_value, old_value)
 
+        ticket.updated_by = request.user  # Set the user who made the update
         ticket.save()
 
-        update_message = f"{field.replace('_', ' ').capitalize()} updated from '{old_value_display}' to '{new_value_display}'."
+        # Since we're using signals to log changes, there's no need to create a TicketAction here
 
-        # Create a TicketAction for the update
-        TicketAction.objects.create(
-            ticket=ticket,
-            action_type='update',
-            details=update_message,
-            created_by=request.user
-        )
+        # Provide immediate feedback to the user via Django messages (optional)
+        messages.success(request, f"{field.replace('_', ' ').capitalize()} updated successfully.")
 
-        # Send update email
-        additional_context = {'update_message': update_message}
-        send_ticket_email(request, ticket, 'updated', additional_context)
-
-        messages.success(request, update_message)
-        return JsonResponse({'success': True, 'message': update_message})
-
+        return JsonResponse({'success': True, 'message': 'Ticket updated successfully.'})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
@@ -238,14 +227,22 @@ def update_ticket_field(request, pk):
 def ticket_detail(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
     agency_users = CustomUser.objects.filter(agency=request.user.agency)
-    status_choices = ['open', 'in_progress', 'closed'] 
-    actions = ticket.actions.all()
+    status_choices = ['open', 'in_progress', 'closed']
+    
+    # Get the sort order from GET parameters, default to 'desc' (newest first)
+    sort_order = request.GET.get('sort', 'desc')
+    if sort_order == 'asc':
+        actions = ticket.actions.all().order_by('created_at')
+    else:
+        actions = ticket.actions.all().order_by('-created_at')
+    
     context = {
         'ticket': ticket,
         'agency_users': agency_users,
         'status_choices': status_choices,
         'actions': actions,
         'ticket_action_types': TicketAction.ACTION_TYPES,
+        'sort_order': sort_order,  # Pass the sort order to the template
     }
     return render(request, 'tickets/ticket_detail.html', context)
 
@@ -253,49 +250,15 @@ def ticket_detail(request, pk):
 def edit_ticket(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
     if request.method == 'POST':
-        old_values = model_to_dict(ticket)
         form = TicketForm(request.POST, instance=ticket, agency=request.user.agency)
         if form.is_valid():
-            updated_ticket = form.save()
+            updated_ticket = form.save(commit=False)
+            updated_ticket.updated_by = request.user  # Set the user who made the update
+            updated_ticket.save()
             messages.success(request, 'Ticket updated successfully.')
-
-            # Compare old and new values
-            new_values = model_to_dict(updated_ticket)
-            changes = []
-            for field in form.changed_data:
-                old_value = old_values.get(field)
-                new_value = new_values.get(field)
-                if old_value != new_value:
-                    # Handle ForeignKey fields
-                    field_object = Ticket._meta.get_field(field)
-                    if isinstance(field_object, models.ForeignKey):
-                        old_value_display = str(field_object.related_model.objects.get(pk=old_value)) if old_value else 'None'
-                        new_value_display = str(field_object.related_model.objects.get(pk=new_value)) if new_value else 'None'
-                    else:
-                        old_value_display = dict(field_object.choices).get(old_value, old_value)
-                        new_value_display = dict(field_object.choices).get(new_value, new_value)
-
-                    changes.append(f"{field.replace('_', ' ').capitalize()} changed from '{old_value_display}' to '{new_value_display}'")
-
-            if changes:
-                update_message = "\n".join(changes)
-
-                # Create a TicketAction to record the update
-                TicketAction.objects.create(
-                    ticket=updated_ticket,
-                    action_type='update',
-                    details=update_message,
-                    created_by=request.user
-                )
-
-                # Send update email
-                additional_context = {'update_message': update_message}
-                send_ticket_email(request, updated_ticket, 'updated', additional_context)
-
             return redirect('tickets:ticket_detail', pk=updated_ticket.pk)
     else:
         form = TicketForm(instance=ticket, agency=request.user.agency)
-
     return render(request, 'tickets/edit_ticket.html', {'form': form, 'ticket': ticket})
 
 @require_POST

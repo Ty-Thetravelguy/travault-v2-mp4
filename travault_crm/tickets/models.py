@@ -65,6 +65,13 @@ class Ticket(models.Model):
         blank=True,
         related_name='received_tickets'
     )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='updated_tickets'
+    )
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES)
     category_type = models.CharField(max_length=10, choices=CATEGORY_TYPE_CHOICES)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES_CLIENT)
@@ -96,8 +103,10 @@ class TicketAction(models.Model):
     )
     updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        ordering = ['created_at']
+    is_system_generated = models.BooleanField(default=False)
 
+    class Meta:
+        pass
+    
     def __str__(self):
         return f"{self.get_action_type_display()} for Ticket #{self.ticket.id}"

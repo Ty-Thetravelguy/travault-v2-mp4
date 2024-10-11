@@ -219,7 +219,11 @@ def update_ticket_field(request, pk):
         # Provide immediate feedback to the user via Django messages (optional)
         messages.success(request, f"{field.replace('_', ' ').capitalize()} updated successfully.")
 
-        return JsonResponse({'success': True, 'message': 'Ticket updated successfully.'})
+        return JsonResponse({
+            'success': True, 
+            'message': 'Ticket updated successfully.',
+            'reload': True  # Add this flag to indicate a reload is needed
+        })
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 

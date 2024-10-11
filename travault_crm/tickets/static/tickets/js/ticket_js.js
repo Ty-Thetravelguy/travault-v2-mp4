@@ -41,23 +41,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                updateUI(field, value);
-                // Instead of reloading the page, add the message manually
-                const messageContainer = document.getElementById('message-container');
-                const alertDiv = document.createElement('div');
-                alertDiv.className = 'alert alert-success alert-dismissible fade show';
-                alertDiv.role = 'alert';
-                alertDiv.innerHTML = `
-                    ${data.message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                `;
-                messageContainer.appendChild(alertDiv);
-    
-                // Trigger the same behavior as in script.js
-                setTimeout(() => {
-                    alertDiv.classList.remove('show');
-                    setTimeout(() => alertDiv.remove(), 150);
-                }, 5000);
+                // Instead of updating UI and showing message, just reload the page
+                window.location.reload();
             }
         })
         .catch(error => {

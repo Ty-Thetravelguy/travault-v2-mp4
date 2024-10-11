@@ -142,11 +142,10 @@
                                 {% for action in actions %}
                                 {% if action.is_system_generated %}
                                 <!-- System-generated action -->
-                                <div class="alert alert-info mb-3">
+                                <div class="alert alert-light mb-3">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <span>
-                                            <strong>{{ action.get_action_type_display }}:</strong>
-                                            {{ action.details|linebreaks }}
+                                            {{ action.details }}
                                         </span>
                                         <small class="text-muted">
                                             {{ action.created_at|date:"F d, Y H:i" }}

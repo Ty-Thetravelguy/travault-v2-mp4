@@ -27,8 +27,16 @@ class CustomUser(AbstractUser):
     # Links the user to an Agency; allows multiple users to be associated with a single agency
     agency = models.ForeignKey('Agency', on_delete=models.CASCADE, related_name='users', null=True, blank=True)
 
-    first_name = models.CharField(max_length=30, blank=True)  # Optional first name
-    last_name = models.CharField(max_length=150, blank=True)  # Optional last name
+    first_name = models.CharField(max_length=30, blank=True) 
+    last_name = models.CharField(max_length=150, blank=True)  
+
+    def get_full_name(self):
+        """Return the first and last name, with a space in between."""
+        full_name = f"{self.first_name} {self.last_name}".strip()
+        return full_name if full_name else self.username
+
+    def __str__(self):
+        return self.get_full_name()
 
 
 class Agency(models.Model):

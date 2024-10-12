@@ -186,8 +186,8 @@ def delete_ticket_confirm(request, pk):
     
     return render(request, 'tickets/delete_ticket_confirm.html', {'ticket': ticket})
 
-@require_POST
 @login_required
+@require_POST
 def update_ticket_field(request, pk):
     """
     View to update a specific field of a ticket via AJAX.
@@ -208,19 +208,45 @@ def update_ticket_field(request, pk):
         if field in ['owner', 'received_from']:
             user = get_object_or_404(CustomUser, pk=value, agency=request.user.agency)
             setattr(ticket, field, user)
+            # Use get_full_name or fallback to username
+            new_display = user.get_full_name()
+            old_display = old_value.get_full_name() if old_value else 'None'
         else:
             setattr(ticket, field, value)
+            # For choice fields, get display values if available
+            if field == 'priority':
+                old_display = dict(ticket.PRIORITY_CHOICES).get(old_value, old_value)
+                new_display = dict(ticket.PRIORITY_CHOICES).get(value, value)
+            elif field == 'status':
+                old_display = dict(ticket.STATUS_CHOICES).get(old_value, old_value)
+                new_display = dict(ticket.STATUS_CHOICES).get(value, value)
+            else:
+                old_display = old_value if old_value else 'None'
+                new_display = value
 
         ticket.updated_by = request.user  # Set the user who made the update
         ticket.save()
 
-        # Since we're using signals to log changes, there's no need to create a TicketAction here
+        # Format field name for display
+        field_name_formatted = field.replace('_', ' ').capitalize()
 
-        # Provide immediate feedback to the user via Django messages (optional)
-        messages.success(request, f"{field.replace('_', ' ').capitalize()} updated successfully.")
+        # Create a descriptive update message
+        update_message = f"The field '{field_name_formatted}' was updated from '{old_display}' to '{new_display}'."
+
+        # Prepare additional context for the email
+        additional_context = {
+            'update_message': update_message,
+        }
+
+        # Trigger email notification
+        email_type = 'updated'
+        send_ticket_email(request, ticket, email_type, additional_context=additional_context)
+
+        # Django messages for UI feedback
+        messages.success(request, f"{field_name_formatted} updated successfully. {update_message}")
 
         return JsonResponse({
-            'success': True, 
+            'success': True,
             'message': 'Ticket updated successfully.',
             'reload': True  # Add this flag to indicate a reload is needed
         })
@@ -280,6 +306,11 @@ def add_ticket_action(request, pk):
             created_by=request.user
         )
         messages.success(request, f"Action '{dict(TicketAction.ACTION_TYPES)[action_type]}' added successfully.")
+
+        # Ensure the ticket has an assigned user (received_from)
+        if not ticket.received_from:
+            ticket.received_from = request.user
+            ticket.save()
 
         # Send action added email
         additional_context = {'action': action}

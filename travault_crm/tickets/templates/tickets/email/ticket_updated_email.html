@@ -30,9 +30,9 @@
         <h1>Ticket Updated: #{{ ticket.pk }}</h1>
         <p>The following updates were made to your ticket:</p>
         {% if update_message %}
-            <p>{{ update_message|linebreaks }}</p>
+        <p>{{ update_message|linebreaks }}</p>
         {% else %}
-            <p>No update details available.</p>
+        <p>No update details available.</p>
         {% endif %}
         <p>Please log in to the system to view the full details.</p>
         <p><a href="{{ ticket_url }}">View Ticket</a></p>

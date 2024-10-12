@@ -22,18 +22,6 @@
         h1 {
             color: #0056b3;
         }
-
-        .ticket-info {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            padding: 15px;
-            margin-top: 20px;
-        }
-
-        .ticket-info p {
-            margin: 10px 0;
-        }
     </style>
 </head>
 
@@ -41,16 +29,13 @@
     <div class="container">
         <h1>New Ticket Created: #{{ ticket.pk }}</h1>
         <p>A new ticket has been created and assigned to you:</p>
-        <div class="ticket-info">
-            <h1>New Ticket Created: #{{ ticket.pk }}</h1>
-            <p>A new ticket has been created and assigned to you.</p>
-            <p><strong>Subject:</strong> {{ ticket.subject }}</p>
-            <p><strong>Description:</strong> {{ ticket.description }}</p>
-            <p><strong>Priority:</strong> {{ ticket.get_priority_display }}</p>
-            <p><strong>Status:</strong> {{ ticket.get_status_display }}</p>
-            <p>Please log in to the system to view the full details.</p>
-            <p><a href="{{ ticket_url }}">View Ticket</a></p>
-            <p><a href="{{ view_in_browser_url }}">View this email in your browser</a></p>
+        <p><strong>Subject:</strong> {{ ticket.subject }}</p>
+        <p><strong>Description:</strong> {{ ticket.description }}</p>
+        <p><strong>Priority:</strong> {{ ticket.get_priority_display }}</p>
+        <p><strong>Status:</strong> {{ ticket.get_status_display }}</p>
+        <p>Please log in to the system to view the full details.</p>
+        <p><a href="{{ ticket_url }}">View Ticket</a></p>
+        <p><a href="{{ view_in_browser_url }}">View this email in your browser</a></p>
     </div>
 </body>
 

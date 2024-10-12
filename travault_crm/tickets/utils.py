@@ -35,7 +35,7 @@ def send_ticket_email(request, ticket, email_type, additional_context=None, prev
     plain_message = strip_tags(html_message)
     from_email = settings.DEFAULT_FROM_EMAIL
     
-    to_email = ticket.owner.email if ticket.owner else None
+    to_email = ticket.received_from.email if ticket.received_from else (ticket.owner.email if ticket.owner else None)
 
     if to_email:
         send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)

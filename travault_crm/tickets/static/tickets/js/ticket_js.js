@@ -326,9 +326,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function applyFilters() {
-        console.log("Applying filters");
         const rows = table.querySelectorAll('tbody tr.clickable-row');
-        console.log("Rows to filter:", rows.length);
+        const assignedToFilter = Array.from(filters.assignedTo.selectedOptions).map(option => option.value);
 
         rows.forEach(row => {
             const status = row.children[0].textContent.trim();
@@ -341,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const showRow = (
                 (filters.status.value === 'all' || (filters.status.value === 'active' && status !== 'Closed')) &&
                 (filters.priority.value === '' || priority.toLowerCase() === filters.priority.value.toLowerCase()) &&
-                (filters.assignedTo.value === '' || assignedTo === filters.assignedTo.value) &&
+                (assignedToFilter.length === 0 || assignedToFilter.includes(assignedTo)) &&
                 (filters.categoryType.value === '' || categoryType.toLowerCase() === filters.categoryType.value.toLowerCase()) &&
                 (filters.category.value === '' || category === filters.category.value) &&
                 (filters.owner.value === '' || owner === filters.owner.value)
@@ -353,6 +352,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize filters
     applyFilters();
-
-    console.log("Initialization complete");
 });

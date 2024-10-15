@@ -3,6 +3,8 @@
 
 {% block ticket_css %}
 <link rel="stylesheet" href="{% static 'tickets/css/ticket_sort.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 {% endblock %}
 
 
@@ -44,9 +46,11 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <select id="assigned-to-filter" class="form-select">
+                <select id="assigned-to-filter" class="form-select select2" multiple data-placeholder="All Assignees">
                     <option value="">All Assignees</option>
-                    <!-- Populate with users -->
+                    {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div class="col-md-2">
@@ -152,5 +156,13 @@
 
 {% block postload_js %}
 <script src="{% static 'tickets/js/ticket_js.js' %}" defer></script>
-
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.select2').select2({
+            placeholder: "Select Assignees",
+            allowClear: true
+        });
+    });
+</script>
 {% endblock %}

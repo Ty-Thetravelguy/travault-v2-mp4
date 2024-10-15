@@ -15,11 +15,7 @@ from django.db.models import ProtectedError
 from django.db.models.functions import Lower
 from agencies.models import CustomUser 
 from .utils import send_ticket_email
-from django.http import HttpResponse
-from django.template.loader import get_template
-from django.template import TemplateDoesNotExist
-from django.forms.models import model_to_dict
-from django.db import models  
+
 
 
 @login_required

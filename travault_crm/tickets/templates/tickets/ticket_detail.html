@@ -55,9 +55,9 @@
                             <div class="col-md-6">
                                 <strong>Status:</strong>
                                 <select id="status-select" class="form-select-sm">
-                                    {% for status in status_choices %}
+                                    {% for status, display in ticket.STATUS_CHOICES %}
                                     <option value="{{ status }}" {% if status == ticket.status %}selected{% endif %}>
-                                        {{ status|title }}
+                                        {{ display }}
                                     </option>
                                     {% endfor %}
                                 </select>
@@ -77,11 +77,11 @@
                             </div>
                             <div class="col-md-6">
                                 <strong>Assigned:</strong>
-                                <select id="received_from-select" class="form-select-sm">
+                                <select id="assigned_to-select" class="form-select-sm">
                                     <option value="">Not Assigned</option>
                                     {% for user in agency_users %}
                                     <option value="{{ user.id }}"
-                                        {% if user == ticket.received_from %}selected{% endif %}>
+                                        {% if user == ticket.assigned_to %}selected{% endif %}>
                                         {{ user.get_full_name|default:user.username }}
                                     </option>
                                     {% endfor %}

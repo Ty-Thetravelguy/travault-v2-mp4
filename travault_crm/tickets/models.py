@@ -16,6 +16,7 @@ class Ticket(models.Model):
     STATUS_CHOICES = [
         ('open', 'Open'),
         ('in_progress', 'In Progress'),
+        ('dev', 'Development'),
         ('closed', 'Closed'),
     ]
 
@@ -58,12 +59,12 @@ class Ticket(models.Model):
     contact = models.ForeignKey(Contact, null=True, blank=True, on_delete=models.SET_NULL) 
     agency = models.ForeignKey(Agency, on_delete=models.CASCADE) 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  
-    received_from = models.ForeignKey(
+    assigned_to = models.ForeignKey(
         CustomUser,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='received_tickets'
+        related_name='assigned_to'
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
@@ -74,7 +75,7 @@ class Ticket(models.Model):
     )
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES)
     category_type = models.CharField(max_length=10, choices=CATEGORY_TYPE_CHOICES)
-    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES_CLIENT)
+    category = models.CharField(max_length=50) 
     subject = models.ForeignKey(TicketSubject, on_delete=models.CASCADE)
     description = models.TextField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')

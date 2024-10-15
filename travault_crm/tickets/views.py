@@ -196,7 +196,7 @@ def update_ticket_field(request, pk):
     field = request.POST.get('field')
     value = request.POST.get('value')
 
-    valid_fields = ['owner', 'received_from', 'priority', 'status']
+    valid_fields = ['owner', 'assigned_to', 'priority', 'status']
 
     if field not in valid_fields:
         return JsonResponse({'success': False, 'error': 'Invalid field'}, status=400)
@@ -205,7 +205,7 @@ def update_ticket_field(request, pk):
         old_value = getattr(ticket, field)
         field_object = Ticket._meta.get_field(field)
 
-        if field in ['owner', 'received_from']:
+        if field in ['owner', 'assigned_to']:
             user = get_object_or_404(CustomUser, pk=value, agency=request.user.agency)
             setattr(ticket, field, user)
             # Use get_full_name or fallback to username
@@ -230,8 +230,17 @@ def update_ticket_field(request, pk):
         # Format field name for display
         field_name_formatted = field.replace('_', ' ').capitalize()
 
-        # Create a descriptive update message
-        update_message = f"The field '{field_name_formatted}' was updated from '{old_display}' to '{new_display}'."
+        # Create a more focused update message
+        if field == 'assigned_to':
+            update_message = f"Ticket assigned to {new_display}"
+        elif field == 'owner':
+            update_message = f"Ticket ownership transferred to {new_display}"
+        else:
+            update_message = f"{field_name_formatted} updated to '{new_display}'"
+
+        additional_context = {
+            'update_message': update_message,
+        }
 
         # Prepare additional context for the email
         additional_context = {
@@ -283,13 +292,20 @@ def edit_ticket(request, pk):
         form = TicketForm(request.POST, instance=ticket, agency=request.user.agency)
         if form.is_valid():
             updated_ticket = form.save(commit=False)
-            updated_ticket.updated_by = request.user  # Set the user who made the update
+            updated_ticket.updated_by = request.user
             updated_ticket.save()
             messages.success(request, 'Ticket updated successfully.')
             return redirect('tickets:ticket_detail', pk=updated_ticket.pk)
+        else:
+            messages.error(request, "There was an error updating the ticket. Please check the form and try again.")
     else:
         form = TicketForm(instance=ticket, agency=request.user.agency)
-    return render(request, 'tickets/edit_ticket.html', {'form': form, 'ticket': ticket})
+    
+    context = {
+        'form': form,
+        'ticket': ticket,
+    }
+    return render(request, 'tickets/edit_ticket.html', context)
 
 @require_POST
 @login_required
@@ -307,9 +323,9 @@ def add_ticket_action(request, pk):
         )
         messages.success(request, f"Action '{dict(TicketAction.ACTION_TYPES)[action_type]}' added successfully.")
 
-        # Ensure the ticket has an assigned user (received_from)
-        if not ticket.received_from:
-            ticket.received_from = request.user
+        # Ensure the ticket has an assigned user (assigned_to)
+        if not ticket.assigned_to:
+            ticket.assigned_to = request.user
             ticket.save()
 
         # Send action added email

@@ -33,9 +33,9 @@
 
                             <!-- Received From Field -->
                             <div class="mb-3">
-                                <label for="{{ form.received_from.id_for_label }}" class="form-label">Received
+                                <label for="{{ form.assigned_to.id_for_label }}" class="form-label">Received
                                     From</label>
-                                {{ form.received_from|add_class:"form-select" }}
+                                {{ form.assigned_to|add_class:"form-select" }}
                             </div>
 
                             <!-- Category Type Field -->
@@ -48,7 +48,7 @@
                             <!-- Category Field -->
                             <div class="mb-3">
                                 <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
-                                {{ form.category|add_class:"form-select category-field" }}
+                                {{ form.category|add_class:"form-select" }}
                             </div>
 
                             <!-- Subject Field -->

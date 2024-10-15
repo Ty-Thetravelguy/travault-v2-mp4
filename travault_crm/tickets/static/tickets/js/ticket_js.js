@@ -1,5 +1,7 @@
+// travault_crm/tickets/static/tickets/js/ticket_js.js
 document.addEventListener('DOMContentLoaded', function() {
-    
+    console.log("DOM fully loaded");
+
     // Clickable rows functionality
     function initializeClickableRows() {
         const rows = document.querySelectorAll('.clickable-row');
@@ -13,8 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     initializeClickableRows();
 
-    // New functionality for ticket detail page
-    const quickUpdateFields = ['owner', 'received_from', 'priority', 'status'];
+    // Quick Update Fields via AJAX
+    const quickUpdateFields = ['owner', 'assigned_to', 'priority', 'status'];
     
     quickUpdateFields.forEach(field => {
         const select = document.getElementById(`${field}-select`);
@@ -22,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
             select.addEventListener('change', function() {
                 quickUpdateField(field, this.value);
             });
-            
         }
     });
 
@@ -41,8 +42,9 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Instead of updating UI and showing message, just reload the page
                 window.location.reload();
+            } else {
+                displayDjangoMessage(data.error || 'An error occurred.', 'error');
             }
         })
         .catch(error => {
@@ -51,9 +53,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function updateUI(field, value) {
-        // Update the UI based on the field that was changed
-        // This is a placeholder function - implement as needed
+    function displayDjangoMessage(message, type) {
+        // Implement a function to display messages to the user.
+        // This can be using Bootstrap alerts or any other UI component.
+        alert(message);  // Simple alert for demonstration
     }
 
     // Category field functionality
@@ -61,12 +64,14 @@ document.addEventListener('DOMContentLoaded', function() {
     var categoryField = document.getElementById('id_category');
 
     if (categoryTypeField && categoryField) {
+        categoryTypeField.addEventListener('change', updateCategoryField);
         function updateCategoryField() {
             var selectedCategoryType = categoryTypeField.value;
-
+            var currentCategory = categoryField.value;  // Store the current category
+        
             // Reset options
             categoryField.innerHTML = '<option value="">Select a category</option>';
-
+        
             if (selectedCategoryType === 'client') {
                 categoryField.removeAttribute('disabled'); // Enable the dropdown
                 populateOptions([
@@ -88,6 +93,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 // If no valid category type is selected, disable the category field
                 categoryField.setAttribute('disabled', 'disabled');
             }
+        
+            // Restore the previously selected category if it exists in the new options
+            if (currentCategory) {
+                const option = categoryField.querySelector(`option[value="${currentCategory}"]`);
+                if (option) {
+                    option.selected = true;
+                }
+            }
         }
 
         function populateOptions(options) {
@@ -102,8 +115,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Attach change listener to category type field
         categoryTypeField.addEventListener('change', updateCategoryField);
 
-        // Initialize the category field state on page load
-        updateCategoryField();
+        // Initialize the category field state on page load only for new tickets
+        if (!categoryField.value) {
+            updateCategoryField();
+    }
     }
 
     // Subject field functionality
@@ -143,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         let isProcessing = false;
-
+       
         function addSubjectHandler(event) {
             event.preventDefault();
             event.stopPropagation();
@@ -165,13 +180,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => response.json())
                 .then(data => {
+                    if (data.success === false) {
+                        displayDjangoMessage(data.error || 'Failed to add subject.', 'error');
+                        return;
+                    }
                     subjectField.value = data.subject;
                     subjectField.dataset.subjectId = data.id;  // Store the ID
                     subjectSuggestions.innerHTML = '';
                     showAlert('New subject added successfully!');
                 })
                 .catch(error => {
-                    // Handle error if needed
+                    console.error('Error:', error);
+                    displayDjangoMessage('An error occurred while adding the subject.', 'error');
                 })
                 .finally(() => {
                     isProcessing = false;
@@ -193,6 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 1000);
         }
     }
+
     // Action modal functionality
     const actionForm = document.getElementById('actionForm');
     const saveActionBtn = document.getElementById('saveAction');
@@ -234,4 +255,104 @@ document.addEventListener('DOMContentLoaded', function() {
             this.querySelector('#deleteActionIdConfirm').textContent = actionId;
         });
     }
+
+    // Sorting functionality
+    const table = document.getElementById('tickets-table');
+    console.log("Table found:", table);
+
+    const headers = table.querySelectorAll('th[data-sort]');
+    console.log("Sortable headers found:", headers.length);
+
+    let currentSort = { column: null, direction: 'asc' };
+
+    headers.forEach(header => {
+        header.addEventListener('click', () => {
+            console.log("Header clicked:", header.dataset.sort);
+            const column = header.dataset.sort;
+            const direction = currentSort.column === column && currentSort.direction === 'asc' ? 'desc' : 'asc';
+            sortTable(column, direction);
+            currentSort = { column, direction };
+            updateSortIcons();
+        });
+    });
+
+    function sortTable(column, direction) {
+        console.log("Sorting table:", column, direction);
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr.clickable-row'));
+        console.log("Rows to sort:", rows.length);
+
+        rows.sort((a, b) => {
+            const aValue = a.children[getColumnIndex(column)].textContent.trim();
+            const bValue = b.children[getColumnIndex(column)].textContent.trim();
+            console.log("Comparing:", aValue, bValue);
+            return direction === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+        });
+
+        tbody.innerHTML = '';
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    function getColumnIndex(column) {
+        return Array.from(headers).findIndex(header => header.dataset.sort === column);
+    }
+
+    function updateSortIcons() {
+        headers.forEach(header => {
+            const icon = header.querySelector('.sort-icon');
+            icon.classList.remove('asc', 'desc');
+            if (header.dataset.sort === currentSort.column) {
+                icon.classList.add(currentSort.direction);
+            }
+        });
+    }
+
+    // Filtering functionality
+    const filters = {
+        status: document.getElementById('status-filter'),
+        priority: document.getElementById('priority-filter'),
+        assignedTo: document.getElementById('assigned-to-filter'),
+        categoryType: document.getElementById('category-type-filter'),
+        category: document.getElementById('category-filter'),
+        owner: document.getElementById('owner-filter')
+    };
+
+    console.log("Filters found:", Object.values(filters).filter(f => f !== null).length);
+
+    Object.values(filters).forEach(filter => {
+        if (filter) {
+            filter.addEventListener('change', applyFilters);
+        }
+    });
+
+    function applyFilters() {
+        console.log("Applying filters");
+        const rows = table.querySelectorAll('tbody tr.clickable-row');
+        console.log("Rows to filter:", rows.length);
+
+        rows.forEach(row => {
+            const status = row.children[0].textContent.trim();
+            const priority = row.children[1].textContent.trim();
+            const assignedTo = row.children[3].textContent.trim();
+            const categoryType = row.children[7].textContent.trim();
+            const category = row.children[8].textContent.trim();
+            const owner = row.children[9].textContent.trim();
+
+            const showRow = (
+                (filters.status.value === 'all' || (filters.status.value === 'active' && status !== 'Closed')) &&
+                (filters.priority.value === '' || priority.toLowerCase() === filters.priority.value.toLowerCase()) &&
+                (filters.assignedTo.value === '' || assignedTo === filters.assignedTo.value) &&
+                (filters.categoryType.value === '' || categoryType.toLowerCase() === filters.categoryType.value.toLowerCase()) &&
+                (filters.category.value === '' || category === filters.category.value) &&
+                (filters.owner.value === '' || owner === filters.owner.value)
+            );
+
+            row.style.display = showRow ? '' : 'none';
+        });
+    }
+
+    // Initialize filters
+    applyFilters();
+
+    console.log("Initialization complete");
 });

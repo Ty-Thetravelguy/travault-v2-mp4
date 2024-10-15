@@ -28,20 +28,24 @@ def log_ticket_update(sender, instance, **kwargs):
         old_value = old_values.get(field)
         new_value = new_values.get(field)
         if old_value != new_value:
-            field_object = Ticket._meta.get_field(field)
-            # Handle ForeignKey fields
-            if isinstance(field_object, models.ForeignKey):
-                old_value_related = getattr(old_instance, field)
-                new_value_related = getattr(instance, field)
-                old_value_display = str(old_value_related) if old_value_related else 'None'
-                new_value_display = str(new_value_related) if new_value_related else 'None'
-            else:
-                old_value_display = dict(field_object.choices).get(old_value, old_value)
-                new_value_display = dict(field_object.choices).get(new_value, new_value)
+            try:
+                field_object = Ticket._meta.get_field(field)
 
-            changes.append(
-                f"{field.replace('_', ' ').capitalize()} changed from '{old_value_display}' to '{new_value_display}'"
-            )
+                if isinstance(field_object, models.ForeignKey):
+                    old_value_display = str(getattr(old_instance, field)) if getattr(old_instance, field) else 'None'
+                    new_value_display = str(getattr(instance, field)) if getattr(instance, field) else 'None'
+                elif hasattr(field_object, 'choices') and field_object.choices:
+                    old_value_display = dict(field_object.choices).get(old_value, str(old_value))
+                    new_value_display = dict(field_object.choices).get(new_value, str(new_value))
+                else:
+                    old_value_display = str(old_value)
+                    new_value_display = str(new_value)
+
+                changes.append(
+                    f"{field.replace('_', ' ').capitalize()} changed from '{old_value_display}' to '{new_value_display}'"
+                )
+            except Exception as e:
+                print(f"Error processing field {field}: {str(e)}")
 
     if changes:
         update_message = "\n".join(changes)
@@ -49,6 +53,6 @@ def log_ticket_update(sender, instance, **kwargs):
             ticket=instance,
             action_type='update',
             details=update_message,
-            created_by=instance.updated_by,  # Ensure this is set in your views
+            created_by=instance.updated_by,
             is_system_generated=True
         )

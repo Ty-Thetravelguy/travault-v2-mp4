@@ -21,7 +21,8 @@ from .utils import send_ticket_email
 @login_required
 def view_tickets(request):
     tickets = Ticket.objects.filter(agency=request.user.agency).order_by('-created_at')
-    return render(request, 'tickets/view_tickets.html', {'tickets': tickets})
+    users = CustomUser.objects.filter(agency=request.user.agency)
+    return render(request, 'tickets/view_tickets.html', {'tickets': tickets, 'users': users})
 
 class TicketSubjectAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
@@ -145,10 +146,10 @@ def ticket_list(request):
     tickets = Ticket.objects.filter(agency=request.user.agency)
     return render(request, 'tickets/ticket_list.html', {'tickets': tickets})
 
-def ticket_detail(request, pk):
-    # Ensure the ticket belongs to the user's agency
-    ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
-    return render(request, 'tickets/ticket_detail.html', {'ticket': ticket})
+# def ticket_detail(request, pk):
+#     # Ensure the ticket belongs to the user's agency
+#     ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
+#     return render(request, 'tickets/ticket_detail.html', {'ticket': ticket})
 
 def preview_ticket_email(request, ticket_id):
     ticket = Ticket.objects.get(pk=ticket_id)

@@ -3,8 +3,6 @@
 
 {% block ticket_css %}
 <link rel="stylesheet" href="{% static 'tickets/css/ticket_sort.css' %}">
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
 {% endblock %}
 
 
@@ -46,7 +44,7 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <select id="assigned-to-filter" class="form-select select2" multiple data-placeholder="All Assignees">
+                <select id="assigned-to-filter" class="form-select">
                     <option value="">All Assignees</option>
                     {% for user in users %}
                     <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
@@ -63,13 +61,15 @@
             <div class="col-md-2">
                 <select id="category-filter" class="form-select">
                     <option value="">All Categories</option>
-                    <!-- Populate with categories -->
+                    <!-- Populate with categories dynamically if needed -->
                 </select>
             </div>
             <div class="col-md-2">
                 <select id="owner-filter" class="form-select">
                     <option value="">All Owners</option>
-                    <!-- Populate with users -->
+                    {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
+                    {% endfor %}
                 </select>
             </div>
         </div>
@@ -106,7 +106,9 @@
                     </thead>
                     <tbody>
                         {% for ticket in tickets %}
-                        <tr class="clickable-row" data-href="{% url 'tickets:ticket_detail' pk=ticket.pk %}">
+                        <tr class="clickable-row" data-href="{% url 'tickets:ticket_detail' pk=ticket.pk %}"
+                            data-owner="{{ ticket.owner.id }}"
+                            data-assigned_to="{{ ticket.assigned_to.id|default:'' }}">
                             <td>{{ ticket.get_status_display }}</td>
                             <td>{{ ticket.get_priority_display }}</td>
                             <td class="text-truncate">{{ ticket.subject }}</td>
@@ -128,7 +130,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="10" class="text-center">No tickets found.</td>
+                            <td colspan="11" class="text-center">No tickets found.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -156,13 +158,4 @@
 
 {% block postload_js %}
 <script src="{% static 'tickets/js/ticket_js.js' %}" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('.select2').select2({
-            placeholder: "Select Assignees",
-            allowClear: true
-        });
-    });
-</script>
 {% endblock %}

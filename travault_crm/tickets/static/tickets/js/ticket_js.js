@@ -1,6 +1,5 @@
 // travault_crm/tickets/static/tickets/js/ticket_js.js
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM fully loaded");
 
     // Clickable rows functionality
     function initializeClickableRows() {
@@ -325,31 +324,127 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    function updateCategoryOptions() {
+        const categoryTypeFilter = filters.categoryType;
+        const categoryFilter = filters.category;
+
+        if (!categoryTypeFilter || !categoryFilter) return;
+
+        const selectedCategoryType = categoryTypeFilter.value;
+
+        // Clear existing options
+        categoryFilter.innerHTML = '<option value="">All Categories</option>';
+
+        if (selectedCategoryType === '') {
+            // Add all categories
+            addCategoryOptions(CATEGORY_CHOICES_CLIENT);
+            addCategoryOptions(CATEGORY_CHOICES_AGENCY);
+        } else if (selectedCategoryType === 'client') {
+            addCategoryOptions(CATEGORY_CHOICES_CLIENT);
+        } else if (selectedCategoryType === 'agency') {
+            addCategoryOptions(CATEGORY_CHOICES_AGENCY);
+        }
+
+        // Trigger change event to update filters
+        categoryFilter.dispatchEvent(new Event('change'));
+    }
+
+    function addCategoryOptions(categories) {
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category[0];
+            option.textContent = category[1];
+            filters.category.appendChild(option);
+        });
+    }
+
+    // Define category choices (you may want to move these to a separate file or generate them dynamically)
+    const CATEGORY_CHOICES_CLIENT = [
+        ['complaint', 'Complaint'],
+        ['query', 'Query'],
+        ['request', 'Request'],
+    ];
+
+    const CATEGORY_CHOICES_AGENCY = [
+        ['consultant_error', 'Consultant Error'],
+        ['supplier_error', 'Supplier Error'],
+        ['supplier_query', 'Supplier Query'],
+        ['system_error', 'System Error'],
+        ['system_query', 'System Query'],
+        ['system_enhancement', 'System Enhancement'],
+    ];
+
+    // Add event listener for category type change
+    if (filters.categoryType) {
+        filters.categoryType.addEventListener('change', function() {
+            updateCategoryOptions();
+            applyFilters();
+        });
+    }
+
+    // Call updateCategoryOptions on page load
+    updateCategoryOptions();
+
     function applyFilters() {
+        const table = document.getElementById('tickets-table');
+        if (!table) {
+            console.error("Tickets table not found!");
+            return;
+        }
+
         const rows = table.querySelectorAll('tbody tr.clickable-row');
-        const assignedToFilter = Array.from(filters.assignedTo.selectedOptions).map(option => option.value);
+        
+        // Retrieve filter values
+        const statusFilter = filters.status.value;
+        const priorityFilter = filters.priority.value.toLowerCase();
+        const categoryTypeFilter = filters.categoryType.value.toLowerCase();
+        const categoryFilter = filters.category.value.toLowerCase();
+        const ownerFilter = filters.owner.value;
+        const assignedToFilter = filters.assignedTo.value;
+
+        console.log("Applying filters with values:", {
+            statusFilter,
+            priorityFilter,
+            categoryTypeFilter,
+            categoryFilter,
+            ownerFilter,
+            assignedToFilter
+        });
 
         rows.forEach(row => {
-            const status = row.children[0].textContent.trim();
-            const priority = row.children[1].textContent.trim();
-            const assignedTo = row.children[3].textContent.trim();
-            const categoryType = row.children[7].textContent.trim();
-            const category = row.children[8].textContent.trim();
-            const owner = row.children[9].textContent.trim();
+            const status = row.children[0].textContent.trim().toLowerCase();
+            const priority = row.children[1].textContent.trim().toLowerCase();
+            const categoryType = row.children[7].textContent.trim().toLowerCase();
+            const category = row.children[8].textContent.trim().toLowerCase();
 
-            const showRow = (
-                (filters.status.value === 'all' || (filters.status.value === 'active' && status !== 'Closed')) &&
-                (filters.priority.value === '' || priority.toLowerCase() === filters.priority.value.toLowerCase()) &&
-                (assignedToFilter.length === 0 || assignedToFilter.includes(assignedTo)) &&
-                (filters.categoryType.value === '' || categoryType.toLowerCase() === filters.categoryType.value.toLowerCase()) &&
-                (filters.category.value === '' || category === filters.category.value) &&
-                (filters.owner.value === '' || owner === filters.owner.value)
-            );
+            const assignedTo = row.dataset.assigned_to || '';
+            const owner = row.dataset.owner || '';
+
+            const isStatusMatch = (statusFilter === 'all') || 
+                                (statusFilter === 'active' && status !== 'closed') ||
+                                (status === statusFilter);
+
+            const isPriorityMatch = (priorityFilter === '') || (priority === priorityFilter);
+
+            const isCategoryTypeMatch = (categoryTypeFilter === '') || (categoryType === categoryTypeFilter);
+
+            const isCategoryMatch = (categoryFilter === '') || (category.toLowerCase() === categoryFilter);
+
+            const isOwnerMatch = (ownerFilter === '') || (owner === ownerFilter);
+
+            const isAssignedToMatch = (assignedToFilter === '') || (assignedTo === assignedToFilter);
+
+            const showRow = isStatusMatch && 
+                            isPriorityMatch && 
+                            isCategoryTypeMatch &&
+                            isCategoryMatch &&
+                            isOwnerMatch &&
+                            isAssignedToMatch;
 
             row.style.display = showRow ? '' : 'none';
         });
     }
 
-    // Initialize filters
+    // Initialize filters on page load
     applyFilters();
 });

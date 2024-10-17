@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="project-primary-color">Manage Closed Tickets</h1>
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr>
+                <th>Ticket ID</th>
+                <th>Title</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in closed_tickets %}
+            <tr>
+                <td>{{ ticket.id }}</td>
+                <td>{{ ticket.title }}</td>
+                <td>
+                    <a href="{% url 'reopen_ticket' ticket.id %}" class="btn btn-success">Reopen</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

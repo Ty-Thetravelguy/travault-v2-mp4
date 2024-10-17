@@ -281,8 +281,21 @@ def ticket_detail(request, pk):
 @login_required
 def edit_ticket(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
+
+    # Restrict editing if the ticket is closed unless the user is an admin
+    if ticket.status == 'closed' and request.user.user_type != 'admin':
+        messages.error(request, 'This ticket is closed and cannot be edited.')
+        return redirect('ticket_detail', pk=ticket.pk)
+    
     if request.method == 'POST':
         form = TicketForm(request.POST, instance=ticket, agency=request.user.agency)
+
+        # Prevent editing of specific fields if the ticket is closed
+        if ticket.status == 'closed':
+            for field in ['priority', 'status', 'owner', 'assigned']:
+                if field in form.fields:
+                    form.fields[field].disabled = True
+
         if form.is_valid():
             updated_ticket = form.save(commit=False)
             updated_ticket.updated_by = request.user
@@ -293,7 +306,13 @@ def edit_ticket(request, pk):
             messages.error(request, "There was an error updating the ticket. Please check the form and try again.")
     else:
         form = TicketForm(instance=ticket, agency=request.user.agency)
-    
+
+        # Make specific fields read-only if the ticket is closed
+        if ticket.status == 'closed':
+            for field in ['priority', 'status', 'owner', 'assigned']:
+                if field in form.fields:
+                    form.fields[field].disabled = True
+
     context = {
         'form': form,
         'ticket': ticket,
@@ -304,6 +323,12 @@ def edit_ticket(request, pk):
 @login_required
 def add_ticket_action(request, pk):
     ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
+
+    # Prevent adding actions if the ticket is closed
+    if ticket.status == 'closed' and request.user.user_type != 'admin':
+        messages.error(request, "Actions cannot be added to a closed ticket.")
+        return redirect('tickets:ticket_detail', pk=pk)
+
     action_type = request.POST.get('action_type')
     details = request.POST.get('details')
 
@@ -324,7 +349,6 @@ def add_ticket_action(request, pk):
         # Send action added email
         additional_context = {'action': action}
         send_ticket_email(request, ticket, 'action_added', additional_context)
-
     else:
         messages.error(request, "Invalid data. Please provide action type and details.")
 
@@ -333,6 +357,12 @@ def add_ticket_action(request, pk):
 @login_required
 def edit_ticket_action(request, action_id):
     action = get_object_or_404(TicketAction, id=action_id, ticket__agency=request.user.agency)
+
+    # Prevent editing actions if the ticket is closed
+    if action.ticket.status == 'closed' and request.user.user_type != 'admin':
+        messages.error(request, "Actions on closed tickets cannot be edited.")
+        return redirect('tickets:ticket_detail', pk=action.ticket.pk)
+
     if request.method == 'POST':
         action_type = request.POST.get('action_type')
         details = request.POST.get('details')
@@ -399,3 +429,17 @@ def view_email_in_browser(request, email_type, ticket_id):
         return redirect('tickets:ticket_detail', pk=ticket_id)
 
     return send_ticket_email(request, ticket, email_type, additional_context=additional_context, preview=True)
+
+@login_required
+def reopen_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+
+    # Only allow admins to reopen closed tickets
+    if request.user.user_type == 'admin':
+        if ticket.status == 'closed':
+            ticket.admin_override_save()
+            messages.success(request, 'Ticket reopened successfully.')
+    else:
+        messages.error(request, 'You do not have permission to reopen this ticket.')
+
+    return redirect('manage_closed_tickets')

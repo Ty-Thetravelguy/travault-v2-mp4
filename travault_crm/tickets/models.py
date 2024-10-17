@@ -3,6 +3,7 @@ from agencies.models import Agency, CustomUser
 from django.db import models
 from django.conf import settings 
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 
 class TicketSubject(models.Model):
@@ -81,6 +82,19 @@ class Ticket(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+    def save(self, *args, **kwargs):
+        if self.pk:  # If the ticket already exists
+            original = Ticket.objects.get(pk=self.pk)
+            if original.status == 'closed' and self.status != 'closed' and not getattr(self, '_is_admin_override', False):
+                raise ValidationError('Closed tickets cannot be reopened by non-admin users.')
+        super(Ticket, self).save(*args, **kwargs)
+
+    def admin_override_save(self, *args, **kwargs):
+        # This method allows admins to explicitly override the status change
+        self._is_admin_override = True
+        self.save(*args, **kwargs)
 
 class TicketAction(models.Model):
     ACTION_TYPES = [

@@ -132,7 +132,7 @@
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h4 class="mb-0">Actions</h4>
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        <button type="button" class="btn btn-green" data-bs-toggle="modal"
                                             data-bs-target="#actionModal">
                                             Add Action
                                         </button>
@@ -165,8 +165,7 @@
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <h5 class="card-title mb-0">{{ action.get_action_type_display }}</h5>
                                             <div>
-                                                <button type="button" class="btn btn-sm btn-outline-primary"
-                                                    data-bs-toggle="modal"
+                                                <button type="button" class="btn btn-green-sm" data-bs-toggle="modal"
                                                     data-bs-target="#editActionModal{{ action.id }}">
                                                     <i class="fas fa-edit"></i> Edit
                                                 </button>
@@ -216,7 +215,7 @@
                                 </a>
                             </div>
                             <div>
-                                <a href="{% url 'tickets:edit_ticket' pk=ticket.pk %}" class="btn btn-primary">
+                                <a href="{% url 'tickets:edit_ticket' pk=ticket.pk %}" class="btn btn-green-inverse">
                                     <i class="fas fa-edit"></i> Full Edit
                                 </a>
                                 {% if user.user_type == 'admin' %}

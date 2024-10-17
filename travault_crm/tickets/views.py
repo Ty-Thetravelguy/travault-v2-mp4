@@ -116,23 +116,23 @@ def delete_subject(request, subject_id):
         }, status=400)
 
 @login_required
-def open_ticket(request, company_id):
-    company = get_object_or_404(Company, id=company_id)
+def open_ticket(request, company_id=None):
+    if company_id:
+        company = get_object_or_404(Company, id=company_id)
+    else:
+        company = None
     
     if request.method == 'POST':
         form = TicketForm(request.POST, agency=request.user.agency)
         if form.is_valid():
             ticket = form.save(commit=False)
-            ticket.company = company
+            ticket.company = form.cleaned_data['company']  # Get company from form
             ticket.owner = request.user
             ticket.agency = request.user.agency
             ticket.save()
 
             messages.success(request, f"Ticket #{ticket.id} has been successfully created.")
-
-            # Send email notification
             send_ticket_email(request, ticket, 'created')
-
             return redirect('tickets:ticket_detail', pk=ticket.id)
         else:
             messages.error(request, "There was an error creating the ticket. Please check the form and try again.")
@@ -146,10 +146,6 @@ def ticket_list(request):
     tickets = Ticket.objects.filter(agency=request.user.agency)
     return render(request, 'tickets/ticket_list.html', {'tickets': tickets})
 
-# def ticket_detail(request, pk):
-#     # Ensure the ticket belongs to the user's agency
-#     ticket = get_object_or_404(Ticket, pk=pk, agency=request.user.agency)
-#     return render(request, 'tickets/ticket_detail.html', {'ticket': ticket})
 
 def preview_ticket_email(request, ticket_id):
     ticket = Ticket.objects.get(pk=ticket_id)

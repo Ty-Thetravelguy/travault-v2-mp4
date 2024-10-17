@@ -2,6 +2,8 @@ from django import template
 from django.forms import CheckboxInput, RadioSelect
 from django.utils.safestring import SafeString
 from activity_log.models import Meeting, Call, Email
+from tickets.models import Ticket
+
 
 
 register = template.Library()
@@ -45,3 +47,7 @@ def is_call(value):
 @register.filter
 def is_email(value):
     return isinstance(value, Email)
+
+@register.filter
+def is_ticket(value):
+    return isinstance(value, Ticket)

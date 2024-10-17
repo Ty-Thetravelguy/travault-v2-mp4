@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.contrib import messages
 from .models import Company, COMPANY_TYPE_CHOICES, Contact, CompanyNotes, TransactionFee
+from tickets.models import Ticket 
 from .forms import CompanyForm, ContactForm, CompanyNotesForm, TransactionFeeForm
 from urllib.parse import quote
 from django.conf import settings
@@ -155,10 +156,15 @@ def company_detail(request, pk, active_tab='details'):
     calls = Call.objects.filter(company=company)
     emails = Email.objects.filter(company=company)
 
-    # Combine and sort activities
+    # Add this new code to fetch tickets
+    tickets = Ticket.objects.filter(company=company).order_by('-created_at')
+    logger.debug(f"Fetched {tickets.count()} tickets for company pk={pk}.")
+
+
+    # Combine and sort activities and tickets
     activities = sorted(
-        list(meetings) + list(calls) + list(emails),
-        key=lambda x: (x.date, x.time),
+        list(meetings) + list(calls) + list(emails) + list(tickets),
+        key=lambda x: x.created_at if hasattr(x, 'created_at') else (x.date, x.time),
         reverse=True
     )
 
@@ -174,6 +180,7 @@ def company_detail(request, pk, active_tab='details'):
         'fee_form': fee_form,
         'edit_forms': edit_forms,
         'activities': activities,
+        'tickets': tickets, 
         'active_tab': active_tab or 'details',
     }
 

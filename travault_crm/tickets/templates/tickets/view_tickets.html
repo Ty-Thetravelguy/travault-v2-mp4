@@ -107,8 +107,8 @@
                     <tbody>
                         {% for ticket in tickets %}
                         <tr class="clickable-row" data-href="{% url 'tickets:ticket_detail' pk=ticket.pk %}"
-                            data-owner="{{ ticket.owner.id }}"
-                            data-assigned_to="{{ ticket.assigned_to.id|default:'' }}">
+                            data-owner="{{ ticket.owner.id }}" data-assigned_to="{{ ticket.assigned_to.id|default:'' }}"
+                            data-category_type="{{ ticket.category_type }}" data-category="{{ ticket.category }}">
                             <td>{{ ticket.get_status_display }}</td>
                             <td>{{ ticket.get_priority_display }}</td>
                             <td class="text-truncate">{{ ticket.subject }}</td>

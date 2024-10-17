@@ -414,8 +414,8 @@ document.addEventListener('DOMContentLoaded', function() {
         rows.forEach(row => {
             const status = row.children[0].textContent.trim().toLowerCase();
             const priority = row.children[1].textContent.trim().toLowerCase();
-            const categoryType = row.children[7].textContent.trim().toLowerCase();
-            const category = row.children[8].textContent.trim().toLowerCase();
+            const categoryType = row.dataset.category_type || '';
+            const category = row.dataset.category || '';
 
             const assignedTo = row.dataset.assigned_to || '';
             const owner = row.dataset.owner || '';
@@ -428,7 +428,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const isCategoryTypeMatch = (categoryTypeFilter === '') || (categoryType === categoryTypeFilter);
 
-            const isCategoryMatch = (categoryFilter === '') || (category.toLowerCase() === categoryFilter);
+            const isCategoryMatch = (categoryFilter === '') || (category === categoryFilter);
 
             const isOwnerMatch = (ownerFilter === '') || (owner === ownerFilter);
 

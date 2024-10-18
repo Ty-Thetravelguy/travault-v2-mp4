@@ -1,4 +1,3 @@
-// travault_crm/tickets/static/tickets/js/ticket_js.js
 document.addEventListener('DOMContentLoaded', function() {
 
     // Clickable rows functionality
@@ -54,7 +53,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function displayDjangoMessage(message, type) {
         // Implement a function to display messages to the user.
-        // This can be using Bootstrap alerts or any other UI component.
         alert(message);  // Simple alert for demonstration
     }
 
@@ -358,7 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Define category choices (you may want to move these to a separate file or generate them dynamically)
+    // Define category choices
     const CATEGORY_CHOICES_CLIENT = [
         ['complaint', 'Complaint'],
         ['query', 'Query'],
@@ -385,13 +383,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // Call updateCategoryOptions on page load
     updateCategoryOptions();
 
+    // Row striping after filtering
+    function reapplyRowStriping() {
+        const table = document.getElementById('tickets-table');
+        const visibleRows = Array.from(table.querySelectorAll('tbody tr.clickable-row'))
+            .filter(row => row.style.display !== 'none'); // Only count visible rows
+    
+        visibleRows.forEach((row, index) => {
+            // Apply alternating row colors
+            if (index % 2 === 0) {
+                row.style.backgroundColor = '#e9ffe9'; // Light green
+            } else {
+                row.style.backgroundColor = '#f9f9f9'; // Light grey
+            }
+        });
+    }
+
+    // Apply filters
     function applyFilters() {
         const table = document.getElementById('tickets-table');
         if (!table) {
             console.error("Tickets table not found!");
             return;
         }
-
+    
         const rows = table.querySelectorAll('tbody tr.clickable-row');
         
         // Retrieve filter values
@@ -401,55 +416,50 @@ document.addEventListener('DOMContentLoaded', function() {
         const categoryFilter = filters.category.value.toLowerCase();
         const ownerFilter = filters.owner.value;
         const assignedToFilter = filters.assignedTo.value;
-
-        console.log("Applying filters with values:", {
-            statusFilter,
-            priorityFilter,
-            categoryTypeFilter,
-            categoryFilter,
-            ownerFilter,
-            assignedToFilter
-        });
-
+    
         rows.forEach(row => {
             const status = row.children[0].textContent.trim().toLowerCase();
             const priority = row.children[1].textContent.trim().toLowerCase();
             const categoryType = row.dataset.category_type || '';
             const category = row.dataset.category || '';
-
             const assignedTo = row.dataset.assigned_to || '';
             const owner = row.dataset.owner || '';
-
+    
             const isStatusMatch = (statusFilter === 'all') || 
                                 (statusFilter === 'active' && status !== 'closed') ||
                                 (status === statusFilter);
-
+    
             const isPriorityMatch = (priorityFilter === '') || (priority === priorityFilter);
-
+    
             const isCategoryTypeMatch = (categoryTypeFilter === '') || (categoryType === categoryTypeFilter);
-
+    
             const isCategoryMatch = (categoryFilter === '') || (category === categoryFilter);
-
+    
             const isOwnerMatch = (ownerFilter === '') || (owner === ownerFilter);
-
+    
             const isAssignedToMatch = (assignedToFilter === '') || (assignedTo === assignedToFilter);
-
+    
             const showRow = isStatusMatch && 
                             isPriorityMatch && 
                             isCategoryTypeMatch &&
                             isCategoryMatch &&
                             isOwnerMatch &&
                             isAssignedToMatch;
-
+    
             row.style.display = showRow ? '' : 'none';
         });
+    
+        // Reapply row striping after filtering
+        reapplyRowStriping();
     }
 
     // Initialize filters on page load
     applyFilters();
 
+    // Initialize tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
+
 });

@@ -255,16 +255,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Sorting functionality
     const table = document.getElementById('tickets-table');
-    console.log("Table found:", table);
-
     const headers = table.querySelectorAll('th[data-sort]');
-    console.log("Sortable headers found:", headers.length);
-
     let currentSort = { column: null, direction: 'asc' };
 
     headers.forEach(header => {
         header.addEventListener('click', () => {
-            console.log("Header clicked:", header.dataset.sort);
             const column = header.dataset.sort;
             const direction = currentSort.column === column && currentSort.direction === 'asc' ? 'desc' : 'asc';
             sortTable(column, direction);
@@ -274,15 +269,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function sortTable(column, direction) {
-        console.log("Sorting table:", column, direction);
         const tbody = table.querySelector('tbody');
         const rows = Array.from(tbody.querySelectorAll('tr.clickable-row'));
-        console.log("Rows to sort:", rows.length);
 
         rows.sort((a, b) => {
             const aValue = a.children[getColumnIndex(column)].textContent.trim();
             const bValue = b.children[getColumnIndex(column)].textContent.trim();
-            console.log("Comparing:", aValue, bValue);
             return direction === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
         });
 
@@ -313,8 +305,6 @@ document.addEventListener('DOMContentLoaded', function() {
         category: document.getElementById('category-filter'),
         owner: document.getElementById('owner-filter')
     };
-
-    console.log("Filters found:", Object.values(filters).filter(f => f !== null).length);
 
     Object.values(filters).forEach(filter => {
         if (filter) {
@@ -385,28 +375,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Row striping after filtering
     function reapplyRowStriping() {
-        const table = document.getElementById('tickets-table');
         const visibleRows = Array.from(table.querySelectorAll('tbody tr.clickable-row'))
             .filter(row => row.style.display !== 'none'); // Only count visible rows
     
         visibleRows.forEach((row, index) => {
             // Apply alternating row colors
-            if (index % 2 === 0) {
-                row.style.backgroundColor = '#e9ffe9'; // Light green
-            } else {
-                row.style.backgroundColor = '#f9f9f9'; // Light grey
-            }
+            row.style.backgroundColor = index % 2 === 0 ? '#e9ffe9' : '#f9f9f9'; // Light green or grey
         });
     }
 
     // Apply filters
     function applyFilters() {
-        const table = document.getElementById('tickets-table');
-        if (!table) {
-            console.error("Tickets table not found!");
-            return;
-        }
-    
         const rows = table.querySelectorAll('tbody tr.clickable-row');
         
         // Retrieve filter values
@@ -418,25 +397,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const assignedToFilter = filters.assignedTo.value;
     
         rows.forEach(row => {
-            const status = row.children[0].textContent.trim().toLowerCase();
-            const priority = row.children[1].textContent.trim().toLowerCase();
+            const status = row.dataset.status;
+            const priority = row.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
             const categoryType = row.dataset.category_type || '';
             const category = row.dataset.category || '';
             const assignedTo = row.dataset.assigned_to || '';
             const owner = row.dataset.owner || '';
-    
+
             const isStatusMatch = (statusFilter === 'all') || 
                                 (statusFilter === 'active' && status !== 'closed') ||
                                 (status === statusFilter);
     
             const isPriorityMatch = (priorityFilter === '') || (priority === priorityFilter);
-    
             const isCategoryTypeMatch = (categoryTypeFilter === '') || (categoryType === categoryTypeFilter);
-    
             const isCategoryMatch = (categoryFilter === '') || (category === categoryFilter);
-    
             const isOwnerMatch = (ownerFilter === '') || (owner === ownerFilter);
-    
             const isAssignedToMatch = (assignedToFilter === '') || (assignedTo === assignedToFilter);
     
             const showRow = isStatusMatch && 

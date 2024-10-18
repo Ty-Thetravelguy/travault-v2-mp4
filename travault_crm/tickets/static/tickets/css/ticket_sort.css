@@ -25,3 +25,17 @@
 #tickets-table th[data-sort] .sort-icon.desc {
     content: '▼';
 }
+
+/* CSS for alternating row colours */
+tr.even {
+    background-color: #e9ffe9; /* Light green */
+}
+
+tr.odd {
+    background-color: #f9f9f9; /* Light grey */
+}
+
+/* Optional: Highlight closed tickets */
+tr.ticket-closed {
+    background-color: #ffcccc; /* Light red for closed tickets */
+}

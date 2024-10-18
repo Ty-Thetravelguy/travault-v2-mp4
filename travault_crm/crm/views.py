@@ -125,7 +125,6 @@ def company_detail(request, pk, active_tab='details'):
         logger.debug("Company notes fetched successfully.")
     except CompanyNotes.DoesNotExist:
         company_notes = None
-        logger.warning(f"No company notes found for company pk={pk}.")
 
     # Fetch transaction fees associated with the company
     transaction_fees = company.transaction_fees.all()

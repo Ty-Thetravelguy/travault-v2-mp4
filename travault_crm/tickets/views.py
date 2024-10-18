@@ -191,6 +191,12 @@ def update_ticket_field(request, pk):
 
     valid_fields = ['owner', 'assigned_to', 'priority', 'status']
 
+    # Restrict editing if the ticket is closed and the user is not an admin
+    if ticket.status == 'closed' and request.user.user_type != 'admin':
+        messages.error(request, 'This ticket is closed and cannot be edited.')
+        return redirect('ticket_detail', pk=ticket.pk)
+
+
     if field not in valid_fields:
         return JsonResponse({'success': False, 'error': 'Invalid field'}, status=400)
 

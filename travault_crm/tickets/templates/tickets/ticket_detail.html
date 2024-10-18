@@ -44,7 +44,8 @@
                         <div class="row mb-2">
                             <div class="col-md-6">
                                 <strong>Priority:</strong>
-                                <select id="priority-select" class="form-select-sm">
+                                <select id="priority-select" class="form-select-sm" {% if ticket.status == 'closed' %}
+                                    disabled {% endif %}>
                                     {% for value, display in ticket.PRIORITY_CHOICES %}
                                     <option value="{{ value }}" {% if value == ticket.priority %}selected{% endif %}>
                                         {{ display }}
@@ -54,7 +55,8 @@
                             </div>
                             <div class="col-md-6">
                                 <strong>Status:</strong>
-                                <select id="status-select" class="form-select-sm">
+                                <select id="status-select" class="form-select-sm" {% if ticket.status == 'closed' %}
+                                    disabled {% endif %}>
                                     {% for status, display in ticket.STATUS_CHOICES %}
                                     <option value="{{ status }}" {% if status == ticket.status %}selected{% endif %}>
                                         {{ display }}
@@ -67,7 +69,8 @@
                         <div class="row mb-2">
                             <div class="col-md-6">
                                 <strong>Owner:</strong>
-                                <select id="owner-select" class="form-select-sm">
+                                <select id="owner-select" class="form-select-sm" {% if ticket.status == 'closed' %}
+                                    disabled {% endif %}>
                                     {% for user in agency_users %}
                                     <option value="{{ user.id }}" {% if user == ticket.owner %}selected{% endif %}>
                                         {{ user.get_full_name|default:user.username }}
@@ -77,7 +80,8 @@
                             </div>
                             <div class="col-md-6">
                                 <strong>Assigned:</strong>
-                                <select id="assigned_to-select" class="form-select-sm">
+                                <select id="assigned_to-select" class="form-select-sm"
+                                    {% if ticket.status == 'closed' %} disabled {% endif %}>
                                     <option value="">Not Assigned</option>
                                     {% for user in agency_users %}
                                     <option value="{{ user.id }}"

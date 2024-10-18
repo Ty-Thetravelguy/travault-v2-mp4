@@ -87,7 +87,11 @@ class Ticket(models.Model):
     def save(self, *args, **kwargs):
         if self.pk:  # If the ticket already exists
             original = Ticket.objects.get(pk=self.pk)
-            if original.status == 'closed' and self.status != 'closed' and not getattr(self, '_is_admin_override', False):
+            if (
+                original.status == 'closed' 
+                and self.status != 'closed' 
+                and not getattr(self, '_is_admin_override', False)
+            ):
                 raise ValidationError('Closed tickets cannot be reopened by non-admin users.')
         super(Ticket, self).save(*args, **kwargs)
 

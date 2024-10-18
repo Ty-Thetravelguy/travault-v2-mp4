@@ -15,13 +15,24 @@
                 <h1 class="display-4 roboto mb-0">Tickets</h1>
             </div>
             <div class="col-md-4 text-md-end">
-                <!-- Button to Create a Ticket Category (Admin/Manager only) -->
-                <a href="{% url 'tickets:manage_subjects' %}" class="btn btn-special btn-lg me-2">
+                <!-- Button to Manage Closed Tickets (Admin/Manager only) -->
+                <a href="{% url 'tickets:manage_closed_tickets' %}"
+                    class="btn btn-special btn-md me-2 {% if request.user.user_type != 'admin' %}disabled{% endif %}"
+                    data-bs-toggle="tooltip"
+                    title="{% if request.user.user_type != 'admin' %}Speak to an admin{% endif %}">
+                    <i class="fas fa-folder-open me-2"></i>Manage Closed Tickets
+                </a>
+
+                <!-- Button to Manage Ticket Subjects (Admin/Manager only) -->
+                <a href="{% url 'tickets:manage_subjects' %}"
+                    class="btn btn-special btn-md me-2 {% if request.user.user_type != 'admin' %}disabled{% endif %}"
+                    data-bs-toggle="tooltip"
+                    title="{% if request.user.user_type != 'admin' %}Speak to an admin{% endif %}">
                     <i class="fas fa-edit me-2"></i>Manage Subjects
                 </a>
 
                 <!-- Button to Open a New Ticket -->
-                <a href="{% url 'tickets:open_ticket' %}" class="btn btn-special btn-lg">
+                <a href="{% url 'tickets:open_ticket' %}" class="btn btn-special btn-md">
                     <i class="fas fa-ticket-alt me-2"></i>Open Ticket
                 </a>
             </div>

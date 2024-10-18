@@ -437,15 +437,28 @@ def view_email_in_browser(request, email_type, ticket_id):
     return send_ticket_email(request, ticket, email_type, additional_context=additional_context, preview=True)
 
 @login_required
-def reopen_ticket(request, ticket_id):
-    ticket = get_object_or_404(Ticket, id=ticket_id)
+def reopen_ticket(request, pk):
+    ticket = get_object_or_404(Ticket, pk=pk)
 
     # Only allow admins to reopen closed tickets
-    if request.user.user_type == 'admin':
+    if request.user.user_type == 'admin':  # Check if the user is an admin
         if ticket.status == 'closed':
-            ticket.admin_override_save()
+            ticket.status = 'open'  # Explicitly set the status to open
+            ticket.admin_override_save()  # Use the admin override save method to save the change
             messages.success(request, 'Ticket reopened successfully.')
+        else:
+            messages.error(request, 'Ticket is not closed, so it cannot be reopened.')
     else:
         messages.error(request, 'You do not have permission to reopen this ticket.')
 
-    return redirect('manage_closed_tickets')
+    return redirect('tickets:manage_closed_tickets')
+
+@login_required
+def manage_closed_tickets(request):
+    if request.user.user_type != 'admin':  # Updated this line
+        messages.error(request, "You do not have permission to access this page.")
+        return redirect('tickets:view_tickets')
+
+    closed_tickets = Ticket.objects.filter(status='closed', agency=request.user.agency)
+
+    return render(request, 'tickets/manage_closed_tickets.html', {'closed_tickets': closed_tickets})

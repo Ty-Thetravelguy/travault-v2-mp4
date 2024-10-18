@@ -2,27 +2,57 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="project-primary-color">Manage Closed Tickets</h1>
-    <table class="table table-striped mt-4">
-        <thead>
-            <tr>
-                <th>Ticket ID</th>
-                <th>Title</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for ticket in closed_tickets %}
-            <tr>
-                <td>{{ ticket.id }}</td>
-                <td>{{ ticket.title }}</td>
-                <td>
-                    <a href="{% url 'reopen_ticket' ticket.id %}" class="btn btn-success">Reopen</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+<section id="manage-closed-tickets" class="bg-gray-200 full-height-bg">
+    <div class="container top-padding roboto">
+        <div class="row justify-content-center py-5">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="card-title text-center mb-4">Manage Closed Tickets</h2>
+
+                        <!-- Closed Tickets Table -->
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Ticket ID</th>
+                                    <th>Title</th>
+                                    <th>Assigned To</th>
+                                    <th>Owner</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ticket in closed_tickets %}
+                                <tr>
+                                    <td>{{ ticket.pk }}</td>
+                                    <td>{{ ticket.subject }}</td>
+                                    <td>{{ ticket.assigned_to }}</td>
+                                    <td>{{ ticket.owner }}</td>
+                                    <td>
+                                        <a href="{% url 'tickets:reopen_ticket' ticket.pk %}"
+                                            class="btn btn-success btn-sm">
+                                            Reopen
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No closed tickets found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <!-- Back to All Tickets Button -->
+                        <div class="mt-3">
+                            <a href="{% url 'tickets:view_tickets' %}" class="btn btn-secondary">
+                                <i class="fas fa-list"></i> Back to All Tickets
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

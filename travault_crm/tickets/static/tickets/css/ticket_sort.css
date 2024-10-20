@@ -39,3 +39,30 @@ tr.odd {
 tr.ticket-closed {
     background-color: #ffcccc; /* Light red for closed tickets */
 }
+
+
+@media (max-width: 991px) {
+    .title-button-row {
+        flex-direction: column;
+    }
+    .button-col {
+        margin-top: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .button-col .btn {
+        margin: 0.25rem;
+    }
+}
+@media (max-width: 767px) {
+    .filter-row {
+        margin-bottom: 10px;
+    }
+    .filter-col {
+        margin-bottom: 10px;
+    }
+    .button-col .btn {
+        margin: 0.5rem;  /* Increased margin for better spacing on very small screens */
+    }
+}

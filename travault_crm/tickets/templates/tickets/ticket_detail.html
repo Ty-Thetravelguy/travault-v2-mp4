@@ -7,12 +7,12 @@
 <div class="container-fluid full-height-bg top-padding bg-gray-200">
     <div class="container mt-5 roboto">
         <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h1 class="project-primary-color mb-0">Ticket Details</h1>
-                    <div>
+            <div class="col-12 col-md-10 col-lg-8">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-3">
+                    <h1 class="project-primary-color mb-3 mb-md-0">Ticket Details</h1>
+                    <div class="d-flex flex-column flex-md-row gap-2">
                         <a href="{% url 'crm:company_detail_with_tab' pk=ticket.company.pk active_tab='activity' %}"
-                            class="btn btn-secondary me-2">
+                            class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Back to Company
                         </a>
                         <a href="{% url 'tickets:view_tickets' %}" class="btn btn-secondary">
@@ -23,29 +23,29 @@
                 <div class="card shadow">
                     <div class="card-body">
                         <div class="row mb-3">
-                            <div class="col-md-8">
+                            <div class="col-12 col-md-8">
                                 <h2>{{ ticket.subject }}</h2>
                             </div>
-                            <div class="col-md-4 text-md-end">
+                            <div class="col-12 col-md-4 text-md-end">
                                 <span class="text-muted">Ticket number: #{{ ticket.pk }}</span>
                             </div>
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-md-6">
+                            <div class="col-12 col-md-6">
                                 <strong>Company:</strong> {{ ticket.company.company_name }}
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-12 col-md-6">
                                 <strong>Company Contact:</strong> {{ ticket.contact.first_name }}
                                 {{ ticket.contact.last_name }}
                             </div>
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-md-6">
+                            <div class="col-12 col-md-6">
                                 <strong>Priority:</strong>
-                                <select id="priority-select" class="form-select-sm" {% if ticket.status == 'closed' %}
-                                    disabled {% endif %}>
+                                <select id="priority-select" class="form-select form-select-sm"
+                                    {% if ticket.status == 'closed' %} disabled {% endif %}>
                                     {% for value, display in ticket.PRIORITY_CHOICES %}
                                     <option value="{{ value }}" {% if value == ticket.priority %}selected{% endif %}>
                                         {{ display }}
@@ -53,10 +53,10 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-12 col-md-6">
                                 <strong>Status:</strong>
-                                <select id="status-select" class="form-select-sm" {% if ticket.status == 'closed' %}
-                                    disabled {% endif %}>
+                                <select id="status-select" class="form-select form-select-sm"
+                                    {% if ticket.status == 'closed' %} disabled {% endif %}>
                                     {% for status, display in ticket.STATUS_CHOICES %}
                                     <option value="{{ status }}" {% if status == ticket.status %}selected{% endif %}>
                                         {{ display }}
@@ -67,10 +67,10 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-md-6">
+                            <div class="col-12 col-md-6">
                                 <strong>Owner:</strong>
-                                <select id="owner-select" class="form-select-sm" {% if ticket.status == 'closed' %}
-                                    disabled {% endif %}>
+                                <select id="owner-select" class="form-select form-select-sm"
+                                    {% if ticket.status == 'closed' %} disabled {% endif %}>
                                     {% for user in agency_users %}
                                     <option value="{{ user.id }}" {% if user == ticket.owner %}selected{% endif %}>
                                         {{ user.get_full_name|default:user.username }}
@@ -78,9 +78,9 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-12 col-md-6">
                                 <strong>Assigned:</strong>
-                                <select id="assigned_to-select" class="form-select-sm"
+                                <select id="assigned_to-select" class="form-select form-select-sm"
                                     {% if ticket.status == 'closed' %} disabled {% endif %}>
                                     <option value="">Not Assigned</option>
                                     {% for user in agency_users %}
@@ -94,10 +94,10 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-md-6">
+                            <div class="col-12 col-md-6">
                                 <strong>Category Type:</strong> {{ ticket.get_category_type_display }}
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-12 col-md-6">
                                 <strong>Category:</strong>
                                 {% if ticket.category_type == 'client' %}
                                 {% for value, display in ticket.CATEGORY_CHOICES_CLIENT %}
@@ -114,17 +114,16 @@
                         </div>
 
                         <div class="row mb-2">
-                            <div class="col-md-6">
+                            <div class="col-12 col-md-6">
                                 <strong>Created:</strong> {{ ticket.created_at }}
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-12 col-md-6">
                                 <strong>Last Updated:</strong> {{ ticket.updated_at }}
                             </div>
                         </div>
 
-
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-12">
                                 <h4>Description:</h4>
                                 <div>{{ ticket.description|linebreaks }}</div>
                             </div>
@@ -132,9 +131,10 @@
 
                         <!-- Actions Section -->
                         <div class="row mt-4">
-                            <div class="col-md-12">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h4 class="mb-0">Actions</h4>
+                            <div class="col-12">
+                                <div
+                                    class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-3">
+                                    <h4 class="mb-3 mb-md-0">Actions</h4>
                                     <div class="d-flex gap-2">
                                         {% if ticket.status != "closed" %}
                                         <button type="button" class="btn btn-green" data-bs-toggle="modal"
@@ -170,9 +170,11 @@
                                 <!-- User-added action -->
                                 <div class="card mb-3 border-left-accent">
                                     <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <h5 class="card-title mb-0">{{ action.get_action_type_display }}</h5>
-                                            <div>
+                                        <div
+                                            class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2">
+                                            <h5 class="card-title mb-2 mb-md-0">{{ action.get_action_type_display }}
+                                            </h5>
+                                            <div class="d-flex gap-2">
                                                 {% if ticket.status != "closed" %}
                                                 <button type="button" class="btn btn-green-sm" data-bs-toggle="modal"
                                                     data-bs-target="#editActionModal{{ action.id }}">
@@ -192,7 +194,8 @@
                                             </div>
                                         </div>
                                         <p class="card-text">{{ action.details|linebreaks }}</p>
-                                        <div class="d-flex justify-content-between align-items-center text-muted">
+                                        <div
+                                            class="d-flex flex-column flex-md-row justify-content-between align-items-center text-muted">
                                             <small>
                                                 Created by: {{ action.created_by.get_full_name|default:'System' }}
                                                 {% if action.updated_by %}
@@ -216,18 +219,18 @@
                             </div>
                         </div>
 
-
-                        <div class="mt-3 d-flex justify-content-between">
-                            <div>
+                        <div
+                            class="mt-3 d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                            <div class="d-flex flex-column flex-md-row gap-2">
                                 <a href="{% url 'crm:company_detail_with_tab' pk=ticket.company.pk active_tab='tickets' %}"
-                                    class="btn btn-secondary me-2">
+                                    class="btn btn-secondary">
                                     <i class="fas fa-arrow-left"></i> Back to Company
                                 </a>
                                 <a href="{% url 'tickets:view_tickets' %}" class="btn btn-secondary">
                                     <i class="fas fa-list"></i> Back to All Tickets
                                 </a>
                             </div>
-                            <div>
+                            <div class="d-flex flex-column flex-md-row gap-2">
                                 {% if ticket.status != "closed" %}
                                 <a href="{% url 'tickets:edit_ticket' pk=ticket.pk %}" class="btn btn-green-inverse">
                                     <i class="fas fa-edit"></i> Full Edit

@@ -5274,3 +5274,19 @@ Traceback (most recent call last):
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 TypeError: BaseModelForm.__init__() got an unexpected keyword argument 'agency'
 ERROR 2024-10-20 09:00:10,536 basehttp "GET /tickets/10/edit/ HTTP/1.1" 500 86805
+ERROR 2024-10-20 09:46:34,929 log Internal Server Error: /agent_support/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/agent_support/views.py", line 33, in agent_support
+    supplier_types = AgentSupportSupplier.SUPPLIER_TYPE
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: type object 'AgentSupportSupplier' has no attribute 'SUPPLIER_TYPE'. Did you mean: 'SUPPLIER_TYPES'?
+ERROR 2024-10-20 09:46:34,931 basehttp "GET /agent_support/ HTTP/1.1" 500 87118

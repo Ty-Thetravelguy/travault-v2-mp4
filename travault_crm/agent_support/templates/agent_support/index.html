@@ -23,7 +23,7 @@
                 <select id="supplierTypeFilter" class="form-select">
                     <option value="">All Supplier Types</option>
                     {% for type, type_display in supplier_types %}
-                    <option value="{{ type }}">{{ type_display }}</option>
+                    <option value="{{ type|lower }}">{{ type_display }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -210,4 +210,8 @@
     </div>
 </div>
 
+
+{% endblock %}
+{% block postload_js %}
+<script src="{% static 'agent_support/js/agent_support_script.js' %}"></script>
 {% endblock %}

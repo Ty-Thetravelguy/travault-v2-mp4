@@ -32,8 +32,13 @@ def agent_support(request):
     suppliers = AgentSupportSupplier.objects.filter(agency=agency).select_related('agency')
     logger.debug(f"Fetched {suppliers.count()} suppliers for agency '{agency.name}'.")
 
+    supplier_types = AgentSupportSupplier.SUPPLIER_TYPES
+
     logger.info(f"agent_support completed in {time.time() - start_time:.2f} seconds.")
-    return render(request, 'agent_support/index.html', {'suppliers': suppliers})
+    return render(request, 'agent_support/index.html', {
+        'suppliers': suppliers,
+        'supplier_types': supplier_types  # Add this line
+    })
 
 
 @login_required

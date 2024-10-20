@@ -123,7 +123,7 @@ def open_ticket(request, company_id=None):
         company = None
     
     if request.method == 'POST':
-        form = TicketForm(request.POST, agency=request.user.agency)
+        form = TicketForm(data=request.POST, agency=request.user.agency)
         if form.is_valid():
             ticket = form.save(commit=False)
             ticket.company = form.cleaned_data['company']  # Get company from form
@@ -294,7 +294,7 @@ def edit_ticket(request, pk):
         return redirect('ticket_detail', pk=ticket.pk)
     
     if request.method == 'POST':
-        form = TicketForm(request.POST, instance=ticket, agency=request.user.agency)
+        form = TicketForm(data=request.POST, instance=ticket, agency=request.user.agency)
 
         # Prevent editing of specific fields if the ticket is closed
         if ticket.status == 'closed':

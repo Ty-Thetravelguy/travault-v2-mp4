@@ -5210,3 +5210,67 @@ Traceback (most recent call last):
     raise NoReverseMatch(msg)
 django.urls.exceptions.NoReverseMatch: Reverse for 'company_detail_with_tab' with keyword arguments '{'pk': '', 'active_tab': 'activity'}' not found. 1 pattern(s) tried: ['crm/company/(?P<pk>[0-9]+)/(?P<active_tab>[^/]+)/\\Z']
 ERROR 2024-10-18 07:00:42,759 basehttp "GET /tickets/open/ HTTP/1.1" 500 191264
+ERROR 2024-10-20 08:53:29,993 log Internal Server Error: /tickets/open/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/tickets/views.py", line 140, in open_ticket
+    form = TicketForm(initial={'company': company}, agency=request.user.agency)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: BaseModelForm.__init__() got an unexpected keyword argument 'agency'
+ERROR 2024-10-20 08:53:29,994 basehttp "GET /tickets/open/ HTTP/1.1" 500 86737
+ERROR 2024-10-20 08:53:54,231 log Internal Server Error: /tickets/10/edit/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/tickets/views.py", line 314, in edit_ticket
+    form = TicketForm(instance=ticket, agency=request.user.agency)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: BaseModelForm.__init__() got an unexpected keyword argument 'agency'
+ERROR 2024-10-20 08:53:54,231 basehttp "GET /tickets/10/edit/ HTTP/1.1" 500 86540
+ERROR 2024-10-20 08:57:49,570 log Internal Server Error: /tickets/10/edit/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/tickets/views.py", line 314, in edit_ticket
+    form = TicketForm(instance=ticket, agency=request.user.agency)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: BaseModelForm.__init__() got an unexpected keyword argument 'agency'
+ERROR 2024-10-20 08:57:49,572 basehttp "GET /tickets/10/edit/ HTTP/1.1" 500 86540
+ERROR 2024-10-20 09:00:10,535 log Internal Server Error: /tickets/10/edit/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/tickets/views.py", line 314, in edit_ticket
+    form = TicketForm(instance=ticket, agency=request.user.agency)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: BaseModelForm.__init__() got an unexpected keyword argument 'agency'
+ERROR 2024-10-20 09:00:10,536 basehttp "GET /tickets/10/edit/ HTTP/1.1" 500 86805

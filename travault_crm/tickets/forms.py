@@ -2,7 +2,6 @@ from django import forms
 from .models import Ticket, TicketSubject
 from agencies.models import CustomUser
 
-
 class TicketForm(forms.ModelForm):
     subject = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'autocomplete': 'off'}))
 
@@ -37,17 +36,18 @@ class TicketForm(forms.ModelForm):
         model = Ticket
         fields = ['company', 'contact', 'priority', 'subject', 'description', 'category_type', 'category', 'assigned_to']
 
+    # Indent the __init__ method inside the class
     def __init__(self, *args, **kwargs):
         self.agency = kwargs.pop('agency', None)
-        super(TicketForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         
-        # Determine the category_type and set choices
-        if self.instance and self.instance.pk:
-            # Editing an existing ticket
+        # Get category_type from self.data first, then instance, then initial
+        if 'category_type' in self.data:
+            category_type = self.data.get('category_type')
+        elif self.instance and self.instance.pk:
             category_type = self.instance.category_type
         else:
-            # Creating a new ticket or handling form submission
-            category_type = self.data.get('category_type') or self.initial.get('category_type')
+            category_type = self.initial.get('category_type')
 
         if category_type == 'client':
             self.fields['category'].choices = self.CATEGORY_CHOICES_CLIENT
@@ -74,6 +74,7 @@ class TicketForm(forms.ModelForm):
         else:
             self.fields['category'].widget.attrs['disabled'] = 'disabled'
 
+    # Indent the clean_category method inside the class
     def clean_category(self):
         category = self.cleaned_data.get('category')
         category_type = self.cleaned_data.get('category_type')
@@ -86,6 +87,7 @@ class TicketForm(forms.ModelForm):
         
         return category
 
+    # Indent the clean_subject method inside the class
     def clean_subject(self):
         subject_text = self.cleaned_data['subject']
         subject, _ = TicketSubject.objects.get_or_create(subject=subject_text)

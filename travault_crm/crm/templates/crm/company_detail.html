@@ -6,67 +6,70 @@
 {% block content %}
 <div class="container-fluid full-height-bg top-padding bg-gray-200">
     <div class="container mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="project-primary-color mb-0 display-5">{{ company.company_name }}</h1>
+        <div class="row d-flex justify-content-between align-items-center mb-4">
+            <div class="col-md-6">
+                <h1 class="project-primary-color mb-0 display-5">{{ company.company_name }}</h1>
+            </div>
+            <div class="col-md-6">
 
-            <!-- Button container: Flexbox for proper alignment -->
-            <div class="d-flex align-items-center">
-                <!-- Go Back Button -->
-                <a href="{% url 'crm:index' %}" class="btn btn-green me-2">
-                    <i class="fas fa-arrow-left"></i> Go Back
-                </a>
+                <!-- Button container: Flexbox for proper alignment -->
+                <div class="d-flex justify-content-end align-items-center">
+                    <!-- Go Back Button -->
+                    <a href="{% url 'crm:index' %}" class="btn btn-green me-2">
+                        <i class="fas fa-arrow-left"></i> Go Back
+                    </a>
 
-                <!-- Dropdown Button -->
-                <div class="dropdown">
-                    <button type="button" class="btn btn-green-inverse dropdown-toggle" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Actions
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <a class="dropdown-item" href="{% url 'crm:add_contact' pk=company.pk %}">
-                                <i class="fas fa-plus me-2"></i> Add Contact
-                            </a>
-                        </li>
-                        <li>
-                            {% if company_notes %}
-                            <a class="dropdown-item" href="{% url 'crm:edit_company_notes' pk=company.pk %}">
-                                <i class="fas fa-edit me-2"></i> Edit Company Notes
-                            </a>
-                            {% else %}
-                            <a class="dropdown-item" href="{% url 'crm:add_company_notes' pk=company.pk %}">
-                                <i class="fas fa-plus me-2"></i> Add Company Notes
-                            </a>
-                            {% endif %}
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{% url 'activity_log:log_call' pk=company.pk %}">
-                                <i class="fas fa-phone me-2"></i> Log a call
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{% url 'activity_log:log_email' pk=company.pk %}">
-                                <i class="fas fa-envelope me-2"></i> Log an email
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{% url 'activity_log:log_meeting' pk=company.pk %}">
-                                <i class="fas fa-users me-2"></i> Log a meeting
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{% url 'tickets:open_ticket' company.pk %}">
-                                <i class="fas fa-ticket-alt me-2"></i> Log a Ticket
-                            </a>
-                        </li>
-                    </ul>
+                    <!-- Dropdown Button -->
+                    <div class="dropdown">
+                        <button type="button" class="btn btn-green-inverse dropdown-toggle" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Actions
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'crm:add_contact' pk=company.pk %}">
+                                    <i class="fas fa-plus me-2"></i> Add Contact
+                                </a>
+                            </li>
+                            <li>
+                                {% if company_notes %}
+                                <a class="dropdown-item" href="{% url 'crm:edit_company_notes' pk=company.pk %}">
+                                    <i class="fas fa-edit me-2"></i> Edit Company Notes
+                                </a>
+                                {% else %}
+                                <a class="dropdown-item" href="{% url 'crm:add_company_notes' pk=company.pk %}">
+                                    <i class="fas fa-plus me-2"></i> Add Company Notes
+                                </a>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'activity_log:log_call' pk=company.pk %}">
+                                    <i class="fas fa-phone me-2"></i> Log a call
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'activity_log:log_email' pk=company.pk %}">
+                                    <i class="fas fa-envelope me-2"></i> Log an email
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'activity_log:log_meeting' pk=company.pk %}">
+                                    <i class="fas fa-users me-2"></i> Log a meeting
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'tickets:open_ticket' company.pk %}">
+                                    <i class="fas fa-ticket-alt me-2"></i> Log a Ticket
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
-
         <ul class="nav nav-tabs" id="companyTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <a class="nav-link {% if active_tab == 'details' %}active{% endif %}" id="details-tab"

@@ -124,6 +124,10 @@ def open_ticket(request, company_id=None):
     
     if request.method == 'POST':
         form = TicketForm(data=request.POST, agency=request.user.agency)
+        if 'company' in request.POST and not form.is_valid():
+            # If only company was changed, re-render the form
+            company = form.cleaned_data.get('company') or company
+            return render(request, 'tickets/open_ticket.html', {'form': form, 'company': company})
         if form.is_valid():
             ticket = form.save(commit=False)
             ticket.company = form.cleaned_data['company']  # Get company from form

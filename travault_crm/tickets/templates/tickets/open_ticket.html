@@ -95,5 +95,18 @@
 {% endblock %}
 
 {% block postload_js %}
+{{ block.super }}
+
 <script src="{% static 'tickets/js/ticket_js.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const companySelect = document.getElementById('{{ form.company.id_for_label }}');
+        const form = document.getElementById('logTicketForm');
+
+        companySelect.addEventListener('change', function () {
+            // Submit the form when company changes
+            form.submit();
+        });
+    });
+</script>
 {% endblock %}

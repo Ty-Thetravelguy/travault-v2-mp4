@@ -1,6 +1,8 @@
 from django import forms
 from .models import Ticket, TicketSubject
 from agencies.models import CustomUser
+from crm.models import Company, Contact
+
 
 class TicketForm(forms.ModelForm):
     subject = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'autocomplete': 'off'}))
@@ -31,6 +33,18 @@ class TicketForm(forms.ModelForm):
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+
+    company = forms.ModelChoiceField(
+        queryset=Company.objects.none(),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        required=True
+    )
+
+    contact = forms.ModelChoiceField(
+        queryset=Contact.objects.none(),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        required=False
+    )
     
     class Meta:
         model = Ticket
@@ -40,6 +54,21 @@ class TicketForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.agency = kwargs.pop('agency', None)
         super().__init__(*args, **kwargs)
+    
+        if self.agency:
+            self.fields['company'].queryset = Company.objects.filter(agency=self.agency)
+            self.fields['assigned_to'].queryset = CustomUser.objects.filter(agency=self.agency)
+
+        # If company is provided initially or in POST data, filter contacts
+        company_id = self.initial.get('company') or self.data.get('company')
+        if company_id:
+            try:
+                company_id = int(company_id)
+                self.fields['contact'].queryset = Contact.objects.filter(company_id=company_id)
+            except (ValueError, TypeError):
+                self.fields['contact'].queryset = Contact.objects.none()
+        else:
+            self.fields['contact'].queryset = Contact.objects.none()
         
         # Get category_type from self.data first, then instance, then initial
         if 'category_type' in self.data:

@@ -60,7 +60,58 @@
                                 </form>
                             </div>
                             <div class="tab-pane fade" id="billing" role="tabpanel" aria-labelledby="billing-tab">
-                                <p>Billing information will be available here.</p>
+                                <div class="billing-info mb-4">
+                                    <h4>Subscription Details</h4>
+                                    <p>Current number of users: {{ agency.users.count }}</p>
+                                    <p>Monthly charge per user: £9.00</p>
+                                    <p>Total monthly charge: £{{ total_monthly_charge }}</p>
+                                </div>
+
+                                <div class="payment-method mb-4">
+                                    <h4>Payment Method</h4>
+                                    {% if stripe_payment_method %}
+                                    <div class="card-info">
+                                        <p>Card ending in {{ stripe_payment_method.last4 }}</p>
+                                        <p>Expires:
+                                            {{ stripe_payment_method.exp_month }}/{{ stripe_payment_method.exp_year }}
+                                        </p>
+                                    </div>
+                                    <button class="btn btn-primary" id="update-payment-method">Update Payment
+                                        Method</button>
+                                    {% else %}
+                                    <p>No payment method on file</p>
+                                    <button class="btn btn-primary" id="add-payment-method">Add Payment Method</button>
+                                    {% endif %}
+                                </div>
+
+                                <div class="invoices">
+                                    <h4>Recent Invoices</h4>
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for invoice in invoices %}
+                                            <tr>
+                                                <td>{{ invoice.created_at|date:"M d, Y" }}</td>
+                                                <td>£{{ invoice.amount }}</td>
+                                                <td>{{ invoice.status }}</td>
+                                                <td>
+                                                    <a href="{{ invoice.invoice_pdf }}" target="_blank"
+                                                        class="btn btn-sm btn-secondary">
+                                                        Download PDF
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
 

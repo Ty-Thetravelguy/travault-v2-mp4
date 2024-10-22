@@ -56,14 +56,12 @@ class AgencyRegistrationView(SignupView):
         try:
             logger.debug("Form validation successful. About to save the form.")
             user = form.save(self.request)
-            
+
             messages.success(self.request, "Registration successful! Please check your email for verification.")
-            return complete_signup(
-                self.request,
-                user,
-                app_settings.EMAIL_VERIFICATION,
-                self.get_success_url()
-            )
+            
+            # Redirect to payment setup after successful registration
+            return redirect('billing:setup_payment')
+            
         except Exception as e:
             logger.error(f"Error during agency registration: {str(e)}", exc_info=True)
             messages.error(self.request, "An error occurred during registration. Please try again.")

@@ -63,7 +63,7 @@
                         <td>{{ company.last_activity_date|date:"d/m/Y" }}</td>
                         <td>{{ company.phone_number }}</td>
                         <td>{{ company.ops_team }}</td>
-                        <td>{{ company.industry }}</td>
+                        <td>{{ company.get_industry_display }}</td>
                         <td>{{ company.company_type }}</td>
                     </tr>
                     {% empty %}

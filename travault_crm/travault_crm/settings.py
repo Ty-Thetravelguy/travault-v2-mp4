@@ -7,6 +7,12 @@ from storages.backends.s3boto3 import S3Boto3Storage
 # Initialise environment variables
 load_dotenv()
 
+# Stripe settings
+STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
+STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
+STRIPE_PRICE_ID = os.getenv('STRIPE_PRICE_ID')
+
 # Access variables
 DIFFBOT_API_KEY = os.getenv('DIFFBOT_API_KEY')
 
@@ -58,6 +64,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 INSTALLED_APPS = [
     'agencies', 
+    'billing', 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

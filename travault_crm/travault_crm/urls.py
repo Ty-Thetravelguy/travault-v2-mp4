@@ -10,6 +10,7 @@ urlpatterns = [
     path('', include('home.urls')),
     path('agencies/', include(('agencies.urls', 'agencies'), namespace='agencies')), 
     path('accounts/', include('allauth.urls')),  # Allauth URLs included
+    path('billing/', include('billing.urls')),
     path('dashboard/', include('dashboard.urls', namespace='dashboard')),
     path('agent_support/', include(('agent_support.urls', 'agent_support'), namespace='agent_support')),  
     path('crm/', include(('crm.urls', 'crm'), namespace='crm')),

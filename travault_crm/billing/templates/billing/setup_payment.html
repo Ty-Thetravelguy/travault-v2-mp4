@@ -1,0 +1,53 @@
+{# billing/templates/billing/setup_payment.html #}
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Set Up Payment</h2>
+                    <form id="payment-form">
+                        <div id="payment-element"></div>
+                        <button id="submit" class="btn btn-primary w-100 mt-4">
+                            <span id="button-text">Set up subscription</span>
+                            <span id="spinner" class="hidden">Processing...</span>
+                        </button>
+                        <div id="payment-message" class="hidden"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    const stripe = Stripe('{{ STRIPE_PUBLIC_KEY }}');
+    const elements = stripe.elements();
+    const paymentElement = elements.create('payment');
+    paymentElement.mount('#payment-element');
+
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const {
+            error
+        } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                return_url: "{% url 'agencies:agency_profile' %}",
+            },
+        });
+
+        if (error) {
+            const messageDiv = document.getElementById('payment-message');
+            messageDiv.textContent = error.message;
+            messageDiv.classList.remove('hidden');
+        }
+    });
+</script>
+{% endblock %}

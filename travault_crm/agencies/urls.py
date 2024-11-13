@@ -3,6 +3,8 @@ from django.urls import path, include
 from .views import confirm_email_and_setup_password
 from . import views
 
+app_name = 'agencies'
+
 urlpatterns = [
     path('register/', views.AgencyRegistrationView.as_view(), name='agency_register'),
     path('login/', views.CustomLoginView.as_view(), name='account_login'), 

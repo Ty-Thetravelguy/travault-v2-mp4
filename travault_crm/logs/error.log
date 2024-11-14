@@ -6884,3 +6884,19 @@ Traceback (most recent call last):
     raise NoReverseMatch(msg)
 django.urls.exceptions.NoReverseMatch: Reverse for 'agency_register' not found. 'agency_register' is not a valid view function or pattern name.
 ERROR 2024-11-13 19:25:30,640 basehttp "GET /agencies/login/ HTTP/1.1" 500 175357
+ERROR 2024-11-14 07:07:38,515 log Internal Server Error: /agent_support/edit_agent_supplier/2/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/agent_support/views.py", line 112, in edit_agent_supplier
+    logger.debug(f"Fetched supplier '{supplier.name}' for editing in agency '{agency.name}'.")
+                                      ^^^^^^^^^^^^^
+AttributeError: 'AgentSupportSupplier' object has no attribute 'name'
+ERROR 2024-11-14 07:07:38,516 basehttp "GET /agent_support/edit_agent_supplier/2/ HTTP/1.1" 500 88830

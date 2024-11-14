@@ -109,14 +109,14 @@ def edit_agent_supplier(request, pk):
     # Fetch the current user's agency and the supplier to be edited
     agency = request.user.agency
     supplier = get_object_or_404(AgentSupportSupplier, pk=pk, agency=agency)
-    logger.debug(f"Fetched supplier '{supplier.name}' for editing in agency '{agency.name}'.")
+    logger.debug(f"Fetched supplier '{supplier.supplier_name}' for editing in agency '{agency.name}'.")
 
     # Handle form submission for updating the supplier
     if request.method == 'POST':
         form = AgentSupportSupplierForm(request.POST, request.FILES, instance=supplier)
         if form.is_valid():
             supplier = form.save()
-            logger.info(f"Agent supplier '{supplier.name}' updated successfully.")
+            logger.info(f"Agent supplier '{supplier.supplier_name}' updated successfully.")
             messages.success(request, "Agent supplier updated successfully.")
             return redirect('agent_support:agent_support')
         else:

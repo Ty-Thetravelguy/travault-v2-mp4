@@ -50,7 +50,6 @@ class TicketForm(forms.ModelForm):
         model = Ticket
         fields = ['company', 'contact', 'priority', 'subject', 'description', 'category_type', 'category', 'assigned_to']
 
-    # Indent the __init__ method inside the class
     def __init__(self, *args, **kwargs):
         self.agency = kwargs.pop('agency', None)
         super().__init__(*args, **kwargs)
@@ -59,11 +58,19 @@ class TicketForm(forms.ModelForm):
             self.fields['company'].queryset = Company.objects.filter(agency=self.agency)
             self.fields['assigned_to'].queryset = CustomUser.objects.filter(agency=self.agency)
 
-        # If company is provided initially or in POST data, filter contacts
-        company_id = self.initial.get('company') or self.data.get('company')
+        # Get company_id from either initial data or POST data
+        company_id = None
+        if 'company' in self.data:
+            try:
+                company_id = int(self.data['company'])
+            except (ValueError, TypeError):
+                pass
+        elif self.initial.get('company'):
+            company_id = self.initial.get('company')
+
+        # Filter contacts based on company_id
         if company_id:
             try:
-                company_id = int(company_id)
                 self.fields['contact'].queryset = Contact.objects.filter(company_id=company_id)
             except (ValueError, TypeError):
                 self.fields['contact'].queryset = Contact.objects.none()

@@ -119,9 +119,11 @@ def delete_subject(request, subject_id):
 def open_ticket(request, company_id=None):
     if company_id:
         company = get_object_or_404(Company, id=company_id)
+        initial_data = {'company': company.id}
     else:
         company = None
-    
+        initial_data = {}
+
     if request.method == 'POST':
         form = TicketForm(data=request.POST, agency=request.user.agency)
         if 'company' in request.POST and not form.is_valid():

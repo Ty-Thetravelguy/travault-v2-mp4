@@ -359,7 +359,10 @@ def add_ticket_action(request, pk):
             ticket.save()
 
         # Send action added email
-        additional_context = {'action': action}
+        additional_context = {
+            'action': action,
+            'email_type': 'action_added'  # Add this line
+        }
         send_ticket_email(request, ticket, 'action_added', additional_context)
     else:
         messages.error(request, "Invalid data. Please provide action type and details.")
@@ -412,35 +415,56 @@ def delete_ticket_action(request, action_id):
 
 @login_required
 def view_email_in_browser(request, email_type, ticket_id):
-    ticket = get_object_or_404(Ticket, pk=ticket_id)
+    # Ensure user has access to this ticket
+    ticket = get_object_or_404(Ticket, pk=ticket_id, agency=request.user.agency)
+    
+    # Validate email type
+    valid_email_types = ['created', 'updated', 'action_added']
+    if email_type not in valid_email_types:
+        messages.error(request, "Invalid email type.")
+        return redirect('tickets:ticket_detail', pk=ticket_id)
 
-    additional_context = {}
+    additional_context = {
+        'email_type': email_type,
+        'is_preview': True
+    }
 
     if email_type == 'created':
-        # No additional context required
+        # For created emails, we just need the ticket details which are already available
         pass
 
     elif email_type == 'updated':
-        # Retrieve the latest update action
-        latest_action = ticket.actions.filter(action_type='update').order_by('-created_at').first()
-        if latest_action:
-            additional_context['update_message'] = latest_action.details
+        # For updated emails, get the latest update action
+        latest_update = ticket.actions.filter(
+            action_type='update',
+            is_system_generated=True
+        ).order_by('-created_at').first()
+        
+        if latest_update:
+            additional_context['update_message'] = latest_update.details
         else:
             additional_context['update_message'] = 'No update details available.'
 
     elif email_type == 'action_added':
-        # Retrieve the latest action added
-        action = ticket.actions.filter(action_type='action_taken').order_by('-created_at').first()
-        if action:
-            additional_context['action'] = action
+        # For action added emails, get the latest non-system-generated action
+        latest_action = ticket.actions.filter(
+            is_system_generated=False
+        ).order_by('-created_at').first()
+        
+        if latest_action:
+            additional_context['action'] = latest_action
         else:
             messages.error(request, "No action available for this ticket.")
             return redirect('tickets:ticket_detail', pk=ticket_id)
-    else:
-        messages.error(request, "Invalid email type.")
-        return redirect('tickets:ticket_detail', pk=ticket_id)
 
-    return send_ticket_email(request, ticket, email_type, additional_context=additional_context, preview=True)
+    # Generate the email preview
+    return send_ticket_email(
+        request=request,
+        ticket=ticket,
+        email_type=email_type,
+        additional_context=additional_context,
+        preview=True
+    )
 
 @login_required
 def reopen_ticket(request, pk):

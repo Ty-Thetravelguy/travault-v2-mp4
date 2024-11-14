@@ -29,11 +29,11 @@
     <div class="container">
         <h1>New Action Added to Ticket #{{ ticket.pk }}</h1>
         {% if action %}
-            <p><strong>Action Type:</strong> {{ action.get_action_type_display }}</p>
-            <p><strong>Details:</strong> {{ action.details }}</p>
-            <p><strong>Added by:</strong> {{ action.created_by.get_full_name }}</p>
+        <p><strong>Action Type:</strong> {{ action.get_action_type_display }}</p>
+        <p><strong>Details:</strong> {{ action.details }}</p>
+        <p><strong>Added by:</strong> {{ action.created_by.get_full_name }}</p>
         {% else %}
-            <p>No action details available.</p>
+        <p>No action details available.</p>
         {% endif %}
         <p>Please log in to the system to view the full details.</p>
         <p><a href="{{ ticket_url }}">View Ticket</a></p>

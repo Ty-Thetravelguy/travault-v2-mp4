@@ -35,6 +35,7 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import SetPasswordForm
 from django.db import transaction
+from billing.models import StripeCustomer
 
 
 
@@ -48,30 +49,65 @@ class AgencyRegistrationView(SignupView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs.pop('instance', None)  # Remove 'instance' if it's present
+        kwargs.pop('instance', None)  # Ensure no unintended 'instance' is passed
         return kwargs
 
     @transaction.atomic
     def form_valid(self, form):
         try:
-            logger.debug("Form validation successful. About to save the form.")
+            # Create user and agency in one transaction
+            logger.debug("Form validation successful. Starting user and agency creation.")
             user = form.save(self.request)
-
-            messages.success(self.request, "Registration successful! Please check your email for verification.")
             
-            # Redirect to payment setup after successful registration
-            return redirect('billing:setup_payment')
+            if not user.agency:
+                logger.error(f"Agency not created for user {user.email}")
+                messages.error(self.request, "Failed to create agency. Please try again.")
+                return self.form_invalid(form)
+            
+            # Set user as admin
+            user.user_type = 'admin'
+            user.save()
+            
+            logger.info(f"Successfully created agency {user.agency.agency_name} with admin user {user.email}")
+            messages.success(self.request, "Registration successful! Please verify your email.")
+            
+            # Send verification email
+            try:
+                send_email_confirmation(self.request, user)
+                logger.info(f"Verification email sent to {user.email}")
+            except Exception as email_error:
+                logger.error(f"Failed to send verification email: {str(email_error)}")
+                # Continue with registration even if email fails
+                
+            return super().form_valid(form)
             
         except Exception as e:
-            logger.error(f"Error during agency registration: {str(e)}", exc_info=True)
+            logger.error(f"Error during registration: {str(e)}", exc_info=True)
             messages.error(self.request, "An error occurred during registration. Please try again.")
             return self.form_invalid(form)
 
     def get_context_data(self, **kwargs):
-        ret = super().get_context_data(**kwargs)
-        ret.update(self.kwargs)
-        return ret
+        try:
+            ret = super().get_context_data(**kwargs)
+            ret.update(self.kwargs)
+            
+            # Add any additional context needed for the template
+            ret['page_title'] = 'Agency Registration'
+            ret['form_title'] = 'Register Your Agency'
+            
+            return ret
+            
+        except Exception as e:
+            logger.error(f"Error getting context data: {str(e)}", exc_info=True)
+            return super().get_context_data(**kwargs)
 
+    def get_success_url(self):
+        try:
+            # You can customize the success URL based on conditions
+            return str(self.success_url)
+        except Exception as e:
+            logger.error(f"Error getting success URL: {str(e)}", exc_info=True)
+            return str(reverse_lazy('account_email_verification_sent'))
 
 
 class CustomLoginView(LoginView):
@@ -163,21 +199,11 @@ def profile_view(request):
     return render(request, 'users/profile.html', {'form': form})
 
 
-@login_required
 def agency_profile_view(request):
     """
     View to display and update the agency profile.
 
-    This view allows admins to view and update the agency's profile information.
-    It handles both GET requests for displaying current profile details and POST
-    requests for updating the profile. Only admins have access to this view.
-
-    Args:
-        request (HttpRequest): The incoming HTTP request from the client.
-
-    Returns:
-        HttpResponse: Renders the agency_profile template with the profile form,
-        or redirects to the agency profile view on successful update.
+    Allows admins to view and update the agency's profile.
     """
     logger.info("Entering agency_profile_view.")
     start_time = time.time()
@@ -191,7 +217,16 @@ def agency_profile_view(request):
     agency = request.user.agency
     logger.debug(f"Fetched agency: {agency.name} for profile update.")
 
-    # Handle form submission for updating agency profile
+    # Fetch the number of users and calculate total monthly charge
+    user_count = CustomUser.objects.filter(agency=agency).count()
+    total_monthly_charge = user_count * 9  # £9 per user
+
+    try:
+        stripe_customer = StripeCustomer.objects.get(agency=agency)
+        payment_method_message = "Payment method on file."
+    except StripeCustomer.DoesNotExist:
+        payment_method_message = "No payment method on file."
+
     if request.method == 'POST':
         form = AgencyProfileForm(request.POST, instance=agency)
         if form.is_valid():
@@ -202,14 +237,18 @@ def agency_profile_view(request):
         else:
             logger.error(f"Form validation errors: {form.errors}")
             messages.error(request, "Please correct the errors below.")
-
-    # Initialize the form for GET requests
     else:
         form = AgencyProfileForm(instance=agency)
         logger.debug("Initialized form for agency profile update.")
 
     logger.info(f"agency_profile_view completed in {time.time() - start_time:.2f} seconds.")
-    return render(request, 'agencies/agency_profile.html', {'form': form})
+    return render(request, 'agencies/agency_profile.html', {
+        'form': form,
+        'user_count': user_count,
+        'total_monthly_charge': total_monthly_charge,
+        'payment_method_message': payment_method_message,
+    })
+
 
 
 @method_decorator(login_required, name='dispatch')

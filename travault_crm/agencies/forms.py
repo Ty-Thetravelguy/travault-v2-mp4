@@ -4,6 +4,9 @@ from django import forms
 from allauth.account.forms import SignupForm
 from .models import Agency, CustomUser
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 class AgencyRegistrationForm(SignupForm):
     """
@@ -125,41 +128,59 @@ class AgencyRegistrationForm(SignupForm):
             raise forms.ValidationError("Please provide up to 6 lines for the address.")
         return address
 
-    def save(self, request):
-        """
-        Saves the form data, creating a user and linking them to a new agency.
+def save(self, request):
+    """
+    Saves the form data, creating a user and linking them to a new agency.
 
-        Returns:
-            user: The newly created user with linked agency.
-        """
+    Returns:
+        user: The newly created user with linked agency.
+    """
+    try:
+        # Create user first
         user = super(AgencyRegistrationForm, self).save(request)
-
-        # Create the agency
-        agency = Agency.objects.create(
-            agency_name=self.cleaned_data['company_name'],
-            address=self.cleaned_data['company_address'],
-            phone=self.cleaned_data['phone_number'],
-            email=user.email,
-            vat_number=self.cleaned_data['vat_number'],
-            company_reg_number=self.cleaned_data['company_reg_number'],
-            employees=self.cleaned_data['employees'],
-            business_focus=self.cleaned_data['business_focus'],
-            contact_name=self.cleaned_data['contact_full_name']
-        )
         
-        # Split the full name into first and last name
-        full_name = self.cleaned_data['contact_full_name'].split()
-        user.first_name = full_name[0]
-        user.last_name = ' '.join(full_name[1:]) if len(full_name) > 1 else ''
+        # Create the agency with proper error handling
+        try:
+            agency = Agency.objects.create(
+                agency_name=self.cleaned_data['company_name'],
+                address=self.cleaned_data['company_address'],
+                phone=self.cleaned_data['phone_number'],
+                email=user.email,
+                vat_number=self.cleaned_data['vat_number'],
+                company_reg_number=self.cleaned_data['company_reg_number'],
+                employees=self.cleaned_data['employees'],
+                business_focus=self.cleaned_data['business_focus'],
+                contact_name=self.cleaned_data['contact_full_name']
+            )
+            logger.info(f"Created agency: {agency.agency_name}")
+        except Exception as e:
+            logger.error(f"Failed to create agency: {str(e)}")
+            raise
         
-        # Set user type to admin for new registrations
-        user.user_type = 'admin'
-        
-        # Link the agency to the user and save
-        user.agency = agency
-        user.save()
+        try:
+            # Split the full name into first and last name safely
+            full_name = self.cleaned_data['contact_full_name'].strip().split()
+            if full_name:
+                user.first_name = full_name[0]
+                user.last_name = ' '.join(full_name[1:]) if len(full_name) > 1 else ''
+            
+            # Set user type to admin and link agency
+            user.user_type = 'admin'
+            user.agency = agency
+            user.save()
+            
+            logger.info(f"Successfully updated user {user.email} with agency and admin status")
+        except Exception as e:
+            logger.error(f"Failed to update user details: {str(e)}")
+            if agency:
+                agency.delete()  # Cleanup if user update fails
+            raise
         
         return user
+        
+    except Exception as e:
+        logger.error(f"Error in AgencyRegistrationForm.save: {str(e)}", exc_info=True)
+        raise
 
 
 class UserForm(forms.ModelForm):

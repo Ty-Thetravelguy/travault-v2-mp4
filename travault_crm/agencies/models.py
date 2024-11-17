@@ -87,6 +87,10 @@ class Agency(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  # Auto-set date/time when the record is created
     updated_at = models.DateTimeField(auto_now=True)  # Auto-updated date/time when the record is updated
 
+    @staticmethod
+    def get_default_agency():
+        return Agency.objects.first()
+
     def __str__(self):
         """
         String representation of the Agency object.

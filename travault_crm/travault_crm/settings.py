@@ -4,14 +4,33 @@ from dotenv import load_dotenv
 from storages.backends.s3boto3 import S3Boto3Storage
 
 
-# Initialise environment variables
-load_dotenv()
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file in project root
+ENV_FILE = BASE_DIR / '.env'
+
+print("==== ENV FILE CHECK ====")
+print(f"Looking for .env file at: {ENV_FILE}")
+print(f"File exists: {ENV_FILE.exists()}")
+
+if ENV_FILE.exists():
+    print("Reading .env file contents:")
+    with open(ENV_FILE) as f:
+        print(f.read())
+
+load_dotenv(ENV_FILE)
+
+# Stripe settings with explicit fallback
+STRIPE_PRICE_ID = os.getenv('STRIPE_PRICE_ID')
+if not STRIPE_PRICE_ID or STRIPE_PRICE_ID == 'your_stripe_price_id_here':
+    raise ValueError(f"Invalid STRIPE_PRICE_ID: {STRIPE_PRICE_ID}. Check your .env file at {ENV_FILE}")
 
 # Stripe settings
 STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
-STRIPE_PRICE_ID = os.getenv('STRIPE_PRICE_ID')
+# STRIPE_PRICE_ID = os.getenv('STRIPE_PRICE_ID')
 
 # Access variables
 DIFFBOT_API_KEY = os.getenv('DIFFBOT_API_KEY')
@@ -100,6 +119,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'billing.middleware.EnforcePaymentMiddleware',
 ]
 
 ROOT_URLCONF = 'travault_crm.urls'
@@ -163,6 +183,7 @@ ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_UNIQUE_EMAIL = True
+
 
 # Add these lines to specify your custom templates
 ACCOUNT_LOGIN_TEMPLATE = 'account/account_login.html'

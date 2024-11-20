@@ -129,59 +129,58 @@ class AgencyRegistrationForm(SignupForm):
         return address
 
 def save(self, request):
-    """
-    Saves the form data, creating a user and linking them to a new agency.
-
-    Returns:
-        user: The newly created user with linked agency.
-    """
+    print("DEBUG: Entering save method of AgencyRegistrationForm.")
     try:
-        # Create user first
+        # Create user
         user = super(AgencyRegistrationForm, self).save(request)
-        
-        # Create the agency with proper error handling
+        print(f"DEBUG: User created successfully with email: {user.email}")
+
+        # Attempt to create agency
         try:
-            agency = Agency.objects.create(
-                agency_name=self.cleaned_data['company_name'],
-                name=self.cleaned_data['company_name'],  # Add this line to keep both fields in sync
-                address=self.cleaned_data['company_address'],
-                phone=self.cleaned_data['phone_number'],
-                email=user.email,
-                vat_number=self.cleaned_data['vat_number'],
-                company_reg_number=self.cleaned_data['company_reg_number'],
-                employees=self.cleaned_data['employees'],
-                business_focus=self.cleaned_data['business_focus'],
-                contact_name=self.cleaned_data['contact_full_name']
-            )
-            logger.info(f"Created agency: {agency.agency_name}")
+            agency_data = {
+                "agency_name": self.cleaned_data['company_name'],
+                "address": self.cleaned_data['company_address'],
+                "phone": self.cleaned_data['phone_number'],
+                "email": user.email,
+                "vat_number": self.cleaned_data['vat_number'],
+                "company_reg_number": self.cleaned_data['company_reg_number'],
+                "employees": self.cleaned_data['employees'],
+                "business_focus": self.cleaned_data['business_focus'],
+                "contact_name": self.cleaned_data['contact_full_name'],
+            }
+            print("DEBUG: Attempting to create agency with data:", agency_data)
+
+            agency = Agency.objects.create(**agency_data)
+            print(f"DEBUG: Agency created successfully: {agency.agency_name}")
         except Exception as e:
-            logger.error(f"Failed to create agency: {str(e)}")
+            print(f"DEBUG ERROR: Exception during agency creation: {e}")
+            import traceback
+            traceback.print_exc()  # Print full traceback for deeper insight
             raise
-        
+
+        # Update user with agency details
         try:
-            # Split the full name into first and last name safely
             full_name = self.cleaned_data['contact_full_name'].strip().split()
             if full_name:
                 user.first_name = full_name[0]
                 user.last_name = ' '.join(full_name[1:]) if len(full_name) > 1 else ''
-            
-            # Set user type to admin and link agency
             user.user_type = 'admin'
             user.agency = agency
             user.save()
-            
-            logger.info(f"Successfully updated user {user.email} with agency and admin status")
+            print(f"DEBUG: User linked to agency: {agency.agency_name}")
         except Exception as e:
-            logger.error(f"Failed to update user details: {str(e)}")
+            print(f"DEBUG ERROR: Exception during user update: {e}")
             if agency:
-                agency.delete()  # Cleanup if user update fails
+                agency.delete()
+                print(f"DEBUG: Agency deleted: {agency.agency_name}")
             raise
-        
+
         return user
-        
+
     except Exception as e:
-        logger.error(f"Error in AgencyRegistrationForm.save: {str(e)}", exc_info=True)
+        print(f"DEBUG ERROR: Unexpected exception in save method: {e}")
         raise
+
 
 
 class UserForm(forms.ModelForm):

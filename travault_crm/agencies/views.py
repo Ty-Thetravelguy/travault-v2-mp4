@@ -42,73 +42,81 @@ from billing.models import BillingInvoice
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
-
 class AgencyRegistrationView(SignupView):
     template_name = 'agencies/registration.html'
     form_class = AgencyRegistrationForm
     success_url = reverse_lazy('account_email_verification_sent')
 
     def get_form_kwargs(self):
+        print("DEBUG: Entering get_form_kwargs method.")
         kwargs = super().get_form_kwargs()
         kwargs.pop('instance', None)  # Ensure no unintended 'instance' is passed
+        print("DEBUG: Form kwargs prepared:", kwargs)
         return kwargs
 
     @transaction.atomic
     def form_valid(self, form):
+        print("DEBUG: Entering form_valid method.")
         try:
             # Create user and agency in one transaction
-            logger.debug("Form validation successful. Starting user and agency creation.")
+            print("DEBUG: Form validation successful. Attempting to save user and agency.")
             user = form.save(self.request)
-            
+            print(f"DEBUG: User created successfully with email: {user.email}")
+
             if not user.agency:
-                logger.error(f"Agency not created for user {user.email}")
+                print(f"DEBUG ERROR: Agency not created for user {user.email}")
                 messages.error(self.request, "Failed to create agency. Please try again.")
                 return self.form_invalid(form)
             
             # Set user as admin
             user.user_type = 'admin'
             user.save()
-            
-            logger.info(f"Successfully created agency {user.agency.agency_name} with admin user {user.email}")
+            print(f"DEBUG: User updated with admin role and linked to agency: {user.agency.agency_name}")
+
+            # Send success message
+            print(f"DEBUG: Successfully created agency {user.agency.agency_name} with admin user {user.email}")
             messages.success(self.request, "Registration successful! Please verify your email.")
             
             # Send verification email
             try:
                 send_email_confirmation(self.request, user)
-                logger.info(f"Verification email sent to {user.email}")
+                print(f"DEBUG: Verification email sent to {user.email}")
             except Exception as email_error:
-                logger.error(f"Failed to send verification email: {str(email_error)}")
+                print(f"DEBUG ERROR: Failed to send verification email: {str(email_error)}")
                 # Continue with registration even if email fails
-                
-            return super().form_valid(form)
             
+            return super().form_valid(form)
+        
         except Exception as e:
-            logger.error(f"Error during registration: {str(e)}", exc_info=True)
+            print(f"DEBUG ERROR: Exception during registration: {str(e)}")
             messages.error(self.request, "An error occurred during registration. Please try again.")
             return self.form_invalid(form)
 
     def get_context_data(self, **kwargs):
+        print("DEBUG: Entering get_context_data method.")
         try:
-            ret = super().get_context_data(**kwargs)
-            ret.update(self.kwargs)
+            context = super().get_context_data(**kwargs)
+            context.update(self.kwargs)
             
-            # Add any additional context needed for the template
-            ret['page_title'] = 'Agency Registration'
-            ret['form_title'] = 'Register Your Agency'
-            
-            return ret
-            
+            # Add additional context if needed
+            context['page_title'] = 'Agency Registration'
+            context['form_title'] = 'Register Your Agency'
+            print("DEBUG: Context prepared:", context)
+            return context
+        
         except Exception as e:
-            logger.error(f"Error getting context data: {str(e)}", exc_info=True)
+            print(f"DEBUG ERROR: Error in get_context_data: {str(e)}")
             return super().get_context_data(**kwargs)
 
     def get_success_url(self):
+        print("DEBUG: Entering get_success_url method.")
         try:
             # You can customize the success URL based on conditions
             return str(self.success_url)
         except Exception as e:
-            logger.error(f"Error getting success URL: {str(e)}", exc_info=True)
+            print(f"DEBUG ERROR: Error getting success URL: {str(e)}")
             return str(reverse_lazy('account_email_verification_sent'))
+
 
 
 class CustomLoginView(LoginView):

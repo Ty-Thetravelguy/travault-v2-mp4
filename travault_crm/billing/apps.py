@@ -1,4 +1,5 @@
 # billing/apps.py
+
 from django.apps import AppConfig
 
 class BillingConfig(AppConfig):
@@ -6,4 +7,4 @@ class BillingConfig(AppConfig):
     name = 'billing'
 
     def ready(self):
-        import billing.subscription  # Import the signals
+        from . import stripe_config

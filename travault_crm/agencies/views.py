@@ -1,5 +1,6 @@
 import logging
 import time
+import stripe
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import CreateView
@@ -36,8 +37,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import SetPasswordForm
 from django.db import transaction
 from billing.models import StripeCustomer
-
-
+from django.contrib.auth import login
+from billing.models import BillingInvoice
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -199,55 +200,53 @@ def profile_view(request):
     return render(request, 'users/profile.html', {'form': form})
 
 
-def agency_profile_view(request):
-    """
-    View to display and update the agency profile.
+@login_required
+def agency_profile(request):
+    user = request.user
+    agency = user.agency
 
-    Allows admins to view and update the agency's profile.
-    """
-    logger.info("Entering agency_profile_view.")
-    start_time = time.time()
-
-    # Ensure the user is an admin
-    if request.user.user_type != 'admin':
-        logger.warning(f"Non-admin user {request.user.username} tried to access agency profile.")
-        messages.error(request, "You do not have permission to access this page.")
-        return redirect('agencies:manage_users')
-
-    agency = request.user.agency
-    logger.debug(f"Fetched agency: {agency.name} for profile update.")
-
-    # Fetch the number of users and calculate total monthly charge
-    user_count = CustomUser.objects.filter(agency=agency).count()
-    total_monthly_charge = user_count * 9  # £9 per user
-
-    try:
-        stripe_customer = StripeCustomer.objects.get(agency=agency)
-        payment_method_message = "Payment method on file."
-    except StripeCustomer.DoesNotExist:
-        payment_method_message = "No payment method on file."
-
+    # Handle the agency details form
     if request.method == 'POST':
-        form = AgencyProfileForm(request.POST, instance=agency)
+        form = AgencyProfileForm(request.POST, request.FILES, instance=agency)
         if form.is_valid():
             form.save()
-            logger.info(f"Agency profile for '{agency.name}' updated successfully.")
-            messages.success(request, "Agency profile updated successfully!")
+            messages.success(request, "Agency details updated successfully.")
             return redirect('agencies:agency_profile')
         else:
-            logger.error(f"Form validation errors: {form.errors}")
             messages.error(request, "Please correct the errors below.")
     else:
         form = AgencyProfileForm(instance=agency)
-        logger.debug("Initialized form for agency profile update.")
 
-    logger.info(f"agency_profile_view completed in {time.time() - start_time:.2f} seconds.")
-    return render(request, 'agencies/agency_profile.html', {
+    # Calculate subscription details
+    user_count = agency.customuser_set.count()
+    total_monthly_charge = user_count * 9.00  # Assuming £9 per user
+
+    # Retrieve payment method (for admin users)
+    payment_method = None
+    if user.user_type == 'admin':
+        try:
+            stripe_customer = agency.stripecustomer
+            payment_methods = stripe.PaymentMethod.list(
+                customer=stripe_customer.stripe_customer_id,
+                type="card"
+            )
+            if payment_methods.data:
+                payment_method = payment_methods.data[0]
+        except Exception as e:
+            logger.error(f"Error retrieving payment method: {e}")
+
+    # Retrieve invoices
+    invoices = BillingInvoice.objects.filter(agency=agency).order_by('-created_at')[:5]
+
+    context = {
         'form': form,
         'user_count': user_count,
         'total_monthly_charge': total_monthly_charge,
-        'payment_method_message': payment_method_message,
-    })
+        'payment_method': payment_method,
+        'invoices': invoices,
+    }
+
+    return render(request, 'agencies/agency_profile.html', context)
 
 
 
@@ -321,7 +320,7 @@ def manage_users(request):
     # Fetch users associated with the user's agency, excluding superusers
     user_agency = request.user.agency
     users = CustomUser.objects.filter(agency=user_agency, is_superuser=False)
-    logger.debug(f"Fetched {users.count()} users for agency '{user_agency.name}'.")
+    logger.debug(f"Fetched {users.count()} users for agency '{user_agency.agency_name}'.")
 
     logger.info(f"manage_users completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'users/manage_users.html', {'users': users})
@@ -543,19 +542,30 @@ def confirm_email_and_setup_password(request, uidb64, token):
                 form = SetPasswordForm(user, request.POST)
                 if form.is_valid():
                     form.save()
-                    logger.info(f"Password set successfully for user '{user.username}'.")
-                    messages.success(request, "Your password has been set successfully! You can now log in.")
-                    return redirect('account_login')
-                else:
-                    logger.error(f"Password form validation failed: {form.errors}.")
+                    login(request, user)
+                    messages.success(request, "Your password has been set successfully!")
 
-            # Initialize the form for GET requests
-            else:
-                form = SetPasswordForm(user)
-                logger.debug("Initialized SetPasswordForm for setting a new password.")
+                    try:
+                        agency = user.agency
+                        stripe_customer = agency.stripecustomer
 
-            logger.info(f"confirm_email_and_setup_password completed in {time.time() - start_time:.2f} seconds.")
-            return render(request, 'account/setup_password.html', {'form': form})
+                        subscription = stripe.Subscription.retrieve(stripe_customer.stripe_subscription_id)
+
+                        if subscription.status in ['active', 'trialing']:
+                            return redirect('dashboard:index')
+                        else:
+                            messages.error(request, "Your agency's subscription is not active.")
+                            if user.user_type == 'admin':
+                                return redirect('billing:setup_payment')
+                            else:
+                                return redirect('billing:subscription_inactive')
+                    except StripeCustomer.DoesNotExist:
+                        if user.user_type == 'admin':
+                            messages.error(request, "Please complete payment setup for your agency.")
+                            return redirect('billing:setup_payment')
+                        else:
+                            messages.error(request, "Your agency has not completed payment setup. Please contact your administrator.")
+                            return redirect('billing:subscription_inactive')
 
         else:
             logger.warning(f"Invalid or expired token for user '{user.username}'.")

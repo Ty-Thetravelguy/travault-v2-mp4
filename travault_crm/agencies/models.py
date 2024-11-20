@@ -74,7 +74,7 @@ class Agency(models.Model):
     ]
 
     agency_name = models.CharField(max_length=255)  # Name of the agency
-    name = models.CharField(max_length=255)
+    # name = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     phone = models.CharField(max_length=20)  # Contact phone number for the agency
     email = models.EmailField()  # Contact email for the agency

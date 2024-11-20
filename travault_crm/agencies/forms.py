@@ -143,6 +143,7 @@ def save(self, request):
         try:
             agency = Agency.objects.create(
                 agency_name=self.cleaned_data['company_name'],
+                name=self.cleaned_data['company_name'],  # Add this line to keep both fields in sync
                 address=self.cleaned_data['company_address'],
                 phone=self.cleaned_data['phone_number'],
                 email=user.email,

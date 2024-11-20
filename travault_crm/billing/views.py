@@ -14,174 +14,174 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from .utils import send_invoice_email
-
-load_dotenv()
+from django.contrib.auth.decorators import user_passes_test
+from django.urls import reverse
 
 logger = logging.getLogger(__name__)
-stripe.api_key = settings.STRIPE_SECRET_KEY
 
 @login_required
+@user_passes_test(lambda u: u.is_superuser or u.user_type == 'admin', login_url='account_login')
 def setup_payment(request):
-    # Add detailed debugging at the start
-    print("==== DEBUG STRIPE SETTINGS ====")
-    print(f"Direct env var: {os.getenv('STRIPE_PRICE_ID')}")
-    print(f"Settings value: {settings.STRIPE_PRICE_ID}")
-    print("============================")
-
-    # Debug environment variables
-    logger.info("Debugging environment variables:")
-    for key, value in os.environ.items():
-        if 'STRIPE' in key:
-            logger.info(f"{key}: {'*' * len(value) if 'SECRET' in key else value}")
-
     try:
-        # Check if user has an agency
-        if not request.user.agency:
+        # Ensure the agency exists
+        agency = request.user.agency
+        if not agency:
             logger.error(f"User {request.user.email} is not associated with an agency.")
             messages.error(request, "Your account is not properly set up. Please contact support.")
             return redirect('billing:billing_error')
 
-        # Check for existing subscription
-        stripe_customer = StripeCustomer.objects.filter(agency=request.user.agency).first()
-        if stripe_customer and stripe_customer.stripe_subscription_id:
-            try:
-                # Verify subscription in Stripe
-                subscription = stripe.Subscription.retrieve(stripe_customer.stripe_subscription_id)
-                if subscription.status not in ['canceled', 'incomplete_expired']:
-                    logger.info(f"Active subscription found: {subscription.id}")
-                    messages.info(request, "Your agency already has an active subscription.")
-                    return redirect('dashboard:index')
-            except stripe.error.StripeError as e:
-                logger.error(f"Error retrieving subscription: {str(e)}")
+        # Initialize Stripe
+        stripe.api_key = settings.STRIPE_SECRET_KEY
 
+        # Check if StripeCustomer exists
         try:
-            # Verify the price exists in Stripe
-            price = stripe.Price.retrieve(settings.STRIPE_PRICE_ID)
-            logger.info(f"Successfully verified price: {price.id}")
-        except stripe.error.StripeError as e:
-            logger.error(f"Failed to verify Stripe price: {str(e)}")
-            messages.error(request, "Unable to verify payment configuration. Please contact support.")
-            return redirect('billing:billing_error')
+            stripe_customer = agency.stripecustomer
+            customer_created = False
+        except StripeCustomer.DoesNotExist:
+            stripe_customer = None
+            customer_created = True
 
-        # Check user and agency
-        if not request.user.agency:
-            logger.error(f"User {request.user.email} is not associated with an agency.")
-            messages.error(request, "Your account is not properly set up. Please contact support.")
-            return redirect('billing:billing_error')
-        
-        logger.info(f"Processing payment setup for agency: {request.user.agency.agency_name} (ID: {request.user.agency.id})")
-
-        # Get or create Stripe customer
-        stripe_customer, created = StripeCustomer.objects.get_or_create(
-            agency=request.user.agency,
-            defaults={'stripe_customer_id': None}
-        )
-
-        if created:
-            logger.info(f"Created new StripeCustomer record for agency: {request.user.agency.agency_name}")
-
-        # Create or retrieve Stripe customer
-        if not stripe_customer.stripe_customer_id:
-            try:
-                logger.info("Creating new Stripe customer...")
+        if request.method == 'POST':
+            # Create Stripe customer if necessary
+            if not stripe_customer:
                 customer = stripe.Customer.create(
                     email=request.user.email,
-                    name=request.user.agency.agency_name,
-                    metadata={
-                        'agency_id': str(request.user.agency.id),
-                        'environment': 'test' if 'test' in settings.STRIPE_SECRET_KEY else 'live'
-                    }
+                    name=agency.agency_name,
                 )
-                stripe_customer.stripe_customer_id = customer.id
-                stripe_customer.save()
-                logger.info(f"Created Stripe customer: {customer.id}")
-            except stripe.error.StripeError as e:
-                logger.error(f"Stripe customer creation failed: {str(e)}")
-                messages.error(request, "Failed to set up customer profile. Please try again.")
-                return redirect('billing:billing_error')
 
-        # Handle subscription creation
-        if not stripe_customer.stripe_subscription_id:
-            try:
-                logger.info(f"Creating subscription for customer: {stripe_customer.stripe_customer_id}")
-                subscription = stripe.Subscription.create(
-                    customer=stripe_customer.stripe_customer_id,
-                    items=[{
-                        'price': settings.STRIPE_PRICE_ID,
-                        'quantity': 1,
-                    }],
-                    payment_behavior='default_incomplete',
-                    expand=['latest_invoice.payment_intent'],
-                    metadata={
-                        'agency_id': str(request.user.agency.id),
-                        'environment': 'test' if 'test' in settings.STRIPE_SECRET_KEY else 'live'
-                    }
+                # Now create the StripeCustomer instance with required fields
+                stripe_customer = StripeCustomer.objects.create(
+                    agency=agency,
+                    stripe_customer_id=customer.id,
+                    stripe_subscription_id='',  # Will be updated after subscription creation
+                    subscription_status='active',
                 )
-                
-                stripe_customer.stripe_subscription_id = subscription.id
-                stripe_customer.save()
-                logger.info(f"Created subscription: {subscription.id}")
 
-                if not subscription.latest_invoice.payment_intent:
-                    logger.error("No payment intent created with subscription")
-                    messages.error(request, "Failed to initialize payment. Please try again.")
-                    return redirect('billing:billing_error')
+            # Retrieve the price ID
+            price_id = settings.STRIPE_PRICE_ID
 
-                return JsonResponse({
-                    'clientSecret': subscription.latest_invoice.payment_intent.client_secret,
-                    'subscriptionId': subscription.id
-                })
-            except stripe.error.StripeError as e:
-                logger.error(f"Subscription creation failed: {str(e)}")
-                messages.error(request, "Failed to set up subscription. Please try again.")
-                return redirect('billing:billing_error')
+            # Create a checkout session
+            session = stripe.checkout.Session.create(
+                customer=stripe_customer.stripe_customer_id,
+                payment_method_types=['card'],
+                line_items=[{
+                    'price': price_id,
+                    'quantity': 1,
+                }],
+                mode='subscription',
+                success_url=request.build_absolute_uri(reverse('billing:setup_payment')) + '?session_id={CHECKOUT_SESSION_ID}',
+                cancel_url=request.build_absolute_uri(reverse('billing:setup_payment')),
+            )
+
+            return redirect(session.url, code=303)
+
+        elif request.method == 'GET' and 'session_id' in request.GET:
+            session_id = request.GET.get('session_id')
+            session = stripe.checkout.Session.retrieve(session_id)
+
+            # Update the subscription ID and status
+            stripe_customer.stripe_subscription_id = session.subscription
+            stripe_customer.subscription_status = 'active'
+            stripe_customer.save()
+
+            messages.success(request, "Payment setup completed successfully!")
+            return redirect('dashboard:index')
+
+        return render(request, 'billing/setup_payment.html', {'stripe_public_key': settings.STRIPE_PUBLIC_KEY})
 
     except Exception as e:
         logger.error(f"Unexpected error in setup_payment: {str(e)}", exc_info=True)
-        messages.error(request, "An unexpected error occurred. Please try again or contact support.")
+        messages.error(request, "An error occurred during payment setup. Please try again.")
         return redirect('billing:billing_error')
-
-    # Render the payment form if no subscription needs to be created
-    return render(request, 'billing/setup_payment.html', {
-        'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY,
-        'CUSTOMER_EMAIL': request.user.email,
-        'AGENCY_NAME': request.user.agency.agency_name
-    })
 
 @csrf_exempt
 @require_POST
 def stripe_webhook(request):
     payload = request.body
-    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
+    endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
+    event = None
 
     try:
         event = stripe.Webhook.construct_event(
-            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+            payload, sig_header, endpoint_secret
         )
     except ValueError as e:
+        # Invalid payload
+        logger.error(f"Invalid payload: {e}")
         return HttpResponse(status=400)
     except stripe.error.SignatureVerificationError as e:
+        # Invalid signature
+        logger.error(f"Invalid signature: {e}")
+        return HttpResponse(status=400)
+    except Exception as e:
+        logger.error(f"Webhook error: {e}")
         return HttpResponse(status=400)
 
+    # Handle the event
     if event['type'] == 'invoice.paid':
         invoice = event['data']['object']
-        agency_id = invoice['subscription']['metadata']['agency_id']
-        
-        # Create invoice record
-        BillingInvoice.objects.create(
-            agency_id=agency_id,
-            stripe_invoice_id=invoice['id'],
-            amount=invoice['amount_paid'] / 100,  # Convert from cents
-            status='paid',
-            invoice_pdf=invoice['invoice_pdf'],
-            paid_at=timezone.now()
-        )
-        
-        # Send invoice email
-        send_invoice_email(agency_id, invoice['invoice_pdf'])
+        customer_id = invoice['customer']
+
+        # Find the StripeCustomer associated with this customer_id
+        try:
+            stripe_customer = StripeCustomer.objects.get(stripe_customer_id=customer_id)
+            stripe_customer.subscription_status = 'active'
+            stripe_customer.save()
+
+            # Create or update the BillingInvoice
+            BillingInvoice.objects.update_or_create(
+                stripe_invoice_id=invoice['id'],
+                agency=stripe_customer.agency,
+                defaults={
+                    'amount': invoice['amount_paid'] / 100,  # Convert from cents
+                    'status': 'paid',
+                    'invoice_pdf': invoice.get('invoice_pdf', ''),
+                    'paid_at': timezone.now(),
+                }
+            )
+
+        except StripeCustomer.DoesNotExist:
+            logger.error(f"StripeCustomer with customer_id {customer_id} not found.")
+
+    elif event['type'] == 'invoice.payment_failed':
+        invoice = event['data']['object']
+        customer_id = invoice['customer']
+
+        # Update the subscription status to 'past_due' or 'payment_failed'
+        try:
+            stripe_customer = StripeCustomer.objects.get(stripe_customer_id=customer_id)
+            stripe_customer.subscription_status = 'past_due'
+            stripe_customer.save()
+
+            # Optionally, notify the agency admin about the payment failure
+
+        except StripeCustomer.DoesNotExist:
+            logger.error(f"StripeCustomer with customer_id {customer_id} not found.")
+
+    # ... handle other event types as needed ...
 
     return HttpResponse(status=200)
 
 @login_required
 def billing_error(request):
     return render(request, 'billing/billing_error.html')
+
+@login_required
+def subscription_inactive(request):
+    return render(request, 'billing/subscription_inactive.html')
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser or u.user_type == 'admin', login_url='account_login')
+def billing_portal(request):
+    try:
+        stripe_customer = request.user.agency.stripecustomer
+        session = stripe.billing_portal.Session.create(
+            customer=stripe_customer.stripe_customer_id,
+            return_url=request.build_absolute_uri(reverse('agencies:agency_profile')),
+        )
+        return redirect(session.url)
+    except Exception as e:
+        logger.error(f"Error creating billing portal session: {e}")
+        messages.error(request, "Failed to load billing portal. Please try again.")
+        return redirect('agencies:agency_profile')

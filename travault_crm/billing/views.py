@@ -99,76 +99,6 @@ def setup_payment(request):
         messages.error(request, "An error occurred during payment setup. Please try again.")
         return redirect('billing:billing_error')
 
-
-@csrf_exempt
-@require_POST
-def stripe_webhook(request):
-    payload = request.body
-    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
-    endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
-    event = None
-
-    try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, endpoint_secret
-        )
-    except ValueError as e:
-        # Invalid payload
-        logger.error(f"Invalid payload: {e}")
-        return HttpResponse(status=400)
-    except stripe.error.SignatureVerificationError as e:
-        # Invalid signature
-        logger.error(f"Invalid signature: {e}")
-        return HttpResponse(status=400)
-    except Exception as e:
-        logger.error(f"Webhook error: {e}")
-        return HttpResponse(status=400)
-
-    # Handle the event
-    if event['type'] == 'invoice.paid':
-        invoice = event['data']['object']
-        customer_id = invoice['customer']
-
-        # Find the StripeCustomer associated with this customer_id
-        try:
-            stripe_customer = StripeCustomer.objects.get(stripe_customer_id=customer_id)
-            stripe_customer.subscription_status = 'active'
-            stripe_customer.save()
-
-            # Create or update the BillingInvoice
-            BillingInvoice.objects.update_or_create(
-                stripe_invoice_id=invoice['id'],
-                agency=stripe_customer.agency,
-                defaults={
-                    'amount': invoice['amount_paid'] / 100,  # Convert from cents
-                    'status': 'paid',
-                    'invoice_pdf': invoice.get('invoice_pdf', ''),
-                    'paid_at': timezone.now(),
-                }
-            )
-
-        except StripeCustomer.DoesNotExist:
-            logger.error(f"StripeCustomer with customer_id {customer_id} not found.")
-
-    elif event['type'] == 'invoice.payment_failed':
-        invoice = event['data']['object']
-        customer_id = invoice['customer']
-
-        # Update the subscription status to 'past_due' or 'payment_failed'
-        try:
-            stripe_customer = StripeCustomer.objects.get(stripe_customer_id=customer_id)
-            stripe_customer.subscription_status = 'past_due'
-            stripe_customer.save()
-
-            # Optionally, notify the agency admin about the payment failure
-
-        except StripeCustomer.DoesNotExist:
-            logger.error(f"StripeCustomer with customer_id {customer_id} not found.")
-
-    # ... handle other event types as needed ...
-
-    return HttpResponse(status=200)
-
 @login_required
 def billing_error(request):
     return render(request, 'billing/billing_error.html')
@@ -181,13 +111,42 @@ def subscription_inactive(request):
 @user_passes_test(lambda u: u.is_superuser or u.user_type == 'admin', login_url='account_login')
 def billing_portal(request):
     try:
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        
+        # Get the stripe customer
         stripe_customer = request.user.agency.stripecustomer
+        
+        # Create Stripe billing portal session
         session = stripe.billing_portal.Session.create(
             customer=stripe_customer.stripe_customer_id,
             return_url=request.build_absolute_uri(reverse('agencies:agency_profile')),
         )
-        return redirect(session.url)
+        
+        # Return the URL as JSON
+        return JsonResponse({'url': session.url})
+        
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe error creating billing portal session: {str(e)}")
+        return JsonResponse({
+            'error': 'Unable to access billing portal. Please try again later.'
+        }, status=500)
     except Exception as e:
-        logger.error(f"Error creating billing portal session: {e}")
-        messages.error(request, "Failed to load billing portal. Please try again.")
-        return redirect('agencies:agency_profile')
+        logger.error(f"Error creating billing portal session: {str(e)}", exc_info=True)
+        return JsonResponse({
+            'error': 'An unexpected error occurred. Please contact support.'
+        }, status=500)
+    
+@login_required
+def create_setup_intent(request):
+    try:
+        stripe_customer = request.user.agency.stripecustomer
+        setup_intent = stripe.SetupIntent.create(
+            customer=stripe_customer.stripe_customer_id,
+            payment_method_types=['card'],
+        )
+        return JsonResponse({
+            'client_secret': setup_intent.client_secret
+        })
+    except Exception as e:
+        logger.error(f"Error creating setup intent: {e}")
+        return JsonResponse({'error': str(e)}, status=500)

@@ -75,13 +75,17 @@
                                         <p>Expires:
                                             {{ stripe_payment_method.exp_month }}/{{ stripe_payment_method.exp_year }}
                                         </p>
+                                        <button class="btn btn-primary" type="button">
+                                            Update Payment Method
+                                        </button>
                                     </div>
-                                    <button class="btn btn-primary" id="update-payment-method">Update Payment
-                                        Method</button>
                                     {% else %}
-                                    <p>No payment method on file</p>
-                                    <button class="btn btn-primary" id="add-payment-method">Add Payment Method</button>
+                                    <p>Error loading payment method. Please contact support.</p>
+                                    <button class="btn btn-primary" type="button">
+                                        Update Payment Method
+                                    </button>
                                     {% endif %}
+                                    <div id="payment-message" class="mt-2" style="display: none;"></div>
                                 </div>
 
                                 <div class="invoices">
@@ -121,4 +125,52 @@
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
+{% block postload_js %}
+<script>
+    const stripe = Stripe('{{ stripe_public_key }}');
+
+    function updatePaymentMethod(event) {
+        event.preventDefault();
+        const button = event.target;
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Loading...';
+
+        // Always use billing portal for payment updates
+        fetch('{% url "billing:billing_portal" %}')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    throw new Error('No portal URL received');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to load payment settings. Please try again or contact support.');
+                button.disabled = false;
+                button.textContent = originalText;
+            });
+    }
+
+    // Add event listener when document is loaded
+    document.addEventListener('DOMContentLoaded', function () {
+        const updateButtons = document.querySelectorAll('.payment-method button');
+        updateButtons.forEach(button => {
+            button.addEventListener('click', updatePaymentMethod);
+        });
+    });
+</script>
 {% endblock %}

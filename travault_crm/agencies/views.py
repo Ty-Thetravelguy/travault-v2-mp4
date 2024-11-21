@@ -1,6 +1,7 @@
 import logging
 import time
 import stripe
+from django.conf import settings
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import CreateView
@@ -228,48 +229,45 @@ def profile_view(request):
 
 @login_required
 def agency_profile(request):
-    user = request.user
-    agency = user.agency
-
-    # Handle the agency details form
+    agency = request.user.agency
+    
     if request.method == 'POST':
-        form = AgencyProfileForm(request.POST, request.FILES, instance=agency)
+        form = AgencyProfileForm(request.POST, instance=agency)
         if form.is_valid():
             form.save()
             messages.success(request, "Agency details updated successfully.")
             return redirect('agencies:agency_profile')
-        else:
-            messages.error(request, "Please correct the errors below.")
     else:
         form = AgencyProfileForm(instance=agency)
 
-    # Change this line to use the correct related_name 'users'
-    user_count = agency.users.count()  # Changed from customuser_set to users
-    total_monthly_charge = user_count * 9.00  # Assuming £9 per user
+    # Get user count and calculate charges
+    user_count = agency.users.count()
+    total_monthly_charge = user_count * 9.00
 
-    # Retrieve payment method (for admin users)
-    payment_method = None
-    if user.user_type == 'admin':
-        try:
-            stripe_customer = agency.stripecustomer
+    # Get Stripe payment method
+    stripe_payment_method = None
+    try:
+        stripe_customer = agency.stripecustomer
+        if stripe_customer.stripe_customer_id:
             payment_methods = stripe.PaymentMethod.list(
                 customer=stripe_customer.stripe_customer_id,
                 type="card"
             )
             if payment_methods.data:
-                payment_method = payment_methods.data[0]
-        except Exception as e:
-            logger.error(f"Error retrieving payment method: {e}")
+                stripe_payment_method = payment_methods.data[0].card
+    except Exception as e:
+        logger.error(f"Error retrieving payment method: {e}")
 
-    # Retrieve invoices
+    # Get recent invoices
     invoices = BillingInvoice.objects.filter(agency=agency).order_by('-created_at')[:5]
 
     context = {
         'form': form,
         'user_count': user_count,
         'total_monthly_charge': total_monthly_charge,
-        'payment_method': payment_method,
+        'stripe_payment_method': stripe_payment_method,
         'invoices': invoices,
+        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,  # Add this line
     }
 
     return render(request, 'agencies/agency_profile.html', context)

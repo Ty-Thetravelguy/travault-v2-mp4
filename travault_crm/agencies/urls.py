@@ -7,6 +7,7 @@ app_name = 'agencies'
 
 urlpatterns = [
     path('register/', views.AgencyRegistrationView.as_view(), name='agency_register'),
+    path('registration-success/', views.registration_success, name='registration_success'),
     path('login/', views.CustomLoginView.as_view(), name='account_login'), 
     path('logout/', views.CustomLogoutView.as_view(), name='account_logout'),
     path('profile/', views.profile_view, name='profile'), 

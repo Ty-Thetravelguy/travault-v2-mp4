@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="bg-gray-200">
+    <div class="container top-padding roboto">
+        <div class="row justify-content-center py-5">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body text-center">
+                        <h2 class="card-title mb-4">Registration Successful!</h2>
+                        <div class="alert alert-success">
+                            <p>Thank you for registering with TraVault!</p>
+                        </div>
+                        <div class="mb-4">
+                            <p>We've sent a verification email to your registered email address. Please check your inbox
+                                and click the verification link to activate your account.</p>
+                            <p><strong>Next steps:</strong></p>
+                            <ol class="text-start">
+                                <li>Check your email for the verification link</li>
+                                <li>Click the link to verify your email</li>
+                                <li>Log in to your account</li>
+                                <li>Set up your payment information</li>
+                            </ol>
+                        </div>
+                        <div class="mt-4">
+                            <p>Didn't receive the email? Check your spam folder or <a
+                                    href="{% url 'account_email' %}">request a new verification email</a>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -131,7 +131,11 @@ class AgencyRegistrationView(SignupView):
             print(f"DEBUG ERROR: Error getting success URL: {str(e)}")
             return str(reverse_lazy('account_email_verification_sent'))
 
-
+def registration_success(request):
+    """
+    View to display registration success page.
+    """
+    return render(request, 'agencies/registration_success.html')
 
 class CustomLoginView(LoginView):
     """

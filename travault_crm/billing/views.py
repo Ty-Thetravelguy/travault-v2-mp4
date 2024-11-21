@@ -66,11 +66,15 @@ def setup_payment(request):
                 payment_method_types=['card'],
                 line_items=[{
                     'price': price_id,
-                    'quantity': 1,
+                    'quantity': agency.users.count(),
                 }],
                 mode='subscription',
-                success_url=request.build_absolute_uri(reverse('billing:setup_payment')) + '?session_id={CHECKOUT_SESSION_ID}',
+                success_url=request.build_absolute_uri(reverse('dashboard:index')),
                 cancel_url=request.build_absolute_uri(reverse('billing:setup_payment')),
+                metadata={
+                    'agency_id': agency.id,
+                    'user_count': agency.users.count(),
+                },
             )
 
             return redirect(session.url, code=303)

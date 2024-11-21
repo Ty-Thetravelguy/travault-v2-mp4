@@ -7290,3 +7290,51 @@ Traceback (most recent call last):
     raise NoReverseMatch(msg)
 django.urls.exceptions.NoReverseMatch: Reverse for 'billing_error' not found. 'billing_error' is not a valid view function or pattern name.
 ERROR 2024-11-17 10:44:02,805 basehttp "GET /billing/setup-payment/ HTTP/1.1" 500 126474
+ERROR 2024-11-21 18:31:05,529 log Internal Server Error: /agencies/agency/profile/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/agencies/views.py", line 247, in agency_profile
+    user_count = agency.customuser_set.count()
+                 ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Agency' object has no attribute 'customuser_set'
+ERROR 2024-11-21 18:31:05,534 basehttp "GET /agencies/agency/profile/ HTTP/1.1" 500 88801
+ERROR 2024-11-21 18:32:30,602 log Internal Server Error: /agencies/agency/profile/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/agencies/views.py", line 247, in agency_profile
+    user_count = agency.customuser_set.count()
+                 ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Agency' object has no attribute 'customuser_set'
+ERROR 2024-11-21 18:32:30,606 basehttp "GET /agencies/agency/profile/ HTTP/1.1" 500 88938
+ERROR 2024-11-21 18:32:55,689 log Internal Server Error: /agencies/agency/profile/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/agencies/views.py", line 247, in agency_profile
+    user_count = agency.customuser_set.count()
+                 ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Agency' object has no attribute 'customuser_set'
+ERROR 2024-11-21 18:32:55,694 basehttp "GET /agencies/agency/profile/ HTTP/1.1" 500 88789

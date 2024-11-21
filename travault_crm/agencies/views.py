@@ -243,8 +243,8 @@ def agency_profile(request):
     else:
         form = AgencyProfileForm(instance=agency)
 
-    # Calculate subscription details
-    user_count = agency.customuser_set.count()
+    # Change this line to use the correct related_name 'users'
+    user_count = agency.users.count()  # Changed from customuser_set to users
     total_monthly_charge = user_count * 9.00  # Assuming £9 per user
 
     # Retrieve payment method (for admin users)

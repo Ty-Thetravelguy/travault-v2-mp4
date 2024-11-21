@@ -54,22 +54,19 @@ def setup_payment(request):
                     agency=agency,
                     stripe_customer_id=customer.id,
                     stripe_subscription_id='',  # Will be updated after subscription creation
-                    subscription_status='active',
+                    subscription_status='pending',  # Changed from 'active' to 'pending'
                 )
-
-            # Retrieve the price ID
-            price_id = settings.STRIPE_PRICE_ID
 
             # Create a checkout session
             session = stripe.checkout.Session.create(
                 customer=stripe_customer.stripe_customer_id,
                 payment_method_types=['card'],
                 line_items=[{
-                    'price': price_id,
+                    'price': settings.STRIPE_PRICE_ID,
                     'quantity': agency.users.count(),
                 }],
                 mode='subscription',
-                success_url=request.build_absolute_uri(reverse('dashboard:index')),
+                success_url=request.build_absolute_uri(reverse('billing:setup_payment')) + '?session_id={CHECKOUT_SESSION_ID}',  # Changed to return here first
                 cancel_url=request.build_absolute_uri(reverse('billing:setup_payment')),
                 metadata={
                     'agency_id': agency.id,
@@ -80,16 +77,20 @@ def setup_payment(request):
             return redirect(session.url, code=303)
 
         elif request.method == 'GET' and 'session_id' in request.GET:
-            session_id = request.GET.get('session_id')
-            session = stripe.checkout.Session.retrieve(session_id)
-
-            # Update the subscription ID and status
-            stripe_customer.stripe_subscription_id = session.subscription
-            stripe_customer.subscription_status = 'active'
-            stripe_customer.save()
-
-            messages.success(request, "Payment setup completed successfully!")
-            return redirect('dashboard:index')
+            session = stripe.checkout.Session.retrieve(request.GET['session_id'])
+            
+            # Verify the session was successful
+            if session.payment_status == 'paid':
+                # Update the subscription ID and status
+                stripe_customer.stripe_subscription_id = session.subscription
+                stripe_customer.subscription_status = 'active'
+                stripe_customer.save()
+                
+                messages.success(request, "Payment setup completed successfully!")
+                return redirect('dashboard:index')
+            else:
+                messages.error(request, "Payment was not completed successfully. Please try again.")
+                return redirect('billing:setup_payment')
 
         return render(request, 'billing/setup_payment.html', {'stripe_public_key': settings.STRIPE_PUBLIC_KEY})
 
@@ -97,6 +98,7 @@ def setup_payment(request):
         logger.error(f"Unexpected error in setup_payment: {str(e)}", exc_info=True)
         messages.error(request, "An error occurred during payment setup. Please try again.")
         return redirect('billing:billing_error')
+
 
 @csrf_exempt
 @require_POST

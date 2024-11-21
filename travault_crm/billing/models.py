@@ -7,7 +7,7 @@ class StripeCustomer(models.Model):
     agency = models.OneToOneField(Agency, on_delete=models.CASCADE)
     stripe_customer_id = models.CharField(max_length=255, null=True, blank=True)
     stripe_subscription_id = models.CharField(max_length=255, null=True, blank=True)
-    subscription_status = models.CharField(max_length=50, default='active')
+    subscription_status = models.CharField(max_length=50, default='inactive')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

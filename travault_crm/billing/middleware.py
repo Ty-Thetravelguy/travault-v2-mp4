@@ -23,6 +23,7 @@ class EnforcePaymentMiddleware:
 
         exempt_paths = [
             reverse('billing:setup_payment'),
+            reverse('billing:stripe_webhook'),
             reverse('account_logout'),
             reverse('account_email_verification_sent'),
             reverse('account_confirm_email', args=['placeholder']),
@@ -44,14 +45,31 @@ class EnforcePaymentMiddleware:
             agency = request.user.agency
             stripe_customer = agency.stripecustomer
 
-            subscription = stripe.Subscription.retrieve(stripe_customer.stripe_subscription_id)
-
-            if subscription.status not in ['active', 'trialing']:
-                messages.error(request, "Your agency's subscription is not active.")
+            # Only check subscription if stripe_subscription_id exists
+            if stripe_customer.stripe_subscription_id:
+                try:
+                    subscription = stripe.Subscription.retrieve(stripe_customer.stripe_subscription_id)
+                    if subscription.status not in ['active', 'trialing']:
+                        messages.error(request, "Your agency's subscription is not active.")
+                        if request.user.user_type == 'admin':
+                            return redirect('billing:setup_payment')
+                        else:
+                            return redirect('billing:subscription_inactive')
+                except stripe.error.StripeError as e:
+                    logger.error(f"Stripe error retrieving subscription: {str(e)}")
+                    if request.user.user_type == 'admin':
+                        return redirect('billing:setup_payment')
+                    else:
+                        return redirect('billing:subscription_inactive')
+            else:
+                # If no subscription ID exists and user is admin, redirect to payment setup
                 if request.user.user_type == 'admin':
+                    messages.error(request, "Please complete payment setup for your agency.")
                     return redirect('billing:setup_payment')
                 else:
+                    messages.error(request, "Your agency has not completed payment setup. Please contact your administrator.")
                     return redirect('billing:subscription_inactive')
+
         except StripeCustomer.DoesNotExist:
             if request.user.user_type == 'admin':
                 messages.error(request, "Please complete payment setup for your agency.")

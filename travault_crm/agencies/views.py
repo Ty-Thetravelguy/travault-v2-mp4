@@ -54,9 +54,16 @@ class AgencyRegistrationView(SignupView):
         print("DEBUG: Form kwargs prepared:", kwargs)
         return kwargs
 
+    def form_invalid(self, form):
+        """Override to add detailed error logging"""
+        print("DEBUG: Form validation failed")
+        print("DEBUG: Form errors:", form.errors)
+        return super().form_invalid(form)
+
     @transaction.atomic
     def form_valid(self, form):
         print("DEBUG: Entering form_valid method.")
+        print("DEBUG: Cleaned data:", form.cleaned_data)
         try:
             # Create user and agency in one transaction
             print("DEBUG: Form validation successful. Attempting to save user and agency.")
@@ -85,13 +92,20 @@ class AgencyRegistrationView(SignupView):
                 print(f"DEBUG ERROR: Failed to send verification email: {str(email_error)}")
                 # Continue with registration even if email fails
             
-            return super().form_valid(form)
+            # Instead of calling super().form_valid(form), directly return redirect
+            return HttpResponseRedirect(self.get_success_url())
         
         except Exception as e:
             print(f"DEBUG ERROR: Exception during registration: {str(e)}")
             messages.error(self.request, "An error occurred during registration. Please try again.")
+            if 'user' in locals() and user.id:
+                try:
+                    user.delete()
+                    print(f"DEBUG: Cleaned up user due to registration failure: {user.email}")
+                except Exception as cleanup_error:
+                    print(f"DEBUG ERROR: Failed to clean up user: {str(cleanup_error)}")
             return self.form_invalid(form)
-
+        
     def get_context_data(self, **kwargs):
         print("DEBUG: Entering get_context_data method.")
         try:

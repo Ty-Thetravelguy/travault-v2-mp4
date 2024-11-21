@@ -63,6 +63,22 @@ class AgencyRegistrationForm(SignupForm):
         ]
         self.order_fields(field_order)
 
+    def clean_username(self):
+        """
+        Validates that the username is unique.
+
+        Raises:
+            ValidationError: If a user with the same username already exists.
+
+        Returns:
+            str: Cleaned data for the username field.
+        """
+        print("DEBUG: Validating username")
+        username = self.cleaned_data.get('username')
+        if CustomUser.objects.filter(username=username).exists():
+            raise forms.ValidationError("This username is already taken. Please choose another.")
+        return username
+
     def clean_company_name(self):
         """
         Validates the company name to ensure it is unique.
@@ -128,59 +144,62 @@ class AgencyRegistrationForm(SignupForm):
             raise forms.ValidationError("Please provide up to 6 lines for the address.")
         return address
 
-def save(self, request):
-    print("DEBUG: Entering save method of AgencyRegistrationForm.")
-    try:
-        # Create user
-        user = super(AgencyRegistrationForm, self).save(request)
-        print(f"DEBUG: User created successfully with email: {user.email}")
-
-        # Attempt to create agency
+    def save(self, request):
+        print("DEBUG: Entering save method of AgencyRegistrationForm.")
         try:
-            agency_data = {
-                "agency_name": self.cleaned_data['company_name'],
-                "address": self.cleaned_data['company_address'],
-                "phone": self.cleaned_data['phone_number'],
-                "email": user.email,
-                "vat_number": self.cleaned_data['vat_number'],
-                "company_reg_number": self.cleaned_data['company_reg_number'],
-                "employees": self.cleaned_data['employees'],
-                "business_focus": self.cleaned_data['business_focus'],
-                "contact_name": self.cleaned_data['contact_full_name'],
-            }
-            print("DEBUG: Attempting to create agency with data:", agency_data)
+            # Create user
+            print(f"DEBUG: Attempting to create user with username: {self.cleaned_data.get('username')}")
+            user = super(AgencyRegistrationForm, self).save(request)
+            print(f"DEBUG: User created successfully with email: {user.email}")
 
-            agency = Agency.objects.create(**agency_data)
-            print(f"DEBUG: Agency created successfully: {agency.agency_name}")
+            # Attempt to create agency
+            try:
+                agency_data = {
+                    "agency_name": self.cleaned_data['company_name'],
+                    "address": self.cleaned_data['company_address'],
+                    "phone": self.cleaned_data['phone_number'],
+                    "email": user.email,
+                    "vat_number": self.cleaned_data['vat_number'],
+                    "company_reg_number": self.cleaned_data['company_reg_number'],
+                    "employees": self.cleaned_data['employees'],
+                    "business_focus": self.cleaned_data['business_focus'],
+                    "contact_name": self.cleaned_data['contact_full_name'],
+                }
+                print("DEBUG: Data for agency creation:", agency_data)
+
+                agency = Agency.objects.create(**agency_data)
+                print(f"DEBUG: Agency created successfully: {agency.agency_name}")
+            except Exception as e:
+                print(f"DEBUG ERROR: Exception during agency creation: {e}")
+                if 'user' in locals():
+                    user.delete()
+                    print("DEBUG: User deleted due to agency creation failure")
+                import traceback
+                traceback.print_exc()  # Print full traceback for deeper insight
+                raise
+
+            # Update user with agency details
+            try:
+                full_name = self.cleaned_data['contact_full_name'].strip().split()
+                if full_name:
+                    user.first_name = full_name[0]
+                    user.last_name = ' '.join(full_name[1:]) if len(full_name) > 1 else ''
+                user.user_type = 'admin'
+                user.agency = agency
+                user.save()
+                print(f"DEBUG: User linked to agency: {agency.agency_name}")
+            except Exception as e:
+                print(f"DEBUG ERROR: Exception during user update: {e}")
+                if agency:
+                    agency.delete()
+                    print(f"DEBUG: Agency deleted: {agency.agency_name}")
+                raise
+
+            return user
+
         except Exception as e:
-            print(f"DEBUG ERROR: Exception during agency creation: {e}")
-            import traceback
-            traceback.print_exc()  # Print full traceback for deeper insight
+            print(f"DEBUG ERROR: Unexpected exception in save method: {e}")
             raise
-
-        # Update user with agency details
-        try:
-            full_name = self.cleaned_data['contact_full_name'].strip().split()
-            if full_name:
-                user.first_name = full_name[0]
-                user.last_name = ' '.join(full_name[1:]) if len(full_name) > 1 else ''
-            user.user_type = 'admin'
-            user.agency = agency
-            user.save()
-            print(f"DEBUG: User linked to agency: {agency.agency_name}")
-        except Exception as e:
-            print(f"DEBUG ERROR: Exception during user update: {e}")
-            if agency:
-                agency.delete()
-                print(f"DEBUG: Agency deleted: {agency.agency_name}")
-            raise
-
-        return user
-
-    except Exception as e:
-        print(f"DEBUG ERROR: Unexpected exception in save method: {e}")
-        raise
-
 
 
 class UserForm(forms.ModelForm):

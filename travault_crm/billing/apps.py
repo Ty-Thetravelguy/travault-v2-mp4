@@ -7,4 +7,4 @@ class BillingConfig(AppConfig):
     name = 'billing'
 
     def ready(self):
-        from . import stripe_config
+        import billing.subscription

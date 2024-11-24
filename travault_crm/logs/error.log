@@ -7460,3 +7460,53 @@ Traceback (most recent call last):
                                                                       ^^^^^^^^^^^^^^^^^
 AttributeError: 'Agency' object has no attribute 'agencyname'. Did you mean: 'agency_name'?
 ERROR 2024-11-24 16:22:24,826 basehttp "GET /agent_support/ HTTP/1.1" 500 89116
+ERROR 2024-11-24 16:25:51,717 log Internal Server Error: /billing/portal/
+ERROR 2024-11-24 16:25:51,717 basehttp "GET /billing/portal/ HTTP/1.1" 500 69
+ERROR 2024-11-24 16:37:39,858 log Internal Server Error: /agencies/add_user/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/agencies/views.py", line 380, in add_user
+    logger.info(f"New user '{new_user.username}' added to agency '{new_user.agency.name}'.")
+                                                                   ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Agency' object has no attribute 'name'
+ERROR 2024-11-24 16:37:39,860 basehttp "POST /agencies/add_user/ HTTP/1.1" 500 90569
+ERROR 2024-11-24 16:50:47,060 log Internal Server Error: /agencies/accounts/confirm-email/MjE/ch09gg-4839ad30c1f271b7bb3efb256e13b180/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 204, in _get_response
+    self.check_response(response, callback)
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 332, in check_response
+    raise ValueError(
+ValueError: The view agencies.views.confirm_email_and_setup_password didn't return an HttpResponse object. It returned None instead.
+ERROR 2024-11-24 16:50:47,061 basehttp "GET /agencies/accounts/confirm-email/MjE/ch09gg-4839ad30c1f271b7bb3efb256e13b180/ HTTP/1.1" 500 84578
+ERROR 2024-11-24 16:53:54,877 log Internal Server Error: /agencies/accounts/confirm-email/MjI/ch09lr-daa18fb1880ea970ff23ad7d9cbae853/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/agencies/views.py", line 597, in confirm_email_and_setup_password
+    return render(request, 'agencies/setup_password.html', {
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: agencies/setup_password.html
+ERROR 2024-11-24 16:53:54,879 basehttp "GET /agencies/accounts/confirm-email/MjI/ch09lr-daa18fb1880ea970ff23ad7d9cbae853/ HTTP/1.1" 500 104893

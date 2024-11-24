@@ -377,7 +377,7 @@ def add_user(request):
             new_user = user_form.save(commit=False)
             new_user.agency = request.user.agency
             new_user.save()
-            logger.info(f"New user '{new_user.username}' added to agency '{new_user.agency.name}'.")
+            logger.info(f"New user '{new_user.username}' added to agency '{new_user.agency.agency_name}'.")
 
             # Create the email confirmation object
             EmailAddress.objects.create(user=new_user, email=new_user.email, primary=True, verified=False)
@@ -533,47 +533,48 @@ def delete_user(request, user_id):
 def confirm_email_and_setup_password(request, uidb64, token):
     """
     View to confirm email and allow the user to set their password.
-
-    This view is used after a user clicks on an email confirmation link. It verifies
-    the token and allows the user to set a new password if the link is valid. If the
-    link is invalid or expired, an error message is displayed.
-
-    Args:
-        request (HttpRequest): The incoming HTTP request from the client.
-        uidb64 (str): Base64 encoded user ID.
-        token (str): Token to verify the user's email.
-
-    Returns:
-        HttpResponse: Renders the setup_password template with the password form,
-        or redirects to the login view on success or error.
     """
-    logger.info(f"Entering confirm_email_and_setup_password with uidb64={uidb64}.")
-    start_time = time.time()
+    logger.info("=== Starting Email Confirmation Process ===")
+    logger.info(f"Received uidb64: {uidb64}")
+    logger.info(f"Received token: {token}")
+    logger.info(f"Request method: {request.method}")
 
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
+        logger.info(f"Decoded UID: {uid}")
+        
         user = get_object_or_404(CustomUser, pk=uid)
-        logger.debug(f"Fetched user: {user.username} for email confirmation and password setup.")
+        logger.info(f"Found user: {user.email}")
+        
+        is_valid = default_token_generator.check_token(user, token)
+        logger.info(f"Is token valid? {is_valid}")
 
-        if default_token_generator.check_token(user, token):
+        if is_valid:
             email_address = EmailAddress.objects.filter(user=user, email=user.email).first()
+            logger.info(f"Found email address: {email_address}")
+            
             if email_address and not email_address.verified:
                 email_address.verified = True
                 email_address.save()
-                logger.info(f"Email address '{email_address.email}' verified for user '{user.username}'.")
+                logger.info(f"Email verified for user: {user.email}")
 
             if request.method == 'POST':
                 form = SetPasswordForm(user, request.POST)
+                logger.info(f"Processing POST request. Form is valid? {form.is_valid()}")
+                
                 if form.is_valid():
                     form.save()
+                    user.backend = 'django.contrib.auth.backends.ModelBackend'
                     login(request, user)
                     messages.success(request, "Your password has been set successfully!")
 
                     try:
                         agency = user.agency
                         stripe_customer = agency.stripecustomer
-
+                        logger.info(f"Found agency: {agency.agency_name}")
+                        
                         subscription = stripe.Subscription.retrieve(stripe_customer.stripe_subscription_id)
+                        logger.info(f"Subscription status: {subscription.status}")
 
                         if subscription.status in ['active', 'trialing']:
                             return redirect('dashboard:index')
@@ -584,19 +585,30 @@ def confirm_email_and_setup_password(request, uidb64, token):
                             else:
                                 return redirect('billing:subscription_inactive')
                     except StripeCustomer.DoesNotExist:
+                        logger.warning("No Stripe customer found for agency")
                         if user.user_type == 'admin':
                             messages.error(request, "Please complete payment setup for your agency.")
                             return redirect('billing:setup_payment')
                         else:
                             messages.error(request, "Your agency has not completed payment setup. Please contact your administrator.")
                             return redirect('billing:subscription_inactive')
+                else:
+                    logger.warning(f"Form validation failed: {form.errors}")
+            else:
+                form = SetPasswordForm(user)
 
+            return render(request, 'users/setup_password.html', {
+                'form': form,
+                'uidb64': uidb64,
+                'token': token,
+                'user': user
+            })
         else:
-            logger.warning(f"Invalid or expired token for user '{user.username}'.")
-            messages.error(request, "The confirmation link is invalid or has expired.")
+            logger.warning(f"Token validation failed for user: {user.email}")
+            messages.error(request, "The confirmation link is invalid or has expired. Please request a new one.")
             return redirect('account_login')
 
-    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
-        logger.error("Invalid confirmation link.")
-        messages.error(request, "The confirmation link is invalid.")
+    except Exception as e:
+        logger.error(f"Error in email confirmation process: {str(e)}", exc_info=True)
+        messages.error(request, "The confirmation link is invalid. Please request a new one.")
         return redirect('account_login')

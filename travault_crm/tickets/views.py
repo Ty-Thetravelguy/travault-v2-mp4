@@ -40,7 +40,11 @@ ticket_subject_autocomplete = TicketSubjectAutocomplete.as_view()
 
 @login_required
 def manage_subjects(request):
-    subjects = TicketSubject.objects.annotate(ticket_count=Count('ticket')).order_by(Lower('subject'))
+    subjects = TicketSubject.objects.filter(
+        agency=request.user.agency
+    ).annotate(
+        ticket_count=Count('ticket')
+    ).order_by(Lower('subject'))
     return render(request, 'tickets/manage_subjects.html', {'subjects': subjects})
 
 @login_required
@@ -55,7 +59,10 @@ def ticket_subject_autocomplete(request):
 def create_ticket_subject(request):
     subject = request.POST.get('subject')
     if subject:
-        new_subject, created = TicketSubject.objects.get_or_create(subject=subject)
+        new_subject, created = TicketSubject.objects.get_or_create(
+            subject=subject,
+            agency=request.user.agency
+        )
         if created:
             messages.success(request, f"New ticket subject '{subject}' has been created.")
         else:

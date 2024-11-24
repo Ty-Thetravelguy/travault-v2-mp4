@@ -7,7 +7,12 @@ from django.core.exceptions import ValidationError
 
 
 class TicketSubject(models.Model):
-    subject = models.CharField(max_length=100, unique=True)
+    subject = models.CharField(max_length=100)
+    agency = models.ForeignKey(Agency, on_delete=models.CASCADE)  # Temporarily allow null
+
+
+    class Meta:
+        unique_together = ['subject', 'agency']  # Subjects can be duplicated across agencies but unique within an agency
 
     def __str__(self):
         return self.subject

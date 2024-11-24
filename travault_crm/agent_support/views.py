@@ -30,7 +30,7 @@ def agent_support(request):
     # Fetch the current user's agency and filter suppliers accordingly
     agency = request.user.agency
     suppliers = AgentSupportSupplier.objects.filter(agency=agency).select_related('agency')
-    logger.debug(f"Fetched {suppliers.count()} suppliers for agency '{agency.name}'.")
+    logger.debug(f"Fetched {suppliers.count()} suppliers for agency '{agency.agency_name}'.")
 
     supplier_types = AgentSupportSupplier.SUPPLIER_TYPES
 
@@ -109,7 +109,7 @@ def edit_agent_supplier(request, pk):
     # Fetch the current user's agency and the supplier to be edited
     agency = request.user.agency
     supplier = get_object_or_404(AgentSupportSupplier, pk=pk, agency=agency)
-    logger.debug(f"Fetched supplier '{supplier.supplier_name}' for editing in agency '{agency.name}'.")
+    logger.debug(f"Fetched supplier '{supplier.supplier_name}' for editing in agency '{agency.agency_name}'.")
 
     # Handle form submission for updating the supplier
     if request.method == 'POST':

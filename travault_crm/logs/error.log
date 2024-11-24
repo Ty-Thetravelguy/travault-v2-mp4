@@ -7428,3 +7428,35 @@ ERROR 2024-11-21 19:16:25,721 log Internal Server Error: /billing/portal/
 ERROR 2024-11-21 19:16:25,722 basehttp "GET /billing/portal/ HTTP/1.1" 500 212
 ERROR 2024-11-21 19:17:49,975 log Internal Server Error: /billing/portal/
 ERROR 2024-11-21 19:17:49,976 basehttp "GET /billing/portal/ HTTP/1.1" 500 69
+ERROR 2024-11-24 16:19:00,178 log Internal Server Error: /agent_support/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/agent_support/views.py", line 33, in agent_support
+    logger.debug(f"Fetched {suppliers.count()} suppliers for agency '{agency.name}'.")
+                                                                      ^^^^^^^^^^^
+AttributeError: 'Agency' object has no attribute 'name'
+ERROR 2024-11-24 16:19:00,179 basehttp "GET /agent_support/ HTTP/1.1" 500 88803
+ERROR 2024-11-24 16:22:24,823 log Internal Server Error: /agent_support/
+Traceback (most recent call last):
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/.pip-modules/lib/python3.12/site-packages/django/contrib/auth/decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/travault-v2-mp4/travault_crm/agent_support/views.py", line 33, in agent_support
+    logger.debug(f"Fetched {suppliers.count()} suppliers for agency '{agency.agencyname}'.")
+                                                                      ^^^^^^^^^^^^^^^^^
+AttributeError: 'Agency' object has no attribute 'agencyname'. Did you mean: 'agency_name'?
+ERROR 2024-11-24 16:22:24,826 basehttp "GET /agent_support/ HTTP/1.1" 500 89116

@@ -26,8 +26,6 @@
 
                 <div class="card shadow">
                     <div class="card-body">
-                        <h2 class="card-title text-center mb-4">Add Company Notes</h2>
-
                         <form method="post" action="#" id="addCompanyNotesForm">
                             {% csrf_token %}
                             {% for field_pair in field_pairs %}
@@ -58,7 +56,7 @@
                             </div>
                             {% endfor %}
                             <div class="text-center mt-4">
-                                <button type="submit" class="btn btn-primary btn-lg">Add Company Notes</button>
+                                <button type="submit" class="btn btn-green-inverse btn-lg">Add Company Notes</button>
                             </div>
                         </form>
                     </div>

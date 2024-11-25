@@ -67,6 +67,7 @@ if DEBUG:
     ])
 CSRF_TRUSTED_ORIGINS = [
     'https://8000-tythetravel-travaultv2m-mpwcm7uefns.ws.codeinstitute-ide.net',
+    'https://travault-crm.herokuapp.com'
 ]
 
 # Application definition
@@ -111,6 +112,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'billing.middleware.EnforcePaymentMiddleware',
+    'django_otp.middleware.OTPMiddleware',
 ]
 
 ROOT_URLCONF = 'travault_crm.urls'

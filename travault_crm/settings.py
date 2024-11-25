@@ -60,6 +60,7 @@ DEBUG = True
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 if DEBUG:
     ALLOWED_HOSTS.extend([
+        'travault-crm.herokuapp.com',
         '8000-tythetravel-travaultv2m-mpwcm7uefns.ws.codeinstitute-ide.net',
         'localhost',
         '127.0.0.1'

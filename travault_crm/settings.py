@@ -139,6 +139,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',  
 ]
 
+OTP_TOTP_ISSUER = "Travault-crm"
 
 SITE_ID = 1
 

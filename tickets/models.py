@@ -80,7 +80,7 @@ class Ticket(models.Model):
         related_name='updated_tickets'
     )
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES)
-    category_type = models.CharField(max_length=10, choices=CATEGORY_TYPE_CHOICES)
+    category_type = models.CharField(max_length=30, choices=CATEGORY_TYPE_CHOICES)
     category = models.CharField(max_length=50) 
     subject = models.ForeignKey(TicketSubject, on_delete=models.CASCADE)
     description = models.TextField()

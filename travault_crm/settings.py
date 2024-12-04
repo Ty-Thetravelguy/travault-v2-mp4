@@ -144,8 +144,18 @@ OTP_TOTP_ISSUER = "Travault-crm"
 
 SITE_ID = 1
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'Your Project <noreply@travault.com>'  
+if 'DEVELOPMENT' in os.environ:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = 'Your Project <noreply@travault.com>'  
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASS')
+    DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
+
 
 WSGI_APPLICATION = 'travault_crm.wsgi.application'
 

@@ -24,3 +24,4 @@ sqlparse==0.5.1
 stripe==11.2.0
 tzdata==2024.2
 vine==5.1.0
+whitenoise==6.8.2

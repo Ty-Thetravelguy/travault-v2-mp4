@@ -205,13 +205,19 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# Database configuration
+DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://neondb_owner:R4QrxfC0MBla@ep-purple-grass-a2m3x556.eu-central-1.aws.neon.tech/barn_otter_coast_427430')
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': DATABASE_URL.split('/')[-1],
+        'USER': DATABASE_URL.split('://')[1].split(':')[0],
+        'PASSWORD': DATABASE_URL.split(':')[2].split('@')[0],
+        'HOST': DATABASE_URL.split('@')[1].split('/')[0],
+        'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

@@ -25,3 +25,4 @@ stripe==11.2.0
 tzdata==2024.2
 vine==5.1.0
 whitenoise==6.8.2
+psycopg2-binary==2.9.9

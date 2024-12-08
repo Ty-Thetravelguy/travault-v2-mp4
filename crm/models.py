@@ -70,10 +70,15 @@ CLIENT_TYPE_CHOICES = [
 ACCOUNT_STATUS_CHOICES = [
     # Statuses for the company's account relationship with the agency
     ('Lead', 'Lead'),
+    ('Qualified', 'Qualified'),
+    ('In Discussion', 'In Discussion'),
+    ('Account Form Sent', 'Account Form Sent'),
     ('New Client', 'New Client'),
     ('Trading', 'Trading'),
     ('No longer Trading', 'No longer Trading'),
     ('On hold', 'On hold'),
+    ('Closed - Won', 'Closed - Won'),
+    ('Closed - Lost', 'Closed - Lost'),
     ('Other', 'Other'),
 ]
 

@@ -200,16 +200,21 @@ ACCOUNT_PASSWORD_RESET_FROM_KEY_DONE_TEMPLATE = 'account/password_reset_from_key
 
 AUTH_USER_MODEL = 'agencies.CustomUser'
 
-# Redis as the broker and result backend
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# Redis/Celery settings
+if 'UPSTASH_REDIS_URL' in os.environ:
+    # Use Upstash Redis URL in production
+    CELERY_BROKER_URL = os.environ.get('UPSTASH_REDIS_URL')
+    CELERY_RESULT_BACKEND = os.environ.get('UPSTASH_REDIS_URL')
+else:
+    # Use local Redis in development
+    CELERY_BROKER_URL = 'redis://localhost:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
-# Optional Celery settings
+# Keep these existing Celery settings
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC' 
-
+CELERY_TIMEZONE = 'UTC'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 # Database

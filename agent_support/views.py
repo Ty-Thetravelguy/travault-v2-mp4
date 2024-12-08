@@ -70,7 +70,7 @@ def add_agent_supplier(request):
             supplier = form.save(commit=False)
             supplier.agency = agency
             supplier.save()
-            logger.info(f"New agent supplier '{supplier}' added for agency '{agency.name}'.")
+            logger.info(f"New agent supplier '{supplier}' added for agency '{agency.agency_name}'.")
             messages.success(request, "Agent supplier added successfully.")
             return redirect('agent_support:agent_support')
         else:

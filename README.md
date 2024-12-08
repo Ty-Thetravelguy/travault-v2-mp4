@@ -1,131 +1,207 @@
-![CI logo](https://codeinstitute.s3.amazonaws.com/fullstack/ci_logo_small.png)
+# Travault: A Tailored CRM for Travel Management Companies
 
-Welcome Tyrone Francis,
+## Project Overview
 
-This is the Code Institute student template for Gitpod. We have preinstalled all of the tools you need to get started. It's perfectly ok to use this template as the basis for your project submissions.
+Travault is a data warehouse solution designed for smaller travel management companies (TMCs). Based on my three years of experience working for a boutique TMC, I've identified a gap in the market for affordable, feature-rich Customer Relationship Management (CRM) systems. While popular CRMs like HubSpot and Salesforce offer powerful tools, their costs can be prohibitive for smaller companies, and free versions often have significant limitations. Travault aims to provide a tailored, cost-effective alternative with enhanced functionality compared to free CRM versions.
 
-You can safely delete this README.md file or change it for your own project. Please do read it at least once, though! It contains some important information about Gitpod and the extensions we use. Some of this information has been updated since the video content was created. The last update to this file was: **June 18, 2024**
+## Key Features
 
-## Gitpod Reminders
+1. **Sales Process Tracking**
+   - Monitor prospect clients through various stages:
+     - Qualified
+     - In Discussion
+     - Account Form Sent
+     - Closed - Won
+     - Closed - Lost
+     - Added to the sales pipeline
 
-To run a frontend (HTML, CSS, Javascript only) application in Gitpod, in the terminal, type:
+2. **Client Management**
+   - Ability to add and link contacts to the company
+   - Activity log initiation to track the client's lifecycle
+   - Options to log meetings, emails, phone calls, and create tickets
+   - "Client Notes" tab for TMC consultants to update information on client operations (e.g., travel policies)
 
-`python3 -m http.server`
+3. **Supplier Management**
+   - Store supplier contact information
+   - Record contractual details:
+     - Payment terms
+     - Payment frequency
+     - Credit line
+     - Form of payment
+   - Activity log for supplier interactions (meetings, emails, phone calls, tickets)
 
-A blue button should appear to click: _Make Public_,
+4. **Ticket Dashboard**
+   - Overview of all open/closed tickets
+   - Toggle button for easy filtering
+   - Categorisation of client-related or supplier-related tickets
+   - Display of opening date and brief description
+   - Detailed view with options to update or close tickets
 
-Another blue button should appear to click: _Open Browser_.
+5. **Supplier Contact Directory**
+   - Centralised area for TMC consultants to access:
+     - Industry contact information
+     - Supplier details
+     - TMC booking processes
 
-To run a backend Python file, type `python3 app.py` if your Python file is named `app.py`, of course.
+## Benefits
 
-A blue button should appear to click: _Make Public_,
+- Cost-effective alternative to premium CRMs
+- Tailored functionality for travel management companies
+- Improved client and supplier relationship management
+- Streamlined communication and issue resolution
+- Enhanced data organization and accessibility
 
-Another blue button should appear to click: _Open Browser_.
+## Database Schema
 
-By Default, Gitpod gives you superuser security privileges. Therefore, you do not need to use the `sudo` (superuser do) command in the bash terminal in any of the lessons.
+### **1.1. Agency Table**
 
-To log into the Heroku toolbelt CLI:
-
-1. Log in to your Heroku account and go to *Account Settings* in the menu under your avatar.
-2. Scroll down to the *API Key* and click *Reveal*
-3. Copy the key
-4. In Gitpod, from the terminal, run `heroku_config`
-5. Paste in your API key when asked
-
-You can now use the `heroku` CLI program - try running `heroku apps` to confirm it works. This API key is unique and private to you, so do not share it. If you accidentally make it public, you can create a new one with _Regenerate API Key_.
-
-### Connecting your Mongo database
-
-- **Connect to Mongo CLI on a IDE**
-- navigate to your MongoDB Clusters Sandbox
-- click **"Connect"** button
-- select **"Connect with the MongoDB shell"**
-- select **"I have the mongo shell installed"**
-- choose **mongosh (2.0 or later)** for : **"Select your mongo shell version"**
-- choose option: **"Run your connection string in your command line"**
-- in the terminal, paste the copied code `mongo "mongodb+srv://<CLUSTER-NAME>.mongodb.net/<DBname>" --apiVersion 1 --username <USERNAME>`
-  - replace all `<angle-bracket>` keys with your own data
-- enter password _(will not echo **\*\*\*\*** on screen)_
-
-------
-
-## Release History
-
-We continually tweak and adjust this template to help give you the best experience. Here is the version history:
-
-**June 18, 2024,** Add Mongo back into template
-
-**June 14, 2024,** Temporarily remove Mongo until the key issue is resolved
-
-**May 28 2024:** Fix Mongo and Links installs
-
-**April 26 2024:** Update node version to 16
-
-**September 20 2023:** Update Python version to 3.9.17.
-
-**September 1 2021:** Remove `PGHOSTADDR` environment variable.
-
-**July 19 2021:** Remove `font_fix` script now that the terminal font issue is fixed.
-
-**July 2 2021:** Remove extensions that are not available in Open VSX.
-
-**June 30 2021:** Combined the P4 and P5 templates into one file, added the uptime script. See the FAQ at the end of this file.
-
-**June 10 2021:** Added: `font_fix` script and alias to fix the Terminal font issue
-
-**May 10 2021:** Added `heroku_config` script to allow Heroku API key to be stored as an environment variable.
-
-**April 7 2021:** Upgraded the template for VS Code instead of Theia.
-
-**October 21 2020:** Versions of the HTMLHint, Prettier, Bootstrap4 CDN and Auto Close extensions updated. The Python extension needs to stay the same version for now.
-
-**October 08 2020:** Additional large Gitpod files (`core.mongo*` and `core.python*`) are now hidden in the Explorer, and have been added to the `.gitignore` by default.
-
-**September 22 2020:** Gitpod occasionally creates large `core.Microsoft` files. These are now hidden in the Explorer. A `.gitignore` file has been created to make sure these files will not be committed, along with other common files.
-
-**April 16 2020:** The template now automatically installs MySQL instead of relying on the Gitpod MySQL image. The message about a Python linter not being installed has been dealt with, and the set-up files are now hidden in the Gitpod file explorer.
-
-**April 13 2020:** Added the _Prettier_ code beautifier extension instead of the code formatter built-in to Gitpod.
-
-**February 2020:** The initialisation files now _do not_ auto-delete. They will remain in your project. You can safely ignore them. They just make sure that your workspace is configured correctly each time you open it. It will also prevent the Gitpod configuration popup from appearing.
-
-**December 2019:** Added Eventyret's Bootstrap 4 extension. Type `!bscdn` in a HTML file to add the Bootstrap boilerplate. Check out the <a href="https://github.com/Eventyret/vscode-bcdn" target="_blank">README.md file at the official repo</a> for more options.
-
-------
-
-## FAQ about the uptime script
-
-**Why have you added this script?**
-
-It will help us to calculate how many running workspaces there are at any one time, which greatly helps us with cost and capacity planning. It will help us decide on the future direction of our cloud-based IDE strategy.
-
-**How will this affect me?**
-
-For everyday usage of Gitpod, it doesn’t have any effect at all. The script only captures the following data:
-
-- An ID that is randomly generated each time the workspace is started.
-- The current date and time
-- The workspace status of “started” or “running”, which is sent every 5 minutes.
-
-It is not possible for us or anyone else to trace the random ID back to an individual, and no personal data is being captured. It will not slow down the workspace or affect your work.
-
-**So….?**
-
-We want to tell you this so that we are being completely transparent about the data we collect and what we do with it.
-
-**Can I opt out?**
-
-Yes, you can. Since no personally identifiable information is being captured, we'd appreciate it if you let the script run; however if you are unhappy with the idea, simply run the following commands from the terminal window after creating the workspace, and this will remove the uptime script:
-
-```
-pkill uptime.sh
-rm .vscode/uptime.sh
-```
-
-**Anything more?**
-
-Yes! We'd strongly encourage you to look at the source code of the `uptime.sh` file so that you know what it's doing. As future software developers, it will be great practice to see how these shell scripts work.
+| **Field Name**       | **Data Type**    | **Constraints**                                      | **Description**                                   |
+|---------------------|-----------------|----------------------------------------------------|--------------------------------------------------|
+| `id`                | Integer (Auto)   | Primary Key                                         | Unique identifier for each agency                |
+| `agency_name`       | Varchar(255)     | Not Null                                            | Name of the agency                               |
+| `address`           | Varchar(255)     | Not Null                                            | Full address of the agency                       |
+| `phone`             | Varchar(20)      | Not Null                                            | Contact phone number                             |
+| `email`             | EmailField       | Not Null                                            | Contact email address                            |
+| `website`           | URLField         | Null, Blank                                         | Website URL (optional)                           |
+| `vat_number`        | Varchar(9)       | Unique, Not Null                                    | VAT number of the agency                         |
+| `company_reg_number`| Varchar(8)       | Unique, Not Null                                    | Company registration number                      |
+| `employees`         | Varchar(10)      | Choices (`EMPLOYEE_CHOICES`), Not Null              | Size of the agency in terms of employees         |
+| `business_focus`    | Varchar(20)      | Choices (`BUSINESS_FOCUS_CHOICES`), Not Null        | Main business focus of the agency                |
+| `contact_name`      | Varchar(100)     | Not Null                                            | Primary contact person's name                    |
+| `created_at`        | DateTime         | Auto Now Add                                        | Timestamp when the agency was created            |
+| `updated_at`        | DateTime         | Auto Now                                            | Timestamp when the agency was last updated       |
 
 ---
 
-Happy coding!
+## **2. Agent Support App**
+
+### **2.1. AgentSupportSupplier Table**
+
+| **Field Name**          | **Data Type**    | **Constraints**                                      | **Description**                                  |
+|-------------------------|-----------------|-----------------------------------------------------|-------------------------------------------------|
+| `id`                   | Integer (Auto)   | Primary Key                                          | Unique identifier for each supplier             |
+| `agency_id`            | Integer          | Foreign Key → `Agency(id)`, Not Null                 | Associated agency                               |
+| `supplier_type`        | Varchar(50)      | Choices (`SUPPLIER_TYPES`), Not Null                 | Type of supplier (Air, Accommodation, etc.)     |
+| `supplier_name`        | Varchar(100)     | Not Null                                             | Name of the supplier                             |
+| `created_at`           | DateTime         | Auto Now Add                                         | Timestamp when the supplier was created         |
+| `updated_at`           | DateTime         | Auto Now                                             | Timestamp when the supplier was last updated    |
+
+---
+
+## **3. Billing App**
+
+### **3.1. StripeCustomer Table**
+
+| **Field Name**          | **Data Type**    | **Constraints**                                      | **Description**                                  |
+|-------------------------|-----------------|-----------------------------------------------------|-------------------------------------------------|
+| `id`                   | Integer (Auto)   | Primary Key                                          | Unique identifier for each Stripe customer      |
+| `agency_id`            | Integer          | One-to-One → `Agency(id)`, Not Null                  | Linked agency                                   |
+| `stripe_customer_id`   | Varchar(255)     | Unique, Null, Blank                                  | Stripe customer identifier                      |
+| `subscription_status`  | Varchar(50)      | Default `'inactive'`                                 | Status of the subscription (active, inactive)  |
+| `created_at`           | DateTime         | Auto Now Add                                         | Timestamp when the record was created           |
+| `updated_at`           | DateTime         | Auto Now                                             | Timestamp when the record was last updated      |
+
+---
+
+## **4. CRM App**
+
+### **4.1. Company Table**
+
+| **Field Name**          | **Data Type**    | **Constraints**                                      | **Description**                                  |
+|-------------------------|-----------------|-----------------------------------------------------|-------------------------------------------------|
+| `id`                   | Integer (Auto)   | Primary Key                                          | Unique identifier for each company             |
+| `agency_id`            | Integer          | Foreign Key → `Agency(id)`, Not Null                 | Associated agency                               |
+| `company_name`         | Varchar(255)     | Not Null                                             | Name of the company                             |
+| `email`                | EmailField       | Not Null                                             | Contact email address                           |
+| `created_at`           | DateTime         | Auto Now Add                                         | Timestamp when the company was created          |
+
+---
+
+## **5. Activity Log App**
+
+### **5.1. Meeting Table**
+
+| **Field Name**          | **Data Type**    | **Constraints**                                      | **Description**                                  |
+|-------------------------|-----------------|-----------------------------------------------------|-------------------------------------------------|
+| `id`                   | Integer (Auto)   | Primary Key                                          | Unique identifier for each meeting             |
+| `subject`              | Varchar(255)     | Not Null                                             | Subject of the meeting                         |
+| `company_id`           | Integer          | Foreign Key → `Company(id)`, Not Null                | Associated company                              |
+| `date`                 | Date             | Not Null                                             | Date of the meeting                             |
+
+---
+
+## **6. Ticketing System**
+
+### **6.1. Ticket Table**
+
+| **Field Name**          | **Data Type**    | **Constraints**                                      | **Description**                                  |
+|-------------------------|-----------------|-----------------------------------------------------|-------------------------------------------------|
+| `id`                   | Integer (Auto)   | Primary Key                                          | Unique identifier for each ticket               |
+| `company_id`           | Integer          | Foreign Key → `Company(id)`, Not Null                 | Associated company                              |
+| `contact_id`           | Integer          | Foreign Key → `Contact(id)`, Null, Blank             | Associated contact                              |
+| `agency_id`            | Integer          | Foreign Key → `Agency(id)`, Not Null                 | Associated agency                               |
+| `owner_id`             | Integer          | Foreign Key → `CustomUser(id)`, Not Null             | User who owns the ticket                        |
+| `priority`             | Varchar(10)      | Choices (`PRIORITY_CHOICES`), Not Null               | Priority of the ticket                          |
+| `status`               | Varchar(20)      | Choices (`STATUS_CHOICES`), Default `'open'`         | Current status of the ticket                    |
+| `created_at`           | DateTime         | Auto Now Add                                         | Timestamp when the ticket was created           |
+| `updated_at`           | DateTime         | Auto Now                                             | Timestamp when the ticket was last updated      |
+
+---
+
+## **Relationships Overview**
+
+- **Agency**
+  - One-to-Many with CustomUser, AgentSupportSupplier, Billing, Company, Ticket
+
+- **CustomUser**
+  - Many-to-One with Agency
+
+- **AgentSupportSupplier**
+  - Many-to-One with Agency
+
+- **StripeCustomer**
+  - One-to-One with Agency
+
+- **Company**
+  - Many-to-One with Agency
+
+- **Ticket**
+  - Many-to-One with Company, Contact, Agency
+
+## **Issues / Bugs**
+
+### **1. CSS Loading Issues**
+
+I had a lot of issues trying to get the CSS to load. After numerous troubleshooting attempts and consultations with ChatGPT, I discovered that the static file was in the incorrect directory. Additionally, I had an incorrect syntax in the `settings.py` file for `STATICFILES_DIRS`. Upon reviewing my previous walkthrough project, **Boutique Ado**, I was able to identify and correct the syntax for `STATICFILES_DIRS`, and everything started working as expected.
+
+---
+
+### **2. "Register" Link Not Working**
+
+The "Register" link in my navigation bar was not properly directing users to the registration page. After reviewing all the code, I discovered that the issue was caused by a bug in the **JavaScript** logic. The incorrect JS code was affecting how the link was being resolved. After identifying the problem, I made the necessary adjustments and the issue was resolved.
+
+---
+
+### **3. AWS S3 Integration Issues**
+
+I encountered problems linking **AWS S3** for users to upload PDFs. The setup process proved to be more challenging than expected, and I have yet to fully resolve it. Further investigation and guidance are required to get this feature working properly.
+
+---
+
+### **4. Back Button Bug in Contact Edit View**
+
+When a user was editing a contact and clicked the "Back" button, they were redirected to a different contact, rather than the original one they were editing. After reviewing the `views.py` file, I realised that the logic for handling the "Back" functionality was flawed. The **edit_contact view** was not properly fetching the correct contact object. I updated the view logic to ensure that it references the correct contact, and the bug was successfully resolved.
+
+---
+
+### **5. URL Routing Bug for Add Transaction Fee**
+
+After refining my code to ensure proper handling of the active tab, I ran into another bug related to URL resolution. Specifically, after adding a fee, the URL incorrectly resolved to the **company_detail view** instead of the **add_transaction_fee view**. This was a tricky issue to debug as there were no syntax errors or obvious mistakes.
+
+To resolve it, I used several debugging techniques, including:
+
+- **Print statements** for tracking URL paths
+- **Logging** key information at various points in the view
+- **Using ChatGPT** to review potential causes
+
+After a thorough review, I discovered that the **URL patterns were not prioritised correctly**. The `company_detail_with_tab` path was matching before `add_transaction_fee`, causing the wrong view to be triggered. To fix it, I adjusted the URL patterns to ensure that **add_transaction_fee** had a higher priority in the URL resolver. After this change, everything worked perfectly.

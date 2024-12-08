@@ -3,6 +3,7 @@
 from django.db import models
 from agencies.models import Agency
 from django.conf import settings
+from django.utils import timezone
 
 # Choices for industry, company type, client type, and account status
 INDUSTRY_CHOICES = [
@@ -125,6 +126,11 @@ class Company(models.Model):
 
     def __str__(self):
         return self.company_name
+    
+    def save(self, *args, **kwargs):
+        if not self.last_activity_date:  # If last_activity_date is not set
+            self.last_activity_date = timezone.now()  # Set it to current time
+        super().save(*args, **kwargs)
 
 class Contact(models.Model):
     """

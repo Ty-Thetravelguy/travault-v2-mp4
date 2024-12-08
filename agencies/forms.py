@@ -2,6 +2,7 @@
 
 from django import forms
 from allauth.account.forms import SignupForm
+from allauth.account.models import EmailAddress 
 from .models import Agency, CustomUser
 import re
 import logging
@@ -223,6 +224,23 @@ class UserForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'user_type': forms.Select(attrs={'class': 'form-control'}), 
         }
+
+    def clean_email(self):
+        """
+        Validate that the email is not already in use by another user.
+        """
+        email = self.cleaned_data.get('email')
+        user_id = self.instance.id if self.instance else None
+
+        # Check if email exists for another user
+        if CustomUser.objects.filter(email=email).exclude(id=user_id).exists():
+            raise forms.ValidationError("This email address is already in use. Please use a different email.")
+
+        # Check if email exists in EmailAddress model
+        if EmailAddress.objects.filter(email=email).exclude(user=self.instance).exists():
+            raise forms.ValidationError("This email address is already registered. Please use a different email.")
+
+        return email
 
 
 class AgencyProfileForm(forms.ModelForm):

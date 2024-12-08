@@ -4,6 +4,8 @@
 
 Travault is a data warehouse solution designed for smaller travel management companies (TMCs). Based on my three years of experience working for a boutique TMC, I've identified a gap in the market for affordable, feature-rich Customer Relationship Management (CRM) systems. While popular CRMs like HubSpot and Salesforce offer powerful tools, their costs can be prohibitive for smaller companies, and free versions often have significant limitations. Travault aims to provide a tailored, cost-effective alternative with enhanced functionality compared to free CRM versions.
 
+View the programme [here](https://travault-686ad8887c30.herokuapp.com/).
+
 ## Key Features
 
 1. **Sales Process Tracking**
@@ -379,3 +381,28 @@ With these changes, I ensured a more consistent reference to the agency name and
 ### **Logout**
 
 - ✅ **User successfully logged out** — Successful
+
+## **Summary of Technologies**
+
+| **Category**        | **Technology/Tool**          | **Purpose**                                          |
+|--------------------|-----------------------------|-----------------------------------------------------|
+| **Framework**       | [Django](https://www.djangoproject.com/) | Web development framework                           |
+| **Storage**         | [AWS S3](https://aws.amazon.com/s3/)     | Media file storage                                  |
+| **Server**          | [Heroku](https://www.heroku.com/)       | Cloud platform for app deployment                  |
+| **Database**        | [PostgreSQL](https://www.postgresql.org/)| Relational database for storing data               |
+| **Queue**           | [Celery](https://docs.celeryq.dev/en/stable/), [Redis](https://redis.io/) | Background job processing & message brokering      |
+| **Cache**           | [Redis](https://redis.io/)               | Cache layer and message broker                     |
+| **Authentication**  | [Django Allauth](https://django-allauth.readthedocs.io/en/latest/), [Django OTP](https://django-otp-official.readthedocs.io/en/latest/) | User authentication, 2FA support                   |
+| **Payment**         | [Stripe](https://stripe.com/)           | Payment processing                                 |
+| **Email**           | [Gmail SMTP](https://www.google.com/gmail/) | Email service for notifications                    |
+| **Environment**     | [dotenv](https://pypi.org/project/python-dotenv/), [os](https://docs.python.org/3/library/os.html) | Securely load environment variables                |
+| **CI/CD**           | [Heroku CI/CD](https://devcenter.heroku.com/articles/heroku-cli) | Continuous deployment to Heroku                   |
+| **Package Management** | pip, requirements.txt   | Package and dependency management                  |
+| **Logging**         | Django Logging, Custom Logs | Logs errors to file and console                   |
+| **File Handling**   | [pathlib](https://docs.python.org/3/library/pathlib.html) | Cross-platform path handling                      |
+| **Templates**       | Django Templates            | HTML templates for rendering views                |
+| **Security**        | CSRF, Clickjacking Protection | Security measures for user interactions         |
+| **Frontend**        | [HTML](https://developer.mozilla.org/en-US/docs/Web/HTML), [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS), [JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript), [Bootstrap](https://getbootstrap.com/) | Frontend development technologies                |
+| **Automation**      | [GitHub Actions](https://github.com/features/actions) | CI/CD for continuous deployment                    |
+| **Error Handling**  | Custom Middleware           | Enforce payment, log errors to files              |
+| **Assistance**      | [ChatGPT](https://openai.com/)            | AI assistance for support, queries, and guidance  |

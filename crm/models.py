@@ -120,6 +120,7 @@ class Company(models.Model):
     client_type = models.CharField(max_length=255, choices=CLIENT_TYPE_CHOICES, default='Travel')
     account_status = models.CharField(max_length=255, choices=ACCOUNT_STATUS_CHOICES, default='Lead')
     create_date = models.DateTimeField(auto_now_add=True)
+    last_activity_date = models.DateTimeField(null=True, blank=True)  # Add this field
     linked_companies = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='linked_to')
 
     def __str__(self):

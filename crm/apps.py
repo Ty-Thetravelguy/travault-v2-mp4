@@ -6,3 +6,4 @@ class CrmConfig(AppConfig):
 
     def ready(self):
         import crm.templatetags.crm_tags
+        import crm.signals 

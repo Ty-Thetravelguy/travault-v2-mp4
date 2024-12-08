@@ -197,19 +197,38 @@ def profile_view(request):
 
             # Check if the email address has changed
             if original_email != new_email:
+                # Check if the new email already exists
+                if CustomUser.objects.filter(email=new_email).exclude(id=user.id).exists():
+                    logger.warning(f"Attempted to change email to existing address: {new_email}")
+                    messages.error(request, "This email address is already in use. Please choose a different one.")
+                    return render(request, 'users/profile.html', {'form': form})
+
                 logger.info(f"Email address change detected for user: {user.username}")
-                # Mark the new email as unverified
-                EmailAddress.objects.filter(user=updated_user).delete()  # Remove old email records
-                EmailAddress.objects.create(user=updated_user, email=new_email, primary=True, verified=False)
-                send_email_confirmation(request, updated_user)  # Send verification email
+                # Keep the original email until verification
+                updated_user.email = original_email  # Keep original email
+                updated_user.save()
+
+                # Handle email verification through allauth
+                EmailAddress.objects.filter(user=updated_user).delete()
+                EmailAddress.objects.create(
+                    user=updated_user,
+                    email=new_email,
+                    primary=True,
+                    verified=False
+                )
+                send_email_confirmation(request, updated_user)
                 logger.info(f"Verification email sent to new address: {new_email}")
 
-                messages.info(request, "The email address has been changed. A verification email has been sent to the new address.")
+                messages.info(request, 
+                    "A verification email has been sent to your new email address. "
+                    "Your current email will remain active until the new one is verified.")
+            else:
+                # Save other profile changes
+                updated_user.save()
+                logger.info(f"Profile updated for user: {user.username}")
+                messages.success(request, "Profile updated successfully!")
 
-            updated_user.save()
-            logger.info(f"Profile updated for user: {user.username}")
-            messages.success(request, "Profile updated successfully!")
-            return redirect('/agencies/profile/')  # Adjust to your profile URL name
+            return redirect('/agencies/profile/')
         else:
             logger.error(f"Profile update failed with errors: {form.errors}")
             messages.error(request, "Please correct the errors below.")
@@ -222,7 +241,6 @@ def profile_view(request):
         form.fields.pop('user_type', None)
         logger.debug("Initialized form for profile update.")
 
-    # Update the template path to match your actual template location
     logger.info(f"profile_view completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'users/profile.html', {'form': form})
 

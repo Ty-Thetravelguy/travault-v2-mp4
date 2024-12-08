@@ -205,3 +205,143 @@ To resolve it, I used several debugging techniques, including:
 - **Using ChatGPT** to review potential causes
 
 After a thorough review, I discovered that the **URL patterns were not prioritised correctly**. The `company_detail_with_tab` path was matching before `add_transaction_fee`, causing the wrong view to be triggered. To fix it, I adjusted the URL patterns to ensure that **add_transaction_fee** had a higher priority in the URL resolver. After this change, everything worked perfectly.
+
+## **Testing Report**
+
+---
+
+### **Registration**
+
+- ✅ **Successful register** — Successful
+- ✅ **Registration email sent** — Successful
+- ✅ **After confirming registration, login** — Successful
+- ✅ **After login, ask for payment** — Successful
+- ✅ **Create new users** — Successful
+- ✅ **New user registration email sent** — Successful
+- ✅ **Payment not asked for users** — Successful
+
+---
+
+### **Agent Support**
+
+- ❌ **Add new supplier** — **Unsuccessful**
+  - **Cause**: Bug caused by a duplicate field that was removed from the database.
+  - **Solution**: Made small adjustments to the `views.py`. After refining the code, it now adds the supplier **successfully**.
+- ✅ **Website opens in a new page** — Successful
+- ✅ **Edit supplier** — Successful
+- ✅ **Add process during editing** — Successful
+- ✅ **Add PDF** — Successful
+- ✅ **Delete agent supplier** — Successful
+
+---
+
+### **The Vault (CRM)**
+
+#### **During the add company process:**
+
+- ✅ **Fetch data from Diffbolt** — Successful
+  - **Note**: It does not always work as it depends on where the data is stored on the website.
+- ✅ **Company added** — Successful
+
+---
+
+#### **Activity and Contact Management**
+
+- ❌ **Last activity timestamp not showing in the table**
+  - **Cause**: No logic existed for it to be displayed.
+  - **Solution**: Updated `models.py`, `app.py`, and created `update_last_activity.py` and `signals.py`. After these changes, the timestamp showed **successfully**.
+- ✅ **Add company contact** — Successful
+- ✅ **Edit company contact** — Successful
+- ✅ **Delete company contact** — Successful
+- ✅ **Add company notes** — Successful
+- ✅ **Edit company notes** — Successful
+- ✅ **Delete company notes** — Successful
+- ✅ **Add fees** — Successful
+- ✅ **Edit fees** — Successful
+
+---
+
+#### **Call, Email, and Meeting Logs**
+
+- ✅ **Log a call** — Successful
+- ✅ **Log an email with a reminder** — Successful
+- ✅ **Log a meeting with a reminder** — Successful
+
+---
+
+#### **Ticketing System**
+
+- ✅ **Create a ticket** — Successful
+- ✅ **Update full ticket** — Successful
+  - 📧 **Email received after creation of ticket** — Successful
+- ✅ **Change ticket status** — Successful
+  - 📧 **Email received after status change** — Successful
+- ✅ **Add action to ticket** — Successful
+  - 📧 **Email received after adding action** — Successful
+- ✅ **Change ticket status to 'closed'** — Successful
+  - 🔒 **After ticket closure, user could not edit or delete anything** — Successful
+- ✅ **Saved subject shows when user starts searching** — Successful
+- ✅ **Update action taken** — Successful
+- ✅ **Delete action** — Successful
+- ✅ **Back buttons working**:
+  - **Back to company (x2)** — **Partially Successful**
+    - 🔍 **Issue**: The second "Back to company" button didn't take the user to the correct tab.
+    - **Solution**: Fixed the syntax in the HTML, and the button now works as expected.
+  - ✅ **Back to all tickets (x2)** — Successful
+- ✅ **Delete ticket** — Successful
+- ✅ **Reopen ticket after closure** — Successful
+
+---
+
+#### **Ticket Subject Management**
+
+- ✅ **Manage Ticket Subjects** — Successful
+  - ✅ **Edit** — Successful
+  - ✅ **Delete** — Successful
+  - ✅ **Add** — Successful
+  - ✅ **Back to tickets button works** — Successful
+
+---
+
+#### **Open a Ticket from Ticket View**
+
+- ✅ **Open a ticket from ticket view** — Successful
+
+---
+
+### **Profile**
+
+- ✅ **Update name and email** — Successful
+  - 📧 **Email verification sent after updating email** — Successful
+  - ❌ **Attempt to change email to one already in the database**:
+    - **Issue**: It was changed initially, but only on verification did the system block the change.
+    - **Solution**: Updated the logic in the `profile_view` function. Now it works as expected.
+
+---
+
+### **Manage Users**
+
+- ✅ **Add new user** — Successful
+  - 📧 **Verification email sent** — Successful
+  - 🔐 **User needs to create a password** — Successful
+- ✅ **Edit user details** — Successful
+
+---
+
+### **Agency Profile**
+
+- ✅ **Update agency profile** — Successful
+
+---
+
+### **Billing**
+
+- ✅ **View number of users** — Successful
+- ✅ **View total cost per user and total cost for all users** — Successful
+- ✅ **Update payment method (redirect to Stripe)** — Successful
+
+---
+
+### **Logout**
+
+- ✅ **User successfully logged out** — Successful

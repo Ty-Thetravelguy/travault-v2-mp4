@@ -608,7 +608,7 @@ def confirm_email_and_setup_password(request, uidb64, token):
             else:
                 form = SetPasswordForm(user)
 
-            return render(request, 'users/setup_password.html', {
+            return render(request, 'account/setup_password.html', {
                 'form': form,
                 'uidb64': uidb64,
                 'token': token,

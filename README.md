@@ -570,3 +570,13 @@ Before starting the deployment, make sure you have the following in place:
    ```bash
    heroku logs --tail
    ```
+
+## **Closing Statement**
+
+I would like to extend my sincere gratitude to **Ben**, my lecturer, for granting me an extension on this project. Your support and understanding made a significant difference in helping me complete this work. Without the additional time, I would have struggled to bring everything together.
+
+This project has been one of the most challenging I have ever undertaken. Balancing the complexity of the technical requirements with the demands of my current role in the travel industry was no easy feat. Managing work responsibilities alongside this project required immense discipline, focus, and resilience.
+
+Despite the challenges, I am proud of the progress I made and the skills I have developed throughout this journey. Completing this project has not only strengthened my technical knowledge but also reinforced my ability to persevere under pressure. This experience will undoubtedly contribute to my future growth as a developer and as a professional in the travel industry.
+
+Thank you once again for your patience, guidance, and support.

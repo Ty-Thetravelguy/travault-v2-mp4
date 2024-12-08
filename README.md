@@ -206,6 +206,40 @@ To resolve it, I used several debugging techniques, including:
 
 After a thorough review, I discovered that the **URL patterns were not prioritised correctly**. The `company_detail_with_tab` path was matching before `add_transaction_fee`, causing the wrong view to be triggered. To fix it, I adjusted the URL patterns to ensure that **add_transaction_fee** had a higher priority in the URL resolver. After this change, everything worked perfectly.
 
+### **6. Field Duplication Bug in Agency Model**
+
+While working on the **Agency model**, I realised I had two fields representing the same data: **`name`** and **`agency_name`**. To streamline the model, I decided to remove the **`name`** field and rely solely on **`agency_name`**.
+
+#### **Issue**
+
+Once I removed the **`name`** field, I encountered multiple errors during testing. The errors occurred wherever the code still referenced **`agency.name`**, which no longer existed. This affected several areas of the code, including:
+
+- **View logic** where `agency.name` was being used.
+- **Logger messages** that referenced `agency.name` for debugging.
+- **Templates** where `agency.name` was used for displaying information.
+
+#### **Debugging Steps**
+
+To resolve this issue, I took the following steps:
+
+- **Searched for all instances** of `agency.name` in the project files.
+- **Replaced `agency.name` with `agency.agency_name`** where applicable.
+- **Added a `__str__()` method** to the Agency model to avoid referencing `agency.agency_name` directly.
+- **Ran tests** to ensure no further errors appeared when creating, editing, or viewing agency-related objects.
+
+#### **Resolution**
+
+- **Updated all references** of `agency.name` to **`agency.agency_name`** in the views, templates, and logger messages.
+- **Implemented a `__str__()` method** in the Agency model to allow direct use of `str(agency)`, which automatically returns
+
+**`agency.agency_name`**.
+
+- **Tested the application thoroughly**, and no errors were found in areas where the previous errors occurred.
+
+With these changes, I ensured a more consistent reference to the agency name and reduced the risk of this issue recurring in future development.
+
+---
+
 ## **Testing Report**
 
 ---

@@ -180,52 +180,48 @@ def profile_view(request):
     logger.info("Entering profile_view.")
     start_time = time.time()
 
-    # Fetch the current user and their original email address
     user = request.user
     original_email = user.email
     logger.debug(f"Fetched user: {user.username} with email: {original_email}")
 
     if request.method == 'POST':
         form = UserForm(request.POST, instance=user)
-        # Exclude fields that should not be editable in the profile context
         form.fields.pop('username', None)
         form.fields.pop('user_type', None)
 
         if form.is_valid():
-            updated_user = form.save(commit=False)
-            new_email = updated_user.email
+            new_email = form.cleaned_data.get('email')
 
-            # Check if the email address has changed
+            # Check if email has changed
             if original_email != new_email:
-                # Check if the new email already exists
+                # Check if email exists in CustomUser model
                 if CustomUser.objects.filter(email=new_email).exclude(id=user.id).exists():
-                    logger.warning(f"Attempted to change email to existing address: {new_email}")
-                    messages.error(request, "This email address is already in use. Please choose a different one.")
+                    messages.error(request, "This email address is already registered. Please use a different email.")
                     return render(request, 'users/profile.html', {'form': form})
 
-                logger.info(f"Email address change detected for user: {user.username}")
-                # Keep the original email until verification
-                updated_user.email = original_email  # Keep original email
+                # Check if email exists in EmailAddress model
+                if EmailAddress.objects.filter(email=new_email).exists():
+                    messages.error(request, "This email address is already in use. Please use a different email.")
+                    return render(request, 'users/profile.html', {'form': form})
+
+                # If we get here, email is unique and we can proceed
+                updated_user = form.save(commit=False)
+                updated_user.email = original_email  # Keep original email for now
                 updated_user.save()
 
-                # Handle email verification through allauth
-                EmailAddress.objects.filter(user=updated_user).delete()
+                # Handle email verification
+                EmailAddress.objects.filter(user=user).delete()
                 EmailAddress.objects.create(
-                    user=updated_user,
+                    user=user,
                     email=new_email,
                     primary=True,
                     verified=False
                 )
-                send_email_confirmation(request, updated_user)
-                logger.info(f"Verification email sent to new address: {new_email}")
-
-                messages.info(request, 
-                    "A verification email has been sent to your new email address. "
-                    "Your current email will remain active until the new one is verified.")
+                send_email_confirmation(request, user)
+                messages.info(request, "A verification email has been sent to your new email address.")
             else:
-                # Save other profile changes
-                updated_user.save()
-                logger.info(f"Profile updated for user: {user.username}")
+                # No email change, just save the form
+                form.save()
                 messages.success(request, "Profile updated successfully!")
 
             return redirect('/agencies/profile/')
@@ -233,17 +229,14 @@ def profile_view(request):
             logger.error(f"Profile update failed with errors: {form.errors}")
             messages.error(request, "Please correct the errors below.")
 
-    # Initialize the form for GET requests
     else:
         form = UserForm(instance=user)
-        # Exclude fields that should not be editable in the profile context
         form.fields.pop('username', None)
         form.fields.pop('user_type', None)
         logger.debug("Initialized form for profile update.")
 
     logger.info(f"profile_view completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'users/profile.html', {'form': form})
-
 
 @login_required
 def agency_profile(request):

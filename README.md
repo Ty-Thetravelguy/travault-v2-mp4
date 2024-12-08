@@ -406,3 +406,167 @@ With these changes, I ensured a more consistent reference to the agency name and
 | **Automation**      | [GitHub Actions](https://github.com/features/actions) | CI/CD for continuous deployment                    |
 | **Error Handling**  | Custom Middleware           | Enforce payment, log errors to files              |
 | **Assistance**      | [ChatGPT](https://openai.com/)            | AI assistance for support, queries, and guidance  |
+
+## **Deployment**
+
+### **Deployment Process**
+
+The deployment of the **Travault CRM** project to **Heroku** was a journey filled with a few unexpected challenges. Below, I provide a summary of the process, issues encountered, and how I resolved them.
+
+---
+
+### **Initial Deployment Attempt**
+
+When I first attempted to deploy the project to Heroku, I encountered a strange and unidentifiable error. Despite several attempts to debug and investigate, I couldn't figure out the root cause. This error persisted, and no amount of troubleshooting seemed to resolve it. Unfortunately, during this process, I also managed to lock myself out of my Heroku account.
+
+---
+
+### **New Heroku Account Creation**
+
+With no access to my previous account, I decided to create a **new Heroku account**. This gave me a fresh start and allowed me to begin the deployment process from scratch. I re-linked my local project to the new Heroku account and created a new app for the deployment.
+
+---
+
+### **Database Migration Challenges**
+
+One of the biggest challenges I faced during deployment was the difference in how **PostgreSQL** and **SQLite** handle database constraints.
+
+#### **Issue 1: Field Length Constraint**
+
+- **Problem:** One of my database fields had a `CharField` with a **max_length** that was too small for the existing data. In development, SQLite didn't flag this as an issue, but PostgreSQL did.  
+- **Solution:** I updated the model to increase the **max_length** for the problematic field, ensuring that it could handle the existing data without errors. I then re-ran the migrations to apply the change.
+
+#### **Issue 2: Migration Problems**
+
+- **Problem:** Existing migrations had issues and continued to throw errors. It appeared that incorrect migrations had been applied earlier, leading to a misalignment between the models and the database schema.  
+- **Solution:** I deleted all existing migration files and re-created them from scratch.  
+  **Steps I followed:**
+
+  ```bash
+  rm -rf */migrations/  # Deleted all migration files
+  python manage.py makemigrations  # Created fresh migrations
+  python manage.py migrate  # Applied new migrations
+
+## **How to Deploy a Django Project to Heroku**
+
+This guide walks you through the process of deploying a Django project to **Heroku**. You'll learn how to set up Heroku, manage PostgreSQL, configure environment variables, and launch your project live.
+
+---
+
+### **Why Deploy on Heroku?**
+
+Heroku is a cloud platform that simplifies deployment, allowing you to get your Django project online with minimal configuration. It supports key technologies like Python, PostgreSQL, and integrates with GitHub for automatic deployments.
+
+---
+
+### **Prerequisites**
+
+Before starting the deployment, make sure you have the following in place:
+
+- **Heroku Account**: Sign up at [Heroku](https://www.heroku.com/).
+- **Heroku CLI**: Install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli).
+- **GitHub Account**: Your project must be pushed to a GitHub repository.
+- **PostgreSQL**: Production database for Django (Heroku uses PostgreSQL, not SQLite).
+- **Environment Variables**: Store sensitive information like API keys, secret keys, and database URLs.
+
+---
+
+### **1. Log in to Heroku**
+
+1. **Go to the Heroku Dashboard**  
+   Visit [Heroku Dashboard](https://dashboard.heroku.com/apps) and log in with your credentials.
+
+2. **Create a New Heroku App**  
+   - Click on the **New** button at the top-right.  
+   - Select **Create new app**.  
+   - Enter an app name (must be unique) and choose a region (usually **Europe** or **United States**).  
+   - Click **Create app**.  
+
+---
+
+### **2. Configure Settings**
+
+1. **Go to the Settings Tab**  
+   On the newly created Heroku app page, navigate to the **Settings** tab.  
+
+2. **Add Config Vars**  
+   - Scroll down to the **Config Vars** section.  
+   - Click **Reveal Config Vars**.  
+   - Add all the key-value pairs from your `.env` file.  
+
+    **Example Config Vars:**
+
+    ```
+     AWS_ACCESS_KEY_ID = <your-aws-key>
+     AWS_SECRET_ACCESS_KEY = <your-aws-secret>
+     DATABASE_URL = <your-database-url>
+     SECRET_KEY = <your-django-secret-key>
+     STRIPE_SECRET_KEY = <your-stripe-secret-key>
+     STRIPE_PUBLIC_KEY = <your-stripe-public-key>
+    ```
+
+    These variables allow your application to securely access critical information like API keys and database URLs.
+
+---
+
+### **3. Connect to GitHub**
+
+1. **Go to the Deploy Tab**  
+   On the Heroku app page, navigate to the **Deploy** tab.  
+
+2. **Connect Your GitHub Repository**  
+   - Scroll down to **Deployment method** and select **GitHub**.  
+   - Click **Connect to GitHub** and log in if prompted.  
+
+3. **Search for Your Repository**  
+   - In the search bar, type the name of your GitHub repository.  
+   - Click **Search** and then **Connect** on your repository.  
+
+---
+
+### **4. Configure Automatic Deployment**
+
+1. **Enable Automatic Deploys**  
+   - Scroll down to the **Automatic Deploys** section.  
+   - Click **Enable Automatic Deploys**.  
+
+   This means that every time you push changes to GitHub, Heroku will automatically deploy the new version of your project.  
+
+2. **Manual Deployment**  
+   For the first deployment, you will need to **manually deploy**.  
+   - Scroll down to the **Manual deploy** section.  
+   - Click the **Deploy Branch** button.  
+   - Heroku will build your app and display the build logs.  
+   - Once the deployment is successful, you will see a message saying **"Your app was successfully deployed."**  
+
+---
+
+### **5. Run Migrations on Heroku**
+
+1. **Access Heroku Console**  
+   - Click on the **More** button in the top-right corner of your Heroku app page.  
+   - Select **Run Console**.  
+
+2. **Run the Following Commands**  
+   - Run database migrations:  
+
+     ```bash
+     python manage.py migrate
+     ```
+
+   - Create a superuser to access the Django admin panel:  
+
+     ```bash
+     python manage.py createsuperuser
+     ```
+
+---
+
+### **6. Check Logs & Test the Live App**
+
+1. **Check Logs for Errors**  
+   If anything goes wrong, check the logs using:
+
+   ```bash
+   heroku logs --tail
+   ```

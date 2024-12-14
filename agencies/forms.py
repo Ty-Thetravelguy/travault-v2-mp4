@@ -5,9 +5,6 @@ from allauth.account.forms import SignupForm
 from allauth.account.models import EmailAddress 
 from .models import Agency, CustomUser
 import re
-import logging
-
-logger = logging.getLogger(__name__)
 
 class AgencyRegistrationForm(SignupForm):
     """
@@ -74,7 +71,6 @@ class AgencyRegistrationForm(SignupForm):
         Returns:
             str: Cleaned data for the username field.
         """
-        print("DEBUG: Validating username")
         username = self.cleaned_data.get('username')
         if CustomUser.objects.filter(username=username).exists():
             raise forms.ValidationError("This username is already taken. Please choose another.")
@@ -91,7 +87,7 @@ class AgencyRegistrationForm(SignupForm):
             str: Cleaned data for the company_name field.
         """
         company_name = self.cleaned_data.get('company_name')
-        if Agency.objects.filter(agency_name=company_name).exists():  # Corrected field name
+        if Agency.objects.filter(agency_name=company_name).exists():
             raise forms.ValidationError("A company with this name already exists.")
         return company_name
 
@@ -146,61 +142,47 @@ class AgencyRegistrationForm(SignupForm):
         return address
 
     def save(self, request):
-        print("DEBUG: Entering save method of AgencyRegistrationForm.")
+        """
+        Saves the user and agency information after validation.
+
+        Args:
+            request: The HTTP request object.
+
+        Returns:
+            user: The created user instance.
+        """
         try:
             # Create user
-            print(f"DEBUG: Attempting to create user with username: {self.cleaned_data.get('username')}")
             user = super(AgencyRegistrationForm, self).save(request)
-            print(f"DEBUG: User created successfully with email: {user.email}")
 
             # Attempt to create agency
-            try:
-                agency_data = {
-                    "agency_name": self.cleaned_data['company_name'],
-                    "address": self.cleaned_data['company_address'],
-                    "phone": self.cleaned_data['phone_number'],
-                    "email": user.email,
-                    "vat_number": self.cleaned_data['vat_number'],
-                    "company_reg_number": self.cleaned_data['company_reg_number'],
-                    "employees": self.cleaned_data['employees'],
-                    "business_focus": self.cleaned_data['business_focus'],
-                    "contact_name": self.cleaned_data['contact_full_name'],
-                }
-                print("DEBUG: Data for agency creation:", agency_data)
+            agency_data = {
+                "agency_name": self.cleaned_data['company_name'],
+                "address": self.cleaned_data['company_address'],
+                "phone": self.cleaned_data['phone_number'],
+                "email": user.email,
+                "vat_number": self.cleaned_data['vat_number'],
+                "company_reg_number": self.cleaned_data['company_reg_number'],
+                "employees": self.cleaned_data['employees'],
+                "business_focus": self.cleaned_data['business_focus'],
+                "contact_name": self.cleaned_data['contact_full_name'],
+            }
 
-                agency = Agency.objects.create(**agency_data)
-                print(f"DEBUG: Agency created successfully: {agency.agency_name}")
-            except Exception as e:
-                print(f"DEBUG ERROR: Exception during agency creation: {e}")
-                if 'user' in locals():
-                    user.delete()
-                    print("DEBUG: User deleted due to agency creation failure")
-                import traceback
-                traceback.print_exc()  # Print full traceback for deeper insight
-                raise
+            agency = Agency.objects.create(**agency_data)
 
             # Update user with agency details
-            try:
-                full_name = self.cleaned_data['contact_full_name'].strip().split()
-                if full_name:
-                    user.first_name = full_name[0]
-                    user.last_name = ' '.join(full_name[1:]) if len(full_name) > 1 else ''
-                user.user_type = 'admin'
-                user.agency = agency
-                user.save()
-                print(f"DEBUG: User linked to agency: {agency.agency_name}")
-            except Exception as e:
-                print(f"DEBUG ERROR: Exception during user update: {e}")
-                if agency:
-                    agency.delete()
-                    print(f"DEBUG: Agency deleted: {agency.agency_name}")
-                raise
+            full_name = self.cleaned_data['contact_full_name'].strip().split()
+            if full_name:
+                user.first_name = full_name[0]
+                user.last_name = ' '.join(full_name[1:]) if len(full_name) > 1 else ''
+            user.user_type = 'admin'
+            user.agency = agency
+            user.save()
 
             return user
 
         except Exception as e:
-            print(f"DEBUG ERROR: Unexpected exception in save method: {e}")
-            raise
+            raise forms.ValidationError(f"An error occurred while saving the agency registration: {e}")
 
 
 class UserForm(forms.ModelForm):
@@ -227,7 +209,13 @@ class UserForm(forms.ModelForm):
 
     def clean_email(self):
         """
-        Validate that the email is not already in use by another user.
+        Validates that the email is not already in use by another user.
+
+        Raises:
+            ValidationError: If the email address is already in use.
+
+        Returns:
+            str: Cleaned email address.
         """
         email = self.cleaned_data.get('email')
         user_id = self.instance.id if self.instance else None
@@ -245,7 +233,9 @@ class UserForm(forms.ModelForm):
 
 class AgencyProfileForm(forms.ModelForm):
     """
-    Form for updating an Agency's profile.
+    Form for updating an Agency's profile, including details such as 
+    agency name, address, VAT number, company registration number, 
+    contact information, and business focus.
     """
     class Meta:
         model = Agency

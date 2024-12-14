@@ -45,100 +45,126 @@ from django.views.decorators.http import require_POST
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
+
 class AgencyRegistrationView(SignupView):
+    """
+    View for handling agency registration.
+
+    This view extends the SignupView to include additional functionality
+    for registering an agency along with the user.
+    """
     template_name = 'agencies/registration.html'
     form_class = AgencyRegistrationForm
     success_url = reverse_lazy('agencies:registration_success')
 
     def get_form_kwargs(self):
-        print("DEBUG: Entering get_form_kwargs method.")
+        """
+        Returns the keyword arguments for instantiating the form.
+
+        This method ensures that no unintended 'instance' is passed to the form.
+
+        Returns:
+            dict: The keyword arguments for the form.
+        """
         kwargs = super().get_form_kwargs()
         kwargs.pop('instance', None)  # Ensure no unintended 'instance' is passed
-        print("DEBUG: Form kwargs prepared:", kwargs)
         return kwargs
 
     def form_invalid(self, form):
-        """Override to add detailed error logging"""
-        print("DEBUG: Form validation failed")
-        print("DEBUG: Form errors:", form.errors)
+        """
+        Handles the case when the form is invalid.
+
+        This method logs the form errors and returns the invalid form.
+
+        Args:
+            form: The invalid form instance.
+
+        Returns:
+            HttpResponse: The response for the invalid form.
+        """
+        messages.error(self.request, "There were errors in your submission. Please correct them.")
         return super().form_invalid(form)
 
     @transaction.atomic
     def form_valid(self, form):
-        print("DEBUG: Entering form_valid method.")
-        print("DEBUG: Cleaned data:", form.cleaned_data)
+        """
+        Handles the case when the form is valid.
+
+        This method creates a user and an agency in a single transaction,
+        sends a verification email, and redirects to the success URL.
+
+        Args:
+            form: The valid form instance.
+
+        Returns:
+            HttpResponse: The response for the valid form.
+        """
         try:
             # Create user and agency in one transaction
-            print("DEBUG: Form validation successful. Attempting to save user and agency.")
             user = form.save(self.request)
-            print(f"DEBUG: User created successfully with email: {user.email}")
 
             if not user.agency:
-                print(f"DEBUG ERROR: Agency not created for user {user.email}")
                 messages.error(self.request, "Failed to create agency. Please try again.")
                 return self.form_invalid(form)
             
             # Set user as admin
             user.user_type = 'admin'
             user.save()
-            print(f"DEBUG: User updated with admin role and linked to agency: {user.agency.agency_name}")
 
             # Send success message
-            print(f"DEBUG: Successfully created agency {user.agency.agency_name} with admin user {user.email}")
             messages.success(self.request, "Registration successful! Please verify your email.")
             
             # Send verification email
-            try:
-                send_email_confirmation(self.request, user)
-                print(f"DEBUG: Verification email sent to {user.email}")
-            except Exception as email_error:
-                print(f"DEBUG ERROR: Failed to send verification email: {str(email_error)}")
-                # Continue with registration even if email fails
-            
+            send_email_confirmation(self.request, user)
+
             # Redirect to your success page instead of the allauth default
             return HttpResponseRedirect(self.get_success_url())
         
         except Exception as e:
-            print(f"DEBUG ERROR: Exception during registration: {str(e)}")
             messages.error(self.request, "An error occurred during registration. Please try again.")
             if 'user' in locals() and user.id:
                 try:
                     user.delete()
-                    print(f"DEBUG: Cleaned up user due to registration failure: {user.email}")
-                except Exception as cleanup_error:
-                    print(f"DEBUG ERROR: Failed to clean up user: {str(cleanup_error)}")
+                except Exception:
+                    pass  # Handle cleanup error silently
             return self.form_invalid(form)
         
     def get_context_data(self, **kwargs):
-        print("DEBUG: Entering get_context_data method.")
-        try:
-            context = super().get_context_data(**kwargs)
-            context.update(self.kwargs)
-            
-            # Add additional context if needed
-            context['page_title'] = 'Agency Registration'
-            context['form_title'] = 'Register Your Agency'
-            print("DEBUG: Context prepared:", context)
-            return context
+        """
+        Adds additional context to the registration template.
+
+        Args:
+            kwargs: Additional keyword arguments.
+
+        Returns:
+            dict: The context data for the template.
+        """
+        context = super().get_context_data(**kwargs)
+        context.update(self.kwargs)
         
-        except Exception as e:
-            print(f"DEBUG ERROR: Error in get_context_data: {str(e)}")
-            return super().get_context_data(**kwargs)
+        # Add additional context if needed
+        context['page_title'] = 'Agency Registration'
+        context['form_title'] = 'Register Your Agency'
+        return context
 
     def get_success_url(self):
-        print("DEBUG: Entering get_success_url method.")
-        try:
-            # You can customize the success URL based on conditions
-            return str(self.success_url)
-        except Exception as e:
-            print(f"DEBUG ERROR: Error getting success URL: {str(e)}")
-            return str(reverse_lazy('account_email_verification_sent'))
+        """
+        Returns the success URL for the registration.
+
+        This method can be customized based on conditions.
+
+        Returns:
+            str: The success URL.
+        """
+        return str(self.success_url)
+
 
 def registration_success(request):
     """
     View to display registration success page.
     """
     return render(request, 'agencies/registration_success.html')
+
 
 class CustomLoginView(LoginView):
     """
@@ -179,12 +205,10 @@ def profile_view(request):
         HttpResponse: Renders the profile template with the profile form,
         or redirects to the profile view on successful update.
     """
-    logger.info("Entering profile_view.")
     start_time = time.time()
 
     user = request.user
     original_email = user.email
-    logger.debug(f"Fetched user: {user.username} with email: {original_email}")
 
     if request.method == 'POST':
         form = UserForm(request.POST, instance=user)
@@ -228,20 +252,33 @@ def profile_view(request):
 
             return redirect('/agencies/profile/')
         else:
-            logger.error(f"Profile update failed with errors: {form.errors}")
             messages.error(request, "Please correct the errors below.")
 
     else:
         form = UserForm(instance=user)
         form.fields.pop('username', None)
         form.fields.pop('user_type', None)
-        logger.debug("Initialized form for profile update.")
 
     logger.info(f"profile_view completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'users/profile.html', {'form': form})
 
+
 @login_required
 def agency_profile(request):
+    """
+    View to display and update the agency's profile.
+
+    This view allows users to view and update their agency's profile information.
+    It handles both GET requests for displaying the current agency details and POST
+    requests for updating the agency profile.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request from the client.
+
+    Returns:
+        HttpResponse: Renders the agency profile template with the agency form,
+        or redirects to the agency profile view on successful update.
+    """
     agency = request.user.agency
     
     if request.method == 'POST':
@@ -274,7 +311,6 @@ def agency_profile(request):
     # Get recent invoices
     invoices = BillingInvoice.objects.filter(agency=agency).order_by('-created_at')[:5]
 
-    print("Form fields:", [(field.name, field.label) for field in form])
     context = {
         'form': form,
         'user_count': user_count,
@@ -285,7 +321,6 @@ def agency_profile(request):
     }
 
     return render(request, 'agencies/agency_profile.html', context)
-
 
 
 @method_decorator(login_required, name='dispatch')
@@ -352,13 +387,11 @@ def manage_users(request):
     Returns:
         HttpResponse: Renders the manage_users template with a list of users.
     """
-    logger.info("Entering manage_users view.")
     start_time = time.time()
 
     # Fetch users associated with the user's agency, excluding superusers
     user_agency = request.user.agency
     users = CustomUser.objects.filter(agency=user_agency, is_superuser=False)
-    logger.debug(f"Fetched {users.count()} users for agency '{user_agency.agency_name}'.")
 
     logger.info(f"manage_users completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'users/manage_users.html', {'users': users})
@@ -381,7 +414,6 @@ def add_user(request):
         HttpResponse: Renders the add_user template with the form, or redirects
         to the manage users view on successful addition.
     """
-    logger.info("Entering add_user view.")
     start_time = time.time()
 
     # Handle form submission for adding a new user
@@ -391,11 +423,9 @@ def add_user(request):
             new_user = user_form.save(commit=False)
             new_user.agency = request.user.agency
             new_user.save()
-            logger.info(f"New user '{new_user.username}' added to agency '{new_user.agency.agency_name}'.")
 
             # Create the email confirmation object
             EmailAddress.objects.create(user=new_user, email=new_user.email, primary=True, verified=False)
-            logger.debug(f"Email confirmation object created for user '{new_user.username}'.")
 
             # Generate the token and uid for the confirmation link
             token = default_token_generator.make_token(new_user)
@@ -405,7 +435,6 @@ def add_user(request):
             confirm_url = request.build_absolute_uri(
                 reverse('agencies:confirm_email_and_setup_password', args=[uid, token])
             )
-            logger.debug(f"Confirmation URL generated for user '{new_user.username}': {confirm_url}")
 
             # Send the custom confirmation email
             context = {
@@ -414,32 +443,29 @@ def add_user(request):
                 'confirm_url': confirm_url,
             }
 
-            # Ensure the template path is correct and accessible
             email_subject = 'Confirm Your Email and Set Your Password'
             email_body = render_to_string('account/custom_account_confirmation_email.html', context)
 
             send_mail(
                 email_subject,
                 email_body,
-                'no-reply@example.com',  # Replace with your sender email
+                'no-reply@travault.com', 
                 [new_user.email],
                 fail_silently=False,
             )
-            logger.info(f"Confirmation email sent to '{new_user.email}'.")
 
             messages.success(request, "User has been added successfully and an email has been sent to confirm and set up the password!")
             return redirect('agencies:manage_users')
         else:
-            logger.error(f"Form validation errors: {user_form.errors}")
             messages.error(request, "Please correct the errors below.")
 
     # Initialize the form for GET requests
     else:
         user_form = UserForm()
-        logger.debug("Initialized form for adding a new user.")
 
     logger.info(f"add_user completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'users/add_user.html', {'user_form': user_form})
+
 
 @login_required
 def edit_user(request, user_id):
@@ -459,13 +485,11 @@ def edit_user(request, user_id):
         HttpResponse: Renders the edit_user template with the form,
         or redirects to the manage users view on successful update.
     """
-    logger.info(f"Entering edit_user view for user_id={user_id}.")
     start_time = time.time()
 
     # Fetch the user to be edited
     user = get_object_or_404(CustomUser, id=user_id)
     original_email = user.email
-    logger.debug(f"Fetched user: {user.username} with original email: {original_email}.")
 
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=user)
@@ -475,27 +499,22 @@ def edit_user(request, user_id):
 
             # Check if the email address has changed
             if original_email != new_email:
-                logger.info(f"Email address change detected for user: {user.username}.")
                 # Mark the new email as unverified
                 EmailAddress.objects.filter(user=updated_user).delete()
-                email_address = EmailAddress.objects.create(user=updated_user, email=new_email, primary=True, verified=False)
+                EmailAddress.objects.create(user=updated_user, email=new_email, primary=True, verified=False)
                 send_email_confirmation(request, updated_user)
-                logger.info(f"Verification email sent to new address: {new_email}.")
 
                 messages.info(request, "The email address has been changed. A verification email has been sent to the new address.")
 
             updated_user.save()
-            logger.info(f"User details updated successfully for user: {user.username}.")
             messages.success(request, "User details updated successfully!")
             return redirect('agencies:manage_users')
         else:
-            logger.error(f"Form validation errors: {user_form.errors}.")
             messages.error(request, "Please correct the errors below.")
 
     # Initialize the form for GET requests
     else:
         user_form = UserForm(instance=user)
-        logger.debug("Initialized form for editing user.")
 
     logger.info(f"edit_user completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'users/edit_user.html', {
@@ -520,22 +539,18 @@ def delete_user(request, user_id):
         HttpResponse: Redirects to the manage users view on successful deletion,
         or renders the delete_user template for confirmation.
     """
-    logger.info(f"Entering delete_user view for user_id={user_id}.")
     start_time = time.time()
 
     # Fetch the user to be deleted
     user = get_object_or_404(CustomUser, id=user_id)
-    logger.debug(f"Fetched user: {user.username} for deletion.")
 
     if request.method == 'POST':
         confirmation_name = request.POST.get('confirmation_name')
         if confirmation_name == user.username:
             user.delete()
-            logger.info(f"User '{user.username}' has been deleted successfully.")
             messages.success(request, "User has been deleted successfully!")
             return redirect('agencies:manage_users')
         else:
-            logger.warning(f"Username confirmation failed for deleting user '{user.username}'.")
             messages.error(request, "The username entered does not match. Please try again.")
 
     logger.info(f"delete_user completed in {time.time() - start_time:.2f} seconds.")
@@ -547,34 +562,36 @@ def delete_user(request, user_id):
 def confirm_email_and_setup_password(request, uidb64, token):
     """
     View to confirm email and allow the user to set their password.
+
+    This view processes the email confirmation link, verifies the token, and allows
+    the user to set their password if the token is valid.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request from the client.
+        uidb64 (str): The base64 encoded user ID.
+        token (str): The token for confirming the email.
+
+    Returns:
+        HttpResponse: Renders the setup password template or redirects to the login page
+        if the confirmation link is invalid or expired.
     """
     logger.info("=== Starting Email Confirmation Process ===")
-    logger.info(f"Received uidb64: {uidb64}")
-    logger.info(f"Received token: {token}")
-    logger.info(f"Request method: {request.method}")
 
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
-        logger.info(f"Decoded UID: {uid}")
-        
         user = get_object_or_404(CustomUser, pk=uid)
-        logger.info(f"Found user: {user.email}")
         
         is_valid = default_token_generator.check_token(user, token)
-        logger.info(f"Is token valid? {is_valid}")
 
         if is_valid:
             email_address = EmailAddress.objects.filter(user=user, email=user.email).first()
-            logger.info(f"Found email address: {email_address}")
             
             if email_address and not email_address.verified:
                 email_address.verified = True
                 email_address.save()
-                logger.info(f"Email verified for user: {user.email}")
 
             if request.method == 'POST':
                 form = SetPasswordForm(user, request.POST)
-                logger.info(f"Processing POST request. Form is valid? {form.is_valid()}")
                 
                 if form.is_valid():
                     form.save()
@@ -585,29 +602,18 @@ def confirm_email_and_setup_password(request, uidb64, token):
                     try:
                         agency = user.agency
                         stripe_customer = agency.stripecustomer
-                        logger.info(f"Found agency: {agency.agency_name}")
-                        
                         subscription = stripe.Subscription.retrieve(stripe_customer.stripe_subscription_id)
-                        logger.info(f"Subscription status: {subscription.status}")
 
                         if subscription.status in ['active', 'trialing']:
                             return redirect('dashboard:index')
                         else:
                             messages.error(request, "Your agency's subscription is not active.")
-                            if user.user_type == 'admin':
-                                return redirect('billing:setup_payment')
-                            else:
-                                return redirect('billing:subscription_inactive')
+                            return redirect('billing:setup_payment' if user.user_type == 'admin' else 'billing:subscription_inactive')
                     except StripeCustomer.DoesNotExist:
-                        logger.warning("No Stripe customer found for agency")
-                        if user.user_type == 'admin':
-                            messages.error(request, "Please complete payment setup for your agency.")
-                            return redirect('billing:setup_payment')
-                        else:
-                            messages.error(request, "Your agency has not completed payment setup. Please contact your administrator.")
-                            return redirect('billing:subscription_inactive')
+                        messages.error(request, "Please complete payment setup for your agency." if user.user_type == 'admin' else "Your agency has not completed payment setup. Please contact your administrator.")
+                        return redirect('billing:setup_payment' if user.user_type == 'admin' else 'billing:subscription_inactive')
                 else:
-                    logger.warning(f"Form validation failed: {form.errors}")
+                    messages.error(request, "Please correct the errors below.")
             else:
                 form = SetPasswordForm(user)
 
@@ -618,7 +624,6 @@ def confirm_email_and_setup_password(request, uidb64, token):
                 'user': user
             })
         else:
-            logger.warning(f"Token validation failed for user: {user.email}")
             messages.error(request, "The confirmation link is invalid or has expired. Please request a new one.")
             return redirect('account_login')
 
@@ -627,8 +632,22 @@ def confirm_email_and_setup_password(request, uidb64, token):
         messages.error(request, "The confirmation link is invalid. Please request a new one.")
         return redirect('account_login')
 
+
 @require_POST
 def resend_verification_email(request):
+    """
+    View to resend the verification email to the user.
+
+    This view handles the POST request to resend the verification email
+    to the currently authenticated user. It provides feedback on the
+    success or failure of the email sending process.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request from the client.
+
+    Returns:
+        HttpResponse: Redirects to the registration success page.
+    """
     try:
         send_email_confirmation(request, request.user)
         messages.success(request, "A new verification email has been sent. Please check your inbox.")

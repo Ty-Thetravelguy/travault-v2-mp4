@@ -5,6 +5,11 @@ from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser, Agency
 
 class CustomUserAdmin(UserAdmin):
+    """
+    Admin interface configuration for the CustomUser model.
+    This class customizes the admin interface for managing users,
+    including the fields displayed and the filtering options.
+    """
     model = CustomUser
     list_display = ['username', 'email', 'first_name', 'last_name', 'user_type', 'agency']
     list_filter = ['user_type', 'agency']
@@ -16,6 +21,11 @@ class CustomUserAdmin(UserAdmin):
     )
 
 class AgencyAdmin(admin.ModelAdmin):
+    """
+    Admin interface configuration for the Agency model.
+    This class customizes the admin interface for managing agencies,
+    including the fields displayed, filtering options, and search fields.
+    """
     list_display = ['agency_name', 'email', 'phone', 'vat_number', 'company_reg_number', 'business_focus', 'employees', 'created_at']
     list_filter = ['business_focus', 'employees']
     search_fields = ['agency_name', 'email', 'vat_number', 'company_reg_number']

@@ -88,6 +88,7 @@ class Agency(models.Model):
 
     @staticmethod
     def get_default_agency():
+        """Returns the first agency in the database."""
         return Agency.objects.first()
 
     def __str__(self):

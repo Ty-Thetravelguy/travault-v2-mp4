@@ -46,7 +46,7 @@ User = get_user_model()
 class AgencyRegistrationView(SignupView):
     template_name = 'agencies/registration.html'
     form_class = AgencyRegistrationForm
-    success_url = reverse_lazy('account_email_verification_sent')
+    success_url = reverse_lazy('agencies:registration_success')
 
     def get_form_kwargs(self):
         print("DEBUG: Entering get_form_kwargs method.")
@@ -93,7 +93,7 @@ class AgencyRegistrationView(SignupView):
                 print(f"DEBUG ERROR: Failed to send verification email: {str(email_error)}")
                 # Continue with registration even if email fails
             
-            # Instead of calling super().form_valid(form), directly return redirect
+            # Redirect to your success page instead of the allauth default
             return HttpResponseRedirect(self.get_success_url())
         
         except Exception as e:

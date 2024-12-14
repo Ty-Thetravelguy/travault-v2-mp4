@@ -162,43 +162,56 @@ WSGI_APPLICATION = 'travault_crm.wsgi.application'
 CSRF_COOKIE_SECURE = True
 CSRF_USE_SESSIONS = True
 
-# Allauth settings
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = True
+# Django AllAuth Configuration
+# --------------------------- 
+
+# User Model
+AUTH_USER_MODEL = 'agencies.CustomUser'
+
+# Authentication Settings
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+ACCOUNT_FORMS = {'signup': 'agencies.forms.AgencyRegistrationForm'}
+ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
+
+# Email Settings
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True
-ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
-ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
-ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/agencies/login/'
-LOGIN_URL = '/'  # Should point to your custom login view
+
+# Password Settings
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
+
+# Username Settings
+ACCOUNT_USERNAME_REQUIRED = True
+
+# Session Settings
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
+ACCOUNT_LOGOUT_ON_GET = True
+
+# URL Redirects
+LOGIN_URL = '/'
 LOGOUT_URL = 'agencies:account_logout'
 LOGIN_REDIRECT_URL = 'dashboard:index'
 LOGOUT_REDIRECT_URL = 'home'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
-ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
-ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_SIGNUP_REDIRECT_URL = 'agencies:registration_success'
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/agencies/login/'
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
+
+# Rate Limiting
 ACCOUNT_RATE_LIMITS = {
     'login_failed': '5/300s',
 }
-ACCOUNT_FORMS = {'signup': 'agencies.forms.AgencyRegistrationForm'}
-ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
-ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
-ACCOUNT_SESSION_REMEMBER = True
-ACCOUNT_UNIQUE_EMAIL = True
 
-
-# Add these lines to specify your custom templates
+# Template Overrides
 ACCOUNT_LOGIN_TEMPLATE = 'account/account_login.html'
 ACCOUNT_LOGOUT_TEMPLATE = 'account/account_logout.html'
 ACCOUNT_PASSWORD_RESET_TEMPLATE = 'account/password_reset.html'
 ACCOUNT_PASSWORD_RESET_DONE_TEMPLATE = 'account/password_reset_done.html'
 ACCOUNT_PASSWORD_RESET_FROM_KEY_TEMPLATE = 'account/password_reset_from_key.html'
 ACCOUNT_PASSWORD_RESET_FROM_KEY_DONE_TEMPLATE = 'account/password_reset_from_key_done.html'
-
-AUTH_USER_MODEL = 'agencies.CustomUser'
 
 # Redis/Celery settings
 if 'UPSTASH_REDIS_URL' in os.environ:

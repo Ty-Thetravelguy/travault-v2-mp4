@@ -11,10 +11,32 @@ import logging
 logger = logging.getLogger(__name__)
 
 class EnforcePaymentMiddleware:
+    """
+    Middleware to enforce payment verification for users.
+
+    This middleware checks if the user is authenticated and has a valid
+    subscription. If the user is not authenticated or is a superuser,
+    they are allowed to proceed without verification. If the user is
+    authenticated but does not have a verified email or an active
+    subscription, they are redirected to the appropriate pages.
+
+    Attributes:
+        get_response (callable): A callable that takes a request and returns a response.
+    """
+
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
+        """
+        Process the request and enforce payment verification.
+
+        Args:
+            request (HttpRequest): The incoming HTTP request.
+
+        Returns:
+            HttpResponse: The response to be returned to the client.
+        """
         if not request.user.is_authenticated:
             return self.get_response(request)
 

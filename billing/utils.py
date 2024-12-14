@@ -1,3 +1,5 @@
+# billing/email_utils.py
+
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import Agency 
@@ -6,6 +8,20 @@ import logging
 logger = logging.getLogger(__name__)
 
 def send_invoice_email(agency_id, invoice_pdf):
+    """
+    Send an invoice email to the specified agency.
+
+    This function fetches the agency details from the database using the provided
+    agency ID and sends an email with the invoice PDF attached.
+
+    Args:
+        agency_id (int): The ID of the agency to which the invoice is being sent.
+        invoice_pdf (str): The URL or path to the invoice PDF to be included in the email.
+
+    Raises:
+        Agency.DoesNotExist: If the agency with the given ID does not exist.
+        Exception: For any other errors that occur during the email sending process.
+    """
     # Fetch the agency from the database
     try:
         agency = Agency.objects.get(id=agency_id)

@@ -1,3 +1,5 @@
+# billing/webhooks.py
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -13,6 +15,18 @@ logger = logging.getLogger(__name__)
 @csrf_exempt
 @require_POST
 def stripe_webhook(request):
+    """
+    Handle incoming webhook events from Stripe.
+
+    This view processes webhook events sent by Stripe, specifically handling
+    the 'invoice.paid' event to create a BillingInvoice record in the database.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request containing the webhook payload.
+
+    Returns:
+        JsonResponse: A JSON response indicating the success or failure of the webhook processing.
+    """
     payload = request.body
     sig_header = request.META['HTTP_STRIPE_SIGNATURE']
 

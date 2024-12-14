@@ -1,3 +1,5 @@
+# billing/signals.py
+
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from agencies.models import CustomUser
@@ -8,6 +10,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Set the Stripe API key from the Django settings
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 def update_subscription_quantity(stripe_customer):
@@ -15,14 +18,14 @@ def update_subscription_quantity(stripe_customer):
     Update the Stripe subscription quantity based on the number of users in an agency.
     
     Args:
-        stripe_customer (StripeCustomer): The StripeCustomer instance containing subscription details
+        stripe_customer (StripeCustomer): The StripeCustomer instance containing subscription details.
         
     Returns:
         Subscription: The updated Stripe subscription object if quantity changed,
-                     or existing subscription if no change needed
+                       or existing subscription if no change needed.
         
     Raises:
-        Exception: Any Stripe API errors or database errors that occur during the update
+        Exception: Any Stripe API errors or database errors that occur during the update.
         
     Example:
         stripe_customer = agency.stripecustomer
@@ -64,10 +67,10 @@ def update_subscription_on_user_change(sender, instance, created, **kwargs):
     Signal handler to update Stripe subscription when a user is created or modified.
     
     Args:
-        sender (Model): The model class (CustomUser)
-        instance (CustomUser): The user instance that was saved
-        created (bool): True if this is a new instance, False if it's an update
-        **kwargs: Additional keyword arguments passed by the signal
+        sender (Model): The model class (CustomUser).
+        instance (CustomUser): The user instance that was saved.
+        created (bool): True if this is a new instance, False if it's an update.
+        **kwargs: Additional keyword arguments passed by the signal.
         
     Note:
         This function is automatically called by Django's post_save signal whenever
@@ -106,9 +109,9 @@ def update_subscription_on_user_delete(sender, instance, **kwargs):
     Signal handler to update Stripe subscription when a user is deleted.
     
     Args:
-        sender (Model): The model class (CustomUser)
-        instance (CustomUser): The user instance that was deleted
-        **kwargs: Additional keyword arguments passed by the signal
+        sender (Model): The model class (CustomUser).
+        instance (CustomUser): The user instance that was deleted.
+        **kwargs: Additional keyword arguments passed by the signal.
         
     Note:
         This function is automatically called by Django's post_delete signal

@@ -1,4 +1,5 @@
 # billing/views.py
+
 import os
 from dotenv import load_dotenv
 import stripe
@@ -22,6 +23,20 @@ logger = logging.getLogger(__name__)
 @login_required
 @user_passes_test(lambda u: u.is_superuser or u.user_type == 'admin', login_url='account_login')
 def setup_payment(request):
+    """
+    View to set up payment for the user's agency.
+
+    This view handles the creation of a Stripe customer and the initiation of a
+    checkout session for subscription payments. It also verifies the payment status
+    after the checkout session is completed.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request.
+
+    Returns:
+        HttpResponse: Redirects to the appropriate page based on the payment status
+                      or renders the setup payment template.
+    """
     try:
         # Ensure the agency exists
         agency = request.user.agency
@@ -99,17 +114,53 @@ def setup_payment(request):
         messages.error(request, "An error occurred during payment setup. Please try again.")
         return redirect('billing:billing_error')
 
+
 @login_required
 def billing_error(request):
+    """
+    View to display the billing error page.
+
+    This view renders the billing error template when there is an issue with the payment setup.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request.
+
+    Returns:
+        HttpResponse: Renders the billing error template.
+    """
     return render(request, 'billing/billing_error.html')
+
 
 @login_required
 def subscription_inactive(request):
+    """
+    View to display the subscription inactive page.
+
+    This view renders a template indicating that the user's subscription is inactive.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request.
+
+    Returns:
+        HttpResponse: Renders the subscription inactive template.
+    """
     return render(request, 'billing/subscription_inactive.html')
+
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser or u.user_type == 'admin', login_url='account_login')
 def billing_portal(request):
+    """
+    View to create a billing portal session for the user's agency.
+
+    This view allows the user to access the Stripe billing portal for managing their subscription.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request.
+
+    Returns:
+        JsonResponse: Returns the URL of the billing portal session as JSON.
+    """
     try:
         stripe.api_key = settings.STRIPE_SECRET_KEY
         
@@ -135,9 +186,21 @@ def billing_portal(request):
         return JsonResponse({
             'error': 'An unexpected error occurred. Please contact support.'
         }, status=500)
-    
+
+
 @login_required
 def create_setup_intent(request):
+    """
+    View to create a setup intent for the user's agency.
+
+    This view is used to create a SetupIntent for securely collecting payment details.
+
+    Args:
+        request (HttpRequest): The incoming HTTP request.
+
+    Returns:
+        JsonResponse: Returns the client secret of the setup intent as JSON.
+    """
     try:
         stripe_customer = request.user.agency.stripecustomer
         setup_intent = stripe.SetupIntent.create(

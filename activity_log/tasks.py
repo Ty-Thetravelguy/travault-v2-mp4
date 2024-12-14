@@ -9,6 +9,8 @@ from .models import Meeting
 def send_follow_up_email(meeting_id):
     """
     Sends a follow-up reminder email for a meeting.
+    If the meeting exists and has a scheduled task date and message, 
+    an email is sent to the meeting creator with the task details.
     """
     try:
         meeting = Meeting.objects.get(id=meeting_id)
@@ -32,8 +34,9 @@ Your Company"""
                 recipient_list,
                 fail_silently=False,
             )
-            print(f"Sent follow-up email for meeting '{meeting.subject}' to {meeting.creator.email}")
     except Meeting.DoesNotExist:
-        print(f"Meeting with id {meeting_id} does not exist.")
+        # Log error or handle it as needed
+        pass  # Meeting not found, no action needed
     except Exception as e:
-        print(f"Error sending follow-up email for meeting id {meeting_id}: {e}")
+        # Log error or handle it as needed
+        pass  # Handle other exceptions as needed

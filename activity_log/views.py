@@ -14,30 +14,23 @@ User = get_user_model()
 
 @login_required
 def log_meeting(request, pk):
+    """
+    Logs a meeting for a specific company. 
+    If the request method is POST, it processes the submitted form data, 
+    validates the input, and saves the meeting along with associated contacts and users.
+    If the request method is GET, it initializes a blank form for logging a meeting.
+    """
     company = get_object_or_404(Company, pk=pk)
 
     if request.method == 'POST':
-        print("Request POST data:", request.POST)
-        print("User:", request.user)            
         form = MeetingForm(request.POST, company=company, creator=request.user)  
         if form.is_valid():
-            print("Form is valid")
-            print("Form cleaned data:", form.cleaned_data)
-            
-            # Parse the contacts_input field from the form data
             contacts_input = form.cleaned_data.get('contacts_input', '')
-            
-            # Check if contacts_input is not empty
-            if contacts_input:
-                contact_ids = contacts_input.split(',')
-            else:
-                contact_ids = []
+            contact_ids = contacts_input.split(',') if contacts_input else []
 
-            # Initialize lists to hold Contact and User objects
             contacts = []
             users = []
 
-            # Loop through the contact_ids to determine if they are Contacts or Users
             for contact_id in contact_ids:
                 if 'contact_contact_' in contact_id:
                     contact_pk = contact_id.replace('contact_contact_', '')
@@ -54,21 +47,16 @@ def log_meeting(request, pk):
                     except User.DoesNotExist:
                         form.add_error(None, f"User with ID {user_pk} not found.")
 
-            # Only proceed with saving if no errors were added
             if not form.errors:
                 try:
                     meeting = form.save(commit=False)
                     meeting.save()
-
-                    # Assuming you have Many-to-Many fields for contacts and users in your Meeting model
                     meeting.contacts.add(*contacts)
                     meeting.users.add(*users)
 
                     messages.success(request, "Meeting logged successfully!")
-                    print("Meeting saved successfully:", meeting)
                     return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='activity')
                 except Exception as e:
-                    print("Error while saving meeting:", str(e))
                     form.add_error(None, f"An unexpected error occurred: {str(e)}")
             else:
                 print("Form errors found:", form.errors)
@@ -80,9 +68,14 @@ def log_meeting(request, pk):
     return render(request, 'activity_log/log_meeting.html', {'form': form, 'company': company})
 
 
-
 @login_required
 def search_attendees(request):
+    """
+    Searches for attendees (contacts and users) based on a query string.
+    If a company primary key is provided, it retrieves contacts associated with that company
+    and users associated with the user's agency. The results are limited to the first 10 matches
+    for both contacts and users.
+    """
     query = request.GET.get('q', '')
     company_pk = request.GET.get('company_pk')
 
@@ -121,8 +114,13 @@ def search_attendees(request):
 
     return JsonResponse({'results': results})
 
+
 @login_required
 def view_meeting(request, pk):
+    """
+    Retrieves and displays the details of a specific meeting, including the associated company
+    and attendees (contacts and users). If the meeting does not exist, a 404 error is raised.
+    """
     meeting = get_object_or_404(Meeting, pk=pk)
     company = meeting.company
 
@@ -138,6 +136,12 @@ def view_meeting(request, pk):
 
 @login_required
 def delete_meeting(request, pk):
+    """
+    Deletes a specific meeting if the user has the necessary permissions.
+    If the user is not an admin within the agency, an error message is displayed.
+    If the request method is POST, the meeting is deleted and the user is redirected.
+    If the request method is GET, a confirmation page is rendered.
+    """
     meeting = get_object_or_404(Meeting, pk=pk)
     company = meeting.company  # Ensure Meeting has a ForeignKey to Company
 
@@ -175,22 +179,20 @@ def delete_meeting(request, pk):
 
 @login_required
 def log_call(request, pk):
+    """
+    Logs a call for a specific company. 
+    If the request method is POST, it processes the submitted form data, 
+    validates the input, and saves the call along with associated contacts and users.
+    If the request method is GET, it initializes a blank form for logging a call.
+    """
     company = get_object_or_404(Company, pk=pk)
 
     if request.method == 'POST':
-        print("Request POST data:", request.POST)
-        print("User:", request.user)
-        
         form = CallForm(request.POST, company=company, creator=request.user)
-        print("Form validation check")
         
         if form.is_valid():
-            print("Form is valid")
-            print("Form cleaned data:", form.cleaned_data)
-            
-            # Parse the contacts_input field from the form data
             contacts_input = form.cleaned_data.get('contacts_input')
-            contact_ids = contacts_input.split(',')
+            contact_ids = contacts_input.split(',') if contacts_input else []
 
             # Initialize lists to hold Contact and User objects
             contacts = []
@@ -224,10 +226,8 @@ def log_call(request, pk):
                     call.users.add(*users)
 
                     messages.success(request, "Call logged successfully!")
-                    print("Call saved successfully:", call)
                     return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='activity')
                 except Exception as e:
-                    print("Error while saving call:", str(e))
                     form.add_error(None, f"An unexpected error occurred: {str(e)}")
             else:
                 print("Form errors found:", form.errors)
@@ -239,9 +239,12 @@ def log_call(request, pk):
     return render(request, 'activity_log/log_call.html', {'form': form, 'company': company})
 
 
-
 @login_required
 def view_call(request, pk):
+    """
+    Retrieves and displays the details of a specific call, including the associated company
+    and contacts. If the call does not exist, a 404 error is raised.
+    """
     call = get_object_or_404(Call, pk=pk)
     company = call.company
 
@@ -252,8 +255,15 @@ def view_call(request, pk):
     }
     return render(request, 'activity_log/view_call.html', context)
 
+
 @login_required
 def delete_call(request, pk):
+    """
+    Deletes a specific call if the user has the necessary permissions.
+    If the user is not an admin within the agency, an error message is displayed.
+    If the request method is POST, the call is deleted and the user is redirected.
+    If the request method is GET, a confirmation page is rendered.
+    """
     call = get_object_or_404(Call, pk=pk)
     company = call.company
 
@@ -286,22 +296,22 @@ def delete_call(request, pk):
     }
     return render(request, 'activity_log/confirm_delete_activity.html', context)
 
+
 @login_required
 def log_email(request, pk):
+    """
+    Logs an email for a specific company. 
+    If the request method is POST, it processes the submitted form data, 
+    validates the input, and saves the email along with associated contacts and users.
+    If the request method is GET, it initializes a blank form for logging an email.
+    """
     company = get_object_or_404(Company, pk=pk)
 
     if request.method == 'POST':
-        print("Request POST data:", request.POST)
-        print("User:", request.user)
-        
         form = EmailForm(request.POST, company=company, creator=request.user)
         if form.is_valid():
-            print("Form is valid")
-            print("Form cleaned data:", form.cleaned_data)
-            
-            # Parse the contacts_input field from the form data
             contacts_input = form.cleaned_data.get('contacts_input')
-            contact_ids = contacts_input.split(',')
+            contact_ids = contacts_input.split(',') if contacts_input else []
 
             # Initialize lists to hold Contact and User objects
             contacts = []
@@ -335,10 +345,8 @@ def log_email(request, pk):
                     email.users.add(*users)
 
                     messages.success(request, "Email logged successfully!")
-                    print("Email saved successfully:", email)
                     return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='activity')
                 except Exception as e:
-                    print("Error while saving email:", str(e))
                     form.add_error(None, f"An unexpected error occurred: {str(e)}")
             else:
                 print("Form errors found:", form.errors)
@@ -352,6 +360,10 @@ def log_email(request, pk):
 
 @login_required
 def view_email(request, pk):
+    """
+    Retrieves and displays the details of a specific email, including the associated company
+    and contacts. If the email does not exist, a 404 error is raised.
+    """
     email = get_object_or_404(Email, pk=pk)
     company = email.company
 
@@ -362,8 +374,15 @@ def view_email(request, pk):
     }
     return render(request, 'activity_log/view_email.html', context)
 
+
 @login_required
 def delete_email(request, pk):
+    """
+    Deletes a specific email if the user has the necessary permissions.
+    If the user is not an admin within the agency, an error message is displayed.
+    If the request method is POST, the email is deleted and the user is redirected.
+    If the request method is GET, a confirmation page is rendered.
+    """
     email = get_object_or_404(Email, pk=pk)
     company = email.company
 

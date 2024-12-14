@@ -7,6 +7,10 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class Meeting(models.Model):
+    """
+    Represents a meeting with associated details, including the company, creator, 
+    outcome, location, date, time, duration, and any follow-up tasks.
+    """
     OUTCOME_CHOICES = [
         ('Scheduled', 'Scheduled'),
         ('Completed', 'Completed'),
@@ -48,6 +52,10 @@ class Meeting(models.Model):
 
 
 class Call(models.Model):
+    """
+    Represents a call with associated details, including the company, creator, 
+    outcome, date, time, duration, and any follow-up tasks.
+    """
     OUTCOME_CHOICES = [
         ('Connected', 'Connected'),
         ('Voicemail', 'Left Voicemail'),
@@ -79,7 +87,12 @@ class Call(models.Model):
     class Meta:
         ordering = ['-date', '-time']
 
+
 class Email(models.Model):
+    """
+    Represents an email with associated details, including the company, creator, 
+    outcome, date, time, and any follow-up tasks.
+    """
     OUTCOME_CHOICES = [
         ('Sent', 'Sent'),
         ('Received', 'Received'),

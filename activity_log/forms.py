@@ -5,15 +5,16 @@ from .models import Meeting, Call, Email
 from crm.models import Contact
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from datetime import datetime, time  # Ensure these are imported
-from .tasks import send_follow_up_email  # Import the task
-
+from datetime import datetime, time  
+from .tasks import send_follow_up_email 
 
 User = get_user_model()
-logger = logging.getLogger('activity_log')  # Use the logger defined in LOGGING
-
 
 class MeetingForm(forms.ModelForm):
+    """
+    A form for creating and updating meetings. 
+    It includes fields for meeting details, attendees, and follow-up tasks.
+    """
     attendees_input = forms.CharField(required=False, widget=forms.HiddenInput())
     to_do_task_message = forms.CharField(
         required=False,
@@ -39,12 +40,19 @@ class MeetingForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        """
+        Initializes the form with company and creator information.
+        """
         self.company = kwargs.pop('company', None)
         self.creator = kwargs.pop('creator', None)
         super().__init__(*args, **kwargs)
-        # No need to set queryset for attendees; handled via JavaScript and hidden field
 
     def save(self, commit=True):
+        """
+        Saves the meeting instance, linking it to the company and creator.
+        If attendees are provided, they are added to the meeting.
+        If a follow-up task is set, it schedules an email reminder.
+        """
         meeting = super().save(commit=False)
         if self.company:
             meeting.company = self.company  # Ensure the meeting is linked to the correct company
@@ -52,55 +60,56 @@ class MeetingForm(forms.ModelForm):
             meeting.creator = self.creator  # Set the creator
 
         if commit:
-            try:
-                meeting.save()
+            meeting.save()
 
-                # Process attendees_input to add to attendees and company_contacts
-                attendees_data = self.cleaned_data.get('attendees_input', '')
+            # Process attendees_input to add to attendees and company_contacts
+            attendees_data = self.cleaned_data.get('attendees_input', '')
 
-                if attendees_data:
-                    attendees_ids = attendees_data.split(',')
+            if attendees_data:
+                attendees_ids = attendees_data.split(',')
 
-                    for attendee_id in attendees_ids:
-                        if attendee_id.startswith('contact_user_'):
-                            try:
-                                user_id = int(attendee_id.replace('contact_user_', ''))
-                                user = User.objects.get(id=user_id)
-                                meeting.attendees.add(user)
-                            except (ValueError, User.DoesNotExist) as e:
-                                logger.error(f"Failed to add user with ID: {attendee_id}. Error: {e}")
-                        elif attendee_id.startswith('contact_contact_'):
-                            try:
-                                contact_id = int(attendee_id.replace('contact_contact_', ''))
-                                contact = Contact.objects.get(id=contact_id)
-                                meeting.company_contacts.add(contact)
-                            except (ValueError, Contact.DoesNotExist) as e:
-                                logger.error(f"Failed to add contact with ID: {attendee_id}. Error: {e}")
+                for attendee_id in attendees_ids:
+                    if attendee_id.startswith('contact_user_'):
+                        try:
+                            user_id = int(attendee_id.replace('contact_user_', ''))
+                            user = User.objects.get(id=user_id)
+                            meeting.attendees.add(user)
+                        except (ValueError, User.DoesNotExist):
+                            # Log error or handle it as needed
+                            pass
+                    elif attendee_id.startswith('contact_contact_'):
+                        try:
+                            contact_id = int(attendee_id.replace('contact_contact_', ''))
+                            contact = Contact.objects.get(id=contact_id)
+                            meeting.company_contacts.add(contact)
+                        except (ValueError, Contact.DoesNotExist):
+                            # Log error or handle it as needed
+                            pass
 
-                meeting.save()
+            # Schedule the email if to_do_task_date is set
+            if meeting.to_do_task_date and meeting.to_do_task_message:
+                # Combine date with a default time (e.g., 09:00 AM)
+                task_datetime = timezone.make_aware(
+                    datetime.combine(meeting.to_do_task_date, time(9, 0)),
+                    timezone.get_current_timezone()
+                )
+                now = timezone.now()
+                delay = (task_datetime - now).total_seconds()
 
-                # Schedule the email if to_do_task_date is set
-                if meeting.to_do_task_date and meeting.to_do_task_message:
-                    # Combine date with a default time (e.g., 09:00 AM)
-                    task_datetime = timezone.make_aware(
-                        datetime.combine(meeting.to_do_task_date, time(9, 0)),
-                        timezone.get_current_timezone()
-                    )
-                    now = timezone.now()
-                    delay = (task_datetime - now).total_seconds()
+                if delay > 0:
+                    send_follow_up_email.apply_async((meeting.id,), eta=task_datetime)
+                else:
+                    # If the date is in the past or now, send immediately
+                    send_follow_up_email.delay(meeting.id)
 
-                    if delay > 0:
-                        send_follow_up_email.apply_async((meeting.id,), eta=task_datetime)
-                    else:
-                        # If the date is in the past or now, send immediately
-                        send_follow_up_email.delay(meeting.id)
-            except Exception as e:
-                logger.error(f"Error saving meeting: {e}")
-                raise  # Re-raise the exception to be handled by the view
         return meeting
 
 
 class CallForm(forms.ModelForm):
+    """
+    A form for creating and updating calls. 
+    It includes fields for call details and follow-up tasks.
+    """
     contacts_input = forms.CharField(widget=forms.HiddenInput(), required=False)
     to_do_task_message = forms.CharField(
         required=False,
@@ -118,11 +127,19 @@ class CallForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        """
+        Initializes the form with company and creator information.
+        """
         self.company = kwargs.pop('company', None)
         self.creator = kwargs.pop('creator', None)
         super().__init__(*args, **kwargs)
 
     def save(self, commit=True):
+        """
+        Saves the call instance, linking it to the company and creator.
+        If contacts are provided, they are added to the call.
+        If a follow-up task is set, it schedules an email reminder.
+        """
         call = super().save(commit=False)
         call.company = self.company
         call.creator = self.creator
@@ -152,6 +169,10 @@ class CallForm(forms.ModelForm):
 
 
 class EmailForm(forms.ModelForm):
+    """
+    A form for creating and updating emails. 
+    It includes fields for email details and follow-up tasks.
+    """
     contacts_input = forms.CharField(widget=forms.HiddenInput(), required=False)
     to_do_task_message = forms.CharField(
         required=False,
@@ -168,11 +189,19 @@ class EmailForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        """
+        Initializes the form with company and creator information.
+        """
         self.company = kwargs.pop('company', None)
         self.creator = kwargs.pop('creator', None)
         super().__init__(*args, **kwargs)
 
     def save(self, commit=True):
+        """
+        Saves the email instance, linking it to the company and creator.
+        If contacts are provided, they are added to the email.
+        If a follow-up task is set, it schedules an email reminder.
+        """
         email = super().save(commit=False)
         email.company = self.company
         email.creator = self.creator
@@ -199,4 +228,3 @@ class EmailForm(forms.ModelForm):
                 else:
                     send_follow_up_email.delay(email.id)
         return email
-

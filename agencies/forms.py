@@ -246,23 +246,23 @@ class UserForm(forms.ModelForm):
 class AgencyProfileForm(forms.ModelForm):
     """
     Form for updating an Agency's profile.
-
-    Fields:
-        - agency_name: The name of the agency.
-        - address: The address of the agency.
-        - vat_number: The VAT number of the agency.
-        - company_reg_number: The company registration number of the agency.
-        - phone: The contact phone number for the agency.
-        - email: The contact email for the agency.
-        - employees: The size range of the agency in terms of employees.
-        - business_focus: The main business focus of the agency.
-        - contact_name: The primary contact person's name for the agency.
     """
     class Meta:
         model = Agency
         fields = ['agency_name', 'address', 'vat_number', 'company_reg_number', 'phone', 'email', 'employees', 'business_focus', 'contact_name']
+        labels = {
+            'agency_name': 'Agency Name',
+            'address': 'Business Address',
+            'vat_number': 'VAT Number',
+            'company_reg_number': 'Company Registration Number',
+            'phone': 'Phone Number',
+            'email': 'Email Address',
+            'employees': 'Number of Employees',
+            'business_focus': 'Business Focus',
+            'contact_name': 'Primary Contact Name'
+        }
         widgets = {
-            'agency_name': forms.TextInput(attrs={'class': 'form-control'}), 
+            'agency_name': forms.TextInput(attrs={'class': 'form-control'}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 6}),
             'vat_number': forms.TextInput(attrs={'class': 'form-control'}),
             'company_reg_number': forms.TextInput(attrs={'class': 'form-control'}),

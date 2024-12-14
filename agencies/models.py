@@ -73,19 +73,18 @@ class Agency(models.Model):
         ('mixed', 'Mixed'),
     ]
 
-    agency_name = models.CharField(max_length=255)  # Name of the agency
-    # name = models.CharField(max_length=255)
-    address = models.CharField(max_length=255)
-    phone = models.CharField(max_length=20)  # Contact phone number for the agency
-    email = models.EmailField()  # Contact email for the agency
-    website = models.URLField(blank=True, null=True)  # Optional website URL for the agency
-    vat_number = models.CharField(max_length=9, unique=True)  # Unique VAT number of the agency
-    company_reg_number = models.CharField(max_length=8, unique=True)  # Unique company registration number
-    employees = models.CharField(max_length=10, choices=EMPLOYEE_CHOICES)  # Size of the agency
-    business_focus = models.CharField(max_length=20, choices=BUSINESS_FOCUS_CHOICES)  # Business focus of the agency
-    contact_name = models.CharField(max_length=100)  # Primary contact person for the agency
-    created_at = models.DateTimeField(auto_now_add=True)  # Auto-set date/time when the record is created
-    updated_at = models.DateTimeField(auto_now=True)  # Auto-updated date/time when the record is updated
+    agency_name = models.CharField("Agency Name", max_length=255)
+    address = models.CharField("Business Address", max_length=255)
+    phone = models.CharField("Phone Number", max_length=20)
+    email = models.EmailField("Email Address")
+    website = models.URLField("Website", blank=True, null=True)
+    vat_number = models.CharField("VAT Number", max_length=9, unique=True)
+    company_reg_number = models.CharField("Company Registration Number", max_length=8, unique=True)
+    employees = models.CharField("Number of Employees", max_length=10, choices=EMPLOYEE_CHOICES)
+    business_focus = models.CharField("Business Focus", max_length=20, choices=BUSINESS_FOCUS_CHOICES)
+    contact_name = models.CharField("Primary Contact Name", max_length=100)
+    created_at = models.DateTimeField("Created At", auto_now_add=True)
+    updated_at = models.DateTimeField("Updated At", auto_now=True)
 
     @staticmethod
     def get_default_agency():

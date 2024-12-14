@@ -21,4 +21,5 @@ urlpatterns = [
     path('accounts/confirm-email/<uidb64>/<token>/', confirm_email_and_setup_password, name='confirm_email_and_setup_password'),
     path('edit_user/<int:user_id>/', views.edit_user, name='edit_user'),
     path('delete_user/<int:user_id>/', views.delete_user, name='delete_user'),
+    path('resend-verification/', views.resend_verification_email, name='resend_verification'),
 ]

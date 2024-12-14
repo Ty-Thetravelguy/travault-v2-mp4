@@ -40,6 +40,8 @@ from django.db import transaction
 from billing.models import StripeCustomer
 from django.contrib.auth import login
 from billing.models import BillingInvoice
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -272,13 +274,14 @@ def agency_profile(request):
     # Get recent invoices
     invoices = BillingInvoice.objects.filter(agency=agency).order_by('-created_at')[:5]
 
+    print("Form fields:", [(field.name, field.label) for field in form])
     context = {
         'form': form,
         'user_count': user_count,
         'total_monthly_charge': total_monthly_charge,
         'stripe_payment_method': stripe_payment_method,
         'invoices': invoices,
-        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,  # Add this line
+        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
     }
 
     return render(request, 'agencies/agency_profile.html', context)
@@ -623,3 +626,14 @@ def confirm_email_and_setup_password(request, uidb64, token):
         logger.error(f"Error in email confirmation process: {str(e)}", exc_info=True)
         messages.error(request, "The confirmation link is invalid. Please request a new one.")
         return redirect('account_login')
+
+@require_POST
+def resend_verification_email(request):
+    try:
+        send_email_confirmation(request, request.user)
+        messages.success(request, "A new verification email has been sent. Please check your inbox.")
+    except Exception as e:
+        logger.error(f"Error sending verification email: {str(e)}")
+        messages.error(request, "There was an error sending the verification email. Please try again or contact support.")
+    
+    return redirect('agencies:registration_success')

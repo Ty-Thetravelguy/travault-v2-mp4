@@ -45,15 +45,19 @@
                                     {% csrf_token %}
                                     {% for field in form %}
                                     <div class="mb-3">
-                                        <label for="{{ field.id_for_label }}"
-                                            class="form-label">{{ field.label }}</label>
-                                        {{ field|add_class:"form-control" }}
+                                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}
+                                        </label>
+                                        {{ field|add_class:"form-control" }} <!-- Keep the add_class filter -->
                                         {% if field.help_text %}
                                         <div class="form-text text-muted">{{ field.help_text }}</div>
                                         {% endif %}
+                                        {% if field.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ field.errors }}
+                                        </div>
+                                        {% endif %}
                                     </div>
                                     {% endfor %}
-
                                     <div class="text-center">
                                         <button type="submit" class="btn btn-get-started btn-lg">Update Profile</button>
                                     </div>
@@ -87,38 +91,8 @@
                                     {% endif %}
                                     <div id="payment-message" class="mt-2" style="display: none;"></div>
                                 </div>
-
-                                <div class="invoices">
-                                    <h4>Recent Invoices</h4>
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Date</th>
-                                                <th>Amount</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for invoice in invoices %}
-                                            <tr>
-                                                <td>{{ invoice.created_at|date:"M d, Y" }}</td>
-                                                <td>£{{ invoice.amount }}</td>
-                                                <td>{{ invoice.status }}</td>
-                                                <td>
-                                                    <a href="{{ invoice.invoice_pdf }}" target="_blank"
-                                                        class="btn btn-sm btn-secondary">
-                                                        Download PDF
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>

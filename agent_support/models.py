@@ -46,7 +46,7 @@ class AgentSupportSupplier(models.Model):
         process_4_text (str): Text description for the fourth process, can be blank.
         process_4_pdf (FileField): PDF file associated with the fourth process, can be blank.
         file (FileField): An additional file associated with the supplier, can be blank.
-        """
+    """
 
     SUPPLIER_TYPES = [
         ('air', 'Air'),
@@ -59,16 +59,16 @@ class AgentSupportSupplier(models.Model):
     # Links the supplier to an agency, with cascading delete if the agency is removed
     agency = models.ForeignKey(Agency, on_delete=models.CASCADE, related_name='agent_support_suppliers')
 
-    supplier_type = models.CharField(max_length=50, choices=SUPPLIER_TYPES)  # Type of supplier
-    supplier_name = models.CharField(max_length=100)  # Name of the supplier
-    agent_websites = models.TextField(blank=True, null=True)  # Associated websites, optional
-    contact_numbers = models.TextField(blank=True, null=True)  # Contact numbers, optional
-    group_email = models.TextField(blank=True, null=True)  # Group email addresses, optional
-    general_email = models.TextField(blank=True, null=True)  # General email addresses, optional
-    account_manager = models.CharField(max_length=100, blank=True, null=True)  # Account manager's name, optional
-    account_manager_contact = models.CharField(max_length=100, blank=True, null=True)  # Account manager's contact, optional
-    account_manager_email = models.EmailField(blank=True, null=True)  # Account manager's email, optional
-    other = models.TextField(blank=True, null=True)  # Other relevant information, optional
+    supplier_type = models.CharField(max_length=50, choices=SUPPLIER_TYPES) 
+    supplier_name = models.CharField(max_length=100)  
+    agent_websites = models.TextField(blank=True, null=True)  
+    contact_numbers = models.TextField(blank=True, null=True) 
+    group_email = models.TextField(blank=True, null=True)  
+    general_email = models.TextField(blank=True, null=True) 
+    account_manager = models.CharField(max_length=100, blank=True, null=True)  
+    account_manager_contact = models.CharField(max_length=100, blank=True, null=True) 
+    account_manager_email = models.EmailField(blank=True, null=True)
+    other = models.TextField(blank=True, null=True)
     
     # Process-related fields to handle different types of processes linked to the supplier
     process_1_subject = models.CharField(max_length=100, blank=True, null=True)

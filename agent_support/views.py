@@ -24,20 +24,18 @@ def agent_support(request):
     Returns:
         HttpResponse: Renders the agent_support/index.html template with a list of suppliers.
     """
-    logger.info("Entering agent_support view.")
     start_time = time.time()
 
     # Fetch the current user's agency and filter suppliers accordingly
     agency = request.user.agency
     suppliers = AgentSupportSupplier.objects.filter(agency=agency).select_related('agency')
-    logger.debug(f"Fetched {suppliers.count()} suppliers for agency '{agency.agency_name}'.")
 
     supplier_types = AgentSupportSupplier.SUPPLIER_TYPES
 
     logger.info(f"agent_support completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'agent_support/index.html', {
         'suppliers': suppliers,
-        'supplier_types': supplier_types  # Add this line
+        'supplier_types': supplier_types
     })
 
 
@@ -57,7 +55,6 @@ def add_agent_supplier(request):
         HttpResponse: Renders the add_agent_supplier template with the form,
         or redirects to the agent support view on successful addition.
     """
-    logger.info("Entering add_agent_supplier view.")
     start_time = time.time()
 
     # Fetch the current user's agency
@@ -70,17 +67,14 @@ def add_agent_supplier(request):
             supplier = form.save(commit=False)
             supplier.agency = agency
             supplier.save()
-            logger.info(f"New agent supplier '{supplier}' added for agency '{agency.agency_name}'.")
             messages.success(request, "Agent supplier added successfully.")
             return redirect('agent_support:agent_support')
         else:
-            logger.error(f"Form validation errors: {form.errors}.")
             messages.error(request, "Please correct the errors below.")
 
     # Initialize the form for GET requests
     else:
         form = AgentSupportSupplierForm()
-        logger.debug("Initialized form for adding a new agent supplier.")
 
     logger.info(f"add_agent_supplier completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'agent_support/add_agent_supplier.html', {'form': form})
@@ -103,30 +97,25 @@ def edit_agent_supplier(request, pk):
         HttpResponse: Renders the edit_agent_supplier template with the form and supplier details,
         or redirects to the agent support view on successful update.
     """
-    logger.info(f"Entering edit_agent_supplier view for supplier pk={pk}.")
     start_time = time.time()
 
     # Fetch the current user's agency and the supplier to be edited
     agency = request.user.agency
     supplier = get_object_or_404(AgentSupportSupplier, pk=pk, agency=agency)
-    logger.debug(f"Fetched supplier '{supplier.supplier_name}' for editing in agency '{agency.agency_name}'.")
 
     # Handle form submission for updating the supplier
     if request.method == 'POST':
         form = AgentSupportSupplierForm(request.POST, request.FILES, instance=supplier)
         if form.is_valid():
             supplier = form.save()
-            logger.info(f"Agent supplier '{supplier.supplier_name}' updated successfully.")
             messages.success(request, "Agent supplier updated successfully.")
             return redirect('agent_support:agent_support')
         else:
-            logger.error(f"Form validation errors: {form.errors}.")
             messages.error(request, "Please correct the errors below.")
 
     # Initialize the form with the current supplier instance for GET requests
     else:
         form = AgentSupportSupplierForm(instance=supplier)
-        logger.debug("Initialized form for editing agent supplier.")
 
     logger.info(f"edit_agent_supplier completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'agent_support/edit_agent_supplier.html', {'form': form, 'supplier': supplier})

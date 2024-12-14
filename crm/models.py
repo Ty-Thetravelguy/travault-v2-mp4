@@ -101,6 +101,7 @@ class Company(models.Model):
         - client_type: The type of client this company is.
         - account_status: Current status of the company's account.
         - create_date: The date and time when the company was created.
+        - last_activity_date: The date and time of the last activity related to the company.
         - linked_companies: Other companies linked to this company for business relationships.
     """
     agency = models.ForeignKey(Agency, on_delete=models.CASCADE, related_name='companies', null=False)
@@ -128,6 +129,10 @@ class Company(models.Model):
         return self.company_name
     
     def save(self, *args, **kwargs):
+        """
+        Override the save method to set the last_activity_date to the current time
+        if it is not already set.
+        """
         if not self.last_activity_date:  # If last_activity_date is not set
             self.last_activity_date = timezone.now()  # Set it to current time
         super().save(*args, **kwargs)

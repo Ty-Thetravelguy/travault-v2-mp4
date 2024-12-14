@@ -1,4 +1,4 @@
-#crm/views.py
+# crm/views.py
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -16,10 +16,8 @@ import requests
 import logging
 import time
 
-
 logger = logging.getLogger(__name__)
 User = get_user_model()
-
 
 @login_required
 def crm_index(request):
@@ -104,36 +102,23 @@ def company_detail(request, pk, active_tab='details'):
     start_time = time.time()
 
     # Fetch the company based on pk and user's agency, with error handling
-    try:
-        company = get_object_or_404(Company, pk=pk, agency=request.user.agency)
-        logger.debug(f"Company fetched: {company.company_name}.")
-    except Exception as e:
-        logger.error(f"Error fetching company with pk={pk}: {e}")
-        raise  # Reraise the exception after logging
+    company = get_object_or_404(Company, pk=pk, agency=request.user.agency)
 
     # Fetch all companies associated with the user's agency
-    try:
-        companies = Company.objects.filter(agency=request.user.agency)
-        logger.debug(f"Fetched {companies.count()} companies for agency {request.user.agency}.")
-    except Exception as e:
-        logger.error(f"Error fetching companies for agency {request.user.agency}: {e}")
-        companies = []  # Fallback to an empty list to avoid breaking the view
+    companies = Company.objects.filter(agency=request.user.agency)
 
     # Fetch company notes, handling the case where notes might not exist
     try:
         company_notes = company.notes
-        logger.debug("Company notes fetched successfully.")
     except CompanyNotes.DoesNotExist:
         company_notes = None
 
     # Fetch transaction fees associated with the company
     transaction_fees = company.transaction_fees.all()
-    logger.debug(f"Fetched {transaction_fees.count()} transaction fees for company pk={pk}.")
 
     # Initialize the form for adding new transaction fees and forms for editing existing fees
     fee_form = TransactionFeeForm()
     edit_forms = {fee.id: TransactionFeeForm(instance=fee) for fee in transaction_fees}
-    logger.debug(f"Prepared forms for adding and editing transaction fees for company pk={pk}.")
 
     # Fetch and annotate contacts related to the company, sorting primary contacts first
     contacts = company.contacts.annotate(
@@ -143,22 +128,18 @@ def company_detail(request, pk, active_tab='details'):
             output_field=BooleanField(),
         )
     ).order_by('-is_primary', 'first_name', 'last_name')
-    logger.debug(f"Fetched and sorted {contacts.count()} contacts for company pk={pk}.")
 
     # Filter contacts into specific categories
     travel_bookers = contacts.filter(is_travel_booker_contact=True)
     vip_travellers = contacts.filter(is_vip_traveller_contact=True)
-    logger.debug(f"Filtered {travel_bookers.count()} travel bookers and {vip_travellers.count()} VIP travellers.")
 
     # Fetch activities (meetings, calls, emails)
     meetings = Meeting.objects.filter(company=company)
     calls = Call.objects.filter(company=company)
     emails = Email.objects.filter(company=company)
 
-    # Add this new code to fetch tickets
+    # Fetch tickets associated with the company
     tickets = Ticket.objects.filter(company=company).order_by('-created_at')
-    logger.debug(f"Fetched {tickets.count()} tickets for company pk={pk}.")
-
 
     # Combine and sort activities and tickets
     activities = sorted(
@@ -212,7 +193,6 @@ def edit_company(request, pk):
 
     # Fetch the company based on pk and user's agency
     company = get_object_or_404(Company, pk=pk, agency=request.user.agency)
-    logger.debug(f"Fetched company: {company.company_name} for editing.")
 
     # Handle form submission for updating company details
     if request.method == 'POST':
@@ -230,7 +210,6 @@ def edit_company(request, pk):
     # Initialize the form with the current company instance for GET requests
     else:
         form = CompanyForm(instance=company, agency=request.user.agency)
-        logger.debug("Initialized form for company editing.")
 
     # Prepare context and render the form
     context = {
@@ -263,7 +242,6 @@ def delete_company(request, pk):
 
     # Fetch the company based on pk and user's agency
     company = get_object_or_404(Company, pk=pk, agency=request.user.agency)
-    logger.debug(f"Fetched company: {company.company_name} for deletion.")
 
     if request.method == 'POST':
         # Delete the company after confirmation
@@ -313,7 +291,6 @@ def add_company(request):
     # Initialize the form for GET requests
     else:
         form = CompanyForm(agency=agency)
-        logger.debug("Initialized form for adding a new company.")
 
     # Prepare context and render the form
     logger.info(f"add_company completed in {time.time() - start_time:.2f} seconds.")
@@ -422,7 +399,6 @@ def search_companies(request):
     # Get the search query and user's agency
     query = request.GET.get('q', '')
     agency = request.user.agency
-    logger.debug(f"Search query: '{query}' for agency: {agency}")
 
     # Perform the search on company names
     try:
@@ -430,7 +406,6 @@ def search_companies(request):
             company_name__istartswith=query,
             agency=agency
         )[:10]
-        logger.debug(f"Found {companies.count()} companies matching the query.")
     except Exception as e:
         logger.error(f"Error searching companies: {e}")
         companies = []
@@ -462,7 +437,6 @@ def contact_detail(request, pk):
 
     # Fetch the contact based on pk
     contact = get_object_or_404(Contact, pk=pk)
-    logger.debug(f"Fetched contact: {contact.first_name} {contact.last_name}.")
 
     logger.info(f"contact_detail completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'crm/contact_detail.html', {'contact': contact})
@@ -490,7 +464,6 @@ def add_contact(request, pk):
 
     # Fetch the company based on pk
     company = get_object_or_404(Company, pk=pk)
-    logger.debug(f"Fetched company: {company.company_name} for adding contact.")
 
     # Handle form submission for adding a new contact
     if request.method == 'POST':
@@ -508,7 +481,6 @@ def add_contact(request, pk):
     # Initialize the form for GET requests
     else:
         form = ContactForm()
-        logger.debug("Initialized form for adding a new contact.")
 
     logger.info(f"add_contact completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'crm/add_contact.html', {'form': form, 'company': company})
@@ -537,7 +509,6 @@ def edit_contact(request, pk):
     # Fetch the contact and its associated company
     contact = get_object_or_404(Contact, pk=pk)
     company = contact.company
-    logger.debug(f"Fetched contact: {contact.first_name} {contact.last_name} for editing.")
 
     # Handle form submission for updating contact details
     if request.method == 'POST':
@@ -553,7 +524,6 @@ def edit_contact(request, pk):
     # Initialize the form with the current contact instance for GET requests
     else:
         form = ContactForm(instance=contact)
-        logger.debug("Initialized form for contact editing.")
 
     logger.info(f"edit_contact completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'crm/edit_contact.html', {
@@ -578,7 +548,6 @@ def confirm_delete_contact(request, pk):
     # Fetch the contact and its associated company
     contact = get_object_or_404(Contact, pk=pk)
     company = contact.company
-    logger.debug(f"Fetched contact: {contact.first_name} {contact.last_name} for deletion confirmation.")
 
     if request.method == 'POST':
         confirmation_name = request.POST.get("confirmation_name")
@@ -595,7 +564,6 @@ def confirm_delete_contact(request, pk):
     # Render a confirmation page for GET requests or if name doesn't match
     logger.info(f"confirm_delete_contact completed in {time.time() - start_time:.2f} seconds.")
     return render(request, 'crm/confirm_delete_contact.html', {'contact': contact})
-
 
 
 @login_required
@@ -621,7 +589,6 @@ def delete_contact_view(request, pk):
     # Fetch the contact and its associated company
     contact = get_object_or_404(Contact, pk=pk)
     company = contact.company
-    logger.debug(f"Fetched contact: {contact.first_name} {contact.last_name} for deletion.")
 
     # Handle deletion upon POST request with name confirmation
     if request.method == "POST":
@@ -681,7 +648,6 @@ def add_company_notes(request, pk):
     # Initialize the form for GET requests
     else:
         form = CompanyNotesForm()
-        logger.debug("Initialized form for adding company notes.")
 
     # Convert form fields to a list and group them into pairs
     form_fields = list(form)
@@ -720,7 +686,6 @@ def edit_company_notes(request, pk):
     # Fetch the company and its associated notes
     company = get_object_or_404(Company, pk=pk)
     company_notes = get_object_or_404(CompanyNotes, company=company)
-    logger.debug(f"Fetched notes for company '{company.company_name}'.")
 
     # Handle form submission for updating notes
     if request.method == 'POST':
@@ -736,7 +701,6 @@ def edit_company_notes(request, pk):
     # Initialize the form with the current notes instance for GET requests
     else:
         form = CompanyNotesForm(instance=company_notes)
-        logger.debug("Initialized form for editing company notes.")
 
     context = {
         'form': form,
@@ -805,7 +769,6 @@ def add_transaction_fee(request, pk):
 
     # Fetch the company based on pk
     company = get_object_or_404(Company, pk=pk)
-    logger.debug(f"Fetched company: {company.company_name} for adding transaction fee.")
 
     # Handle form submission for adding a new transaction fee
     if request.method == 'POST':
@@ -816,7 +779,6 @@ def add_transaction_fee(request, pk):
             fee.save()
             logger.info(f"Transaction fee successfully added to company '{company.company_name}'.")
             messages.success(request, f"Transaction fee has been successfully added to '{company.company_name}'.")
-            # Redirect to the company detail view with 'notes' tab active
             return redirect('crm:company_detail_with_tab', pk=company.pk, active_tab='notes')
         else:
             logger.error(f"Form validation errors: {form.errors}")
@@ -862,7 +824,6 @@ def edit_transaction_fee(request, pk):
     # Fetch the transaction fee and its associated company
     fee = get_object_or_404(TransactionFee, pk=pk)
     company = fee.company
-    logger.debug(f"Fetched transaction fee for company '{company.company_name}'.")
 
     # Handle form submission for updating the transaction fee
     if request.method == 'POST':
@@ -879,7 +840,6 @@ def edit_transaction_fee(request, pk):
     # Initialize the form with the current fee instance for GET requests
     else:
         form = TransactionFeeForm(instance=fee)
-        logger.debug("Initialized form for editing transaction fee.")
 
     context = {
         'form': form,
@@ -913,7 +873,6 @@ def delete_transaction_fee(request, pk):
     fee = get_object_or_404(TransactionFee, pk=pk)
     company_pk = fee.company.pk
     company_name = fee.company.company_name
-    logger.debug(f"Fetched transaction fee for company '{company_name}' for deletion.")
 
     # Handle fee deletion upon POST request
     if request.method == 'POST':

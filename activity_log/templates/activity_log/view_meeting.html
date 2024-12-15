@@ -1,12 +1,14 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends "base.html" %} <!-- Extend the base template for consistent layout -->
+{% load static %} <!-- Load static files -->
 
 {% block content %}
 <div class="container-fluid full-height-bg top-padding bg-gray-200">
+    <!-- Main container with styling for spacing and background color -->
     <div class="container mt-5 roboto">
         <div class="row mb-4">
             <div class="col-12 text-center">
                 <h1 class="project-primary-color mb-0">Meeting Details</h1>
+                <!-- Header for the meeting details section -->
             </div>
         </div>
 
@@ -15,24 +17,28 @@
                 <div class="card shadow">
                     <div class="card-body">
                         <h2>{{ meeting.subject }}</h2>
+                        <!-- Display the subject of the meeting -->
                         <p><strong>Date:</strong> {{ meeting.date }}</p>
                         <p><strong>Time:</strong> {{ meeting.time }}</p>
                         <p><strong>Duration:</strong> {{ meeting.duration }} minutes</p>
                         <p><strong>Outcome:</strong> {{ meeting.outcome }}</p>
                         <p><strong>Location:</strong> {{ meeting.location }}</p>
+                        <!-- Display meeting details such as date, time, duration, outcome, and location -->
                         <p><strong>Attendees:</strong>
                             {% for attendee in meeting.attendees.all %}
-                            {{ attendee.first_name }} {{ attendee.last_name }} (User){% if not forloop.last %},
-                            {% endif %}
+                            {{ attendee.first_name }} {{ attendee.last_name }} (User){% if not forloop.last %}, {% endif
+                            %}
                             {% endfor %}
                             {% if meeting.attendees.exists and meeting.company_contacts.exists %}, {% endif %}
                             {% for contact in meeting.company_contacts.all %}
-                            {{ contact.first_name }} {{ contact.last_name }} (Contact){% if not forloop.last %},
-                            {% endif %}
+                            {{ contact.first_name }} {{ contact.last_name }} (Contact){% if not forloop.last %}, {%
+                            endif %}
                             {% endfor %}
+                            <!-- List all attendees and company contacts associated with the meeting -->
                         </p>
                         <h4>Details:</h4>
                         <div>{{ meeting.details|safe }}</div>
+                        <!-- Display additional details about the meeting -->
 
                         {% if meeting.to_do_task_date or meeting.to_do_task_message %}
                         <hr>
@@ -44,6 +50,7 @@
                         <p><strong>Message:</strong></p>
                         <div>{{ meeting.to_do_task_message|linebreaks }}</div>
                         {% endif %}
+                        <!-- Display to-do task details if available -->
                         {% endif %}
 
                         <div class="mt-3 text-center">
@@ -51,12 +58,12 @@
                                 class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Back to Company
                             </a>
-                            <!-- Delete Meeting Button -->
+                            <!-- Button to navigate back to the company details page -->
                             {% if user.user_type == 'admin' %}
-                            <!-- Delete Meeting Button -->
                             <a href="{% url 'activity_log:delete_meeting' pk=meeting.pk %}" class="btn btn-danger ml-2">
                                 <i class="fas fa-trash-alt"></i> Delete Meeting
                             </a>
+                            <!-- Button to delete the meeting, visible only to admin users -->
                             {% endif %}
                         </div>
                     </div>

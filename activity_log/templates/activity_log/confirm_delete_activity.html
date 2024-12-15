@@ -1,10 +1,11 @@
 <!-- activity_log/templates/activity_log/confirm_delete.html -->
 
-{% extends "base.html" %}
-{% load static %}
+{% extends "base.html" %} <!-- Use the base template for consistent layout -->
+{% load static %} <!-- Load static files -->
 
 {% block content %}
 <div class="container-fluid mt-5 full-height-bg top-padding bg-gray-200">
+    <!-- Main container for the confirmation dialog -->
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card shadow">
@@ -12,11 +13,15 @@
                     <h3 class="text-danger">Confirm Deletion</h3>
                     <p>Are you sure you want to delete the {{ activity_type }}
                         "<strong>{{ activity.subject }}</strong>"?</p>
+                    <!-- Confirmation message with dynamic content -->
                     <form method="POST">
                         {% csrf_token %}
+                        <!-- CSRF token for form security -->
                         <a href="{% url 'crm:company_detail_with_tab' pk=company.pk active_tab='activity' %}"
                             class="btn btn-secondary">Cancel</a>
+                        <!-- Cancel button -->
                         <button type="submit" class="btn btn-danger">Delete</button>
+                        <!-- Submit button to confirm deletion -->
                     </form>
                 </div>
             </div>

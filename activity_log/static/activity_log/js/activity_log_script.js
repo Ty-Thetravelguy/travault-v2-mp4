@@ -1,24 +1,26 @@
+// Main event listener that initializes the form handling when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function () {
     // -------------------
     // Unified Data Variables
     // -------------------
-    // This allows passing necessary URLs and data through forms (Meeting, Call, Email)
-    // Each form must include a script block defining its data.
+    // These variables are used across different form types (Meeting, Call, Email)
+    // Each form must include a script block that defines its specific data
 
-    // -------------------
-    // Attendees/Contacts Handling
-    // -------------------
-    const forms = document.querySelectorAll('form[id$="Form"]'); // Select all forms ending with 'Form'
+    // Select all forms that end with 'Form' in their ID
+    const forms = document.querySelectorAll('form[id$="Form"]');
 
+    // Iterate through each form to set up contact/attendee handling
     forms.forEach(form => {
         const formId = form.id;
 
-        let searchAttendeesUrl;
-        let companyPk;
-        let inputDisplayId;
-        let hiddenInputId;
-        let selectedContainerId;
+        // Variables to store form-specific configuration
+        let searchAttendeesUrl;    // API endpoint for searching attendees/contacts
+        let companyPk;             // Company primary key
+        let inputDisplayId;        // ID of the visible input field
+        let hiddenInputId;        // ID of the hidden input storing selected contacts
+        let selectedContainerId;   // ID of container showing selected contacts
 
+        // Configure variables based on form type
         if (formId === 'logMeetingForm') {
             searchAttendeesUrl = logMeetingData.searchAttendeesUrl;
             companyPk = logMeetingData.companyPk;
@@ -39,17 +41,19 @@ document.addEventListener('DOMContentLoaded', function () {
             selectedContainerId = '#selected-contacts';
         }
 
-        // If data is not defined, skip this form
+        // Skip if required data is not defined
         if (!searchAttendeesUrl || !companyPk) return;
 
-        // Now use inputDisplayId, hiddenInputId, selectedContainerId
+        // Get DOM elements for the current form
         const contactsInputDisplay = form.querySelector(inputDisplayId);
         const hiddenContactsInput = form.querySelector(hiddenInputId);
         const selectedContactsContainer = form.querySelector(selectedContainerId);
-        let selectedContacts = [];
+        let selectedContacts = [];  // Array to store selected contact IDs
 
+        // Proceed only if all required elements are found
         if (contactsInputDisplay && hiddenContactsInput && selectedContactsContainer) {
-            // Debounce function to limit the rate of API calls
+            // Debounce function to prevent excessive API calls
+            // Only executes the callback after delay milliseconds have elapsed since the last call
             function debounce(func, delay) {
                 let timeout;
                 return function (...args) {
@@ -58,15 +62,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 };
             }
 
+            // Add input listener with debouncing for contact search
             contactsInputDisplay.addEventListener(
                 'input',
                 debounce(function () {
                     const query = contactsInputDisplay.value.trim();
+                    // Only search if query is at least 2 characters
                     if (query.length < 2) {
                         clearContactsList();
                         return;
                     }
 
+                    // Fetch contacts/attendees from the API
                     fetch(`${searchAttendeesUrl}?q=${encodeURIComponent(query)}&company_pk=${companyPk}`)
                         .then(response => response.json())
                         .then(data => {
@@ -76,21 +83,25 @@ document.addEventListener('DOMContentLoaded', function () {
                         .catch(error => {
                             console.error('Error fetching attendees:', error);
                         });
-                }, 300)
-            ); // 300ms debounce delay
+                }, 300)  // Wait 300ms after last keystroke before searching
+            );
 
+            // Remove the current suggestions list if it exists
             function clearContactsList() {
                 const oldList = form.querySelector('#contacts-suggestions');
                 if (oldList) oldList.remove();
             }
 
+            // Create and display the suggestions dropdown
             function showContactsSuggestions(suggestions, formId) {
                 if (suggestions.length === 0) return;
 
+                // Create suggestions list with Bootstrap styling
                 const suggestionList = document.createElement('ul');
                 suggestionList.id = 'contacts-suggestions';
                 suggestionList.classList.add('list-group', 'position-absolute', 'w-100', 'z-index-1000');
 
+                // Add each suggestion as a clickable item
                 suggestions.forEach(contact => {
                     const listItem = document.createElement('li');
                     listItem.textContent = contact.name;
@@ -98,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     listItem.classList.add('list-group-item', 'list-group-item-action');
                     listItem.style.cursor = 'pointer';
 
+                    // Add click handler to select the contact
                     listItem.addEventListener('click', function () {
                         selectContact(contact, formId);
                     });
@@ -105,35 +117,42 @@ document.addEventListener('DOMContentLoaded', function () {
                     suggestionList.appendChild(listItem);
                 });
 
+                // Position the suggestions list below the input
                 contactsInputDisplay.parentNode.style.position = 'relative';
                 contactsInputDisplay.parentNode.appendChild(suggestionList);
             }
 
+            // Handle contact selection
             function selectContact(contact, formId) {
                 const id = contact.id;
 
+                // Only add if not already selected
                 if (!selectedContacts.includes(id)) {
                     selectedContacts.push(id);
                     updateHiddenContactsInput();
                     showSelectedContact(contact, formId);
                 }
 
-                contactsInputDisplay.value = ''; // Clear the input field after selection
-                clearContactsList(); // Clear the suggestions after selection
+                // Clean up after selection
+                contactsInputDisplay.value = '';
+                clearContactsList();
             }
 
+            // Display selected contact as a badge with remove button
             function showSelectedContact(contact, formId) {
+                // Create badge with Bootstrap styling
                 const contactBadge = document.createElement('span');
                 contactBadge.className = 'badge me-2 mb-2 d-inline-flex align-items-center';
                 contactBadge.textContent = contact.name;
+                contactBadge.dataset.id = contact.id;
 
-                contactBadge.dataset.id = contact.id; // Store the contact ID
-
+                // Add remove button to badge
                 const closeButton = document.createElement('button');
                 closeButton.innerHTML = '&times;';
                 closeButton.className = 'btn-close btn-close-white ms-2';
                 closeButton.setAttribute('aria-label', 'Remove');
 
+                // Handle removing the contact
                 closeButton.addEventListener('click', e => {
                     e.preventDefault();
                     const id = contact.id;
@@ -149,6 +168,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 selectedContactsContainer.appendChild(contactBadge);
             }
 
+            // Update the hidden input with selected contact IDs
             function updateHiddenContactsInput() {
                 hiddenContactsInput.value = selectedContacts.join(',');
             }
@@ -235,9 +255,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // ------------------------------
         // Form Submission Handling
         // ------------------------------
-        
-form.addEventListener('submit', function (event) {
-    console.log("Form data before submission:", new FormData(form));
+        form.addEventListener('submit', function (event) {
+            console.log("Form data before submission:", new FormData(form));
     
             // Update the textarea with CKEditor's data
             if (editorInstance) {

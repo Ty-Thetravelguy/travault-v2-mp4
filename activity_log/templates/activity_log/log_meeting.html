@@ -1,30 +1,32 @@
-{% extends "base.html" %}
-{% load static %}
-{% load custom_log_tags %}
+{% extends "base.html" %} <!-- Extend the base template for consistent layout -->
+{% load static %} <!-- Load static files -->
+{% load custom_log_tags %} <!-- Load custom template tags for logging -->
 
 {% block css %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static 'activity_log/css/activity_style.css' %}">
+{{ block.super }} <!-- Include parent block's CSS -->
+<link rel="stylesheet" href="{% static 'activity_log/css/activity_style.css' %}"> <!-- Custom CSS for activity log -->
 {% endblock %}
 
 {% block content %}
 <section id="log-meeting" class="bg-gray-200">
+    <!-- Main section for logging a meeting -->
     <div class="container top-padding roboto">
         <div class="row justify-content-center py-5">
             <div class="col-md-8">
                 <div class="card shadow">
                     <div class="card-body">
                         <h2 class="card-title text-center mb-4">Log Meeting for {{ company.company_name }}</h2>
+                        <!-- Form to log meeting details -->
                         <form method="post" id="logMeetingForm">
-                            {% csrf_token %}
+                            {% csrf_token %} <!-- CSRF token for form security -->
 
-                            <!-- Subject -->
+                            <!-- Subject input -->
                             <div class="mb-3">
                                 <label for="{{ form.subject.id_for_label }}" class="form-label">Subject</label>
                                 {{ form.subject|add_class:"form-control" }}
                             </div>
 
-                            <!-- Attendees -->
+                            <!-- Attendees input -->
                             <div class="mb-3">
                                 <label for="id_attendees_input_display" class="form-label">Attendees</label>
                                 <input type="hidden" id="id_attendees_input" name="attendees_input" value="">
@@ -34,7 +36,7 @@
                                 </div>
                             </div>
 
-                            <!-- Outcome and Location (same line) -->
+                            <!-- Outcome and Location inputs -->
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="{{ form.outcome.id_for_label }}" class="form-label">Outcome</label>
@@ -46,7 +48,7 @@
                                 </div>
                             </div>
 
-                            <!-- Date, Time, and Duration (same line) -->
+                            <!-- Date, Time, and Duration inputs -->
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label for="{{ form.date.id_for_label }}" class="form-label">Date</label>
@@ -62,13 +64,13 @@
                                 </div>
                             </div>
 
-                            <!-- Details -->
+                            <!-- Details input -->
                             <div class="mb-3">
                                 <label for="{{ form.details.id_for_label }}" class="form-label">Details</label>
                                 {{ form.details|add_class:"form-control" }}
                             </div>
 
-                            <!-- To Do Task / Follow-up -->
+                            <!-- To Do Task / Follow-up input -->
                             <div class="mb-3">
                                 <label for="{{ form.to_do_task_date.id_for_label }}" class="form-label">To Do Task /
                                     Follow-up</label>
@@ -113,10 +115,9 @@
         </form>
     </div>
 </div>
-
 {% endblock %}
-{% block postload_js %}
 
+{% block postload_js %}
 <script>
     var logMeetingData = {
         searchAttendeesUrl: "{% url 'activity_log:search_attendees' %}",
@@ -126,7 +127,6 @@
 
 <!-- Include CKEditor JS -->
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
-
 
 <!-- External JS file for log meeting form (with vanilla JS) -->
 <script src="{% static 'activity_log/js/activity_log_script.js' %}"></script>

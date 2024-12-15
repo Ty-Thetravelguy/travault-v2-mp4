@@ -118,8 +118,8 @@
                                         <p><strong>Email:</strong> {{ company.email }}</p>
                                         <p><strong>LinkedIn:</strong>
                                             {% if company.linkedin_social_page %}
-                                            <a href="{{ company.linkedin_social_page }}"
-                                                target="_blank">{{ company.linkedin_social_page }}</a>
+                                            <a href="{{ company.linkedin_social_page }}" target="_blank">{{
+                                                company.linkedin_social_page }}</a>
                                             {% else %}
                                             Not available
                                             {% endif %}
@@ -417,8 +417,8 @@
                                                                     </label>
                                                                     {{ field|add_class:"form-control" }}
                                                                     {% if field.help_text %}
-                                                                    <small
-                                                                        class="form-text text-muted">{{ field.help_text }}</small>
+                                                                    <small class="form-text text-muted">{{
+                                                                        field.help_text }}</small>
                                                                     {% endif %}
                                                                     {% for error in field.errors %}
                                                                     <div class="text-danger">{{ error }}</div>
@@ -536,7 +536,8 @@
                         {% if activities %}
                         <ul class="list-group list-group-flush">
                             {% for activity in activities %}
-                            {% with is_meeting=activity|is_meeting is_call=activity|is_call is_email=activity|is_email is_ticket=activity|is_ticket %}
+                            {% with is_meeting=activity|is_meeting is_call=activity|is_call %}
+                            {% with is_email=activity|is_email is_ticket=activity|is_ticket %}
                             <li class="list-group-item py-3">
                                 <div class="row align-items-center">
                                     <!-- Icon Column -->
@@ -599,6 +600,7 @@
                                     </div>
                                 </div>
                             </li>
+                            {% endwith %}
                             {% endwith %}
                             {% endfor %}
                         </ul>

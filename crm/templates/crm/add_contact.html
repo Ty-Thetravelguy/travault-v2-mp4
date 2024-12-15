@@ -32,7 +32,9 @@
                         <form method="post" action="#" id="addContactForm">
                             {% csrf_token %}
                             {% for field in form %}
-                            {% if field.name in 'is_primary_contact,is_travel_booker_contact,is_traveller_contact,is_vip_traveller_contact' %}
+                            {% if field.name in
+                            'is_primary_contact,is_travel_booker_contact,is_traveller_contact,is_vip_traveller_contact'
+                            %}
                             <div class="mb-3 form-check">
                                 {{ field }}
                                 <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>

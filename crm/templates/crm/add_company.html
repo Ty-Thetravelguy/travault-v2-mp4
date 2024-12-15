@@ -27,7 +27,8 @@
                             {% for field in form %}
                             <div class="mb-3">
                                 <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                {% if field.name == 'street_address' or field.name == 'city' or field.name == 'state_province' or field.name == 'postal_code' or field.name == 'country' %}
+                                {% if field.name == 'street_address' or field.name == 'city' or field.name ==
+                                'state_province' or field.name == 'postal_code' or field.name == 'country' %}
                                 <input type="text" name="{{ field.name }}" id="{{ field.id_for_label }}"
                                     class="form-control" value="{{ field.value|default:'' }}">
                                 {% elif field.name == 'industry' %}

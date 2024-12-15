@@ -1,9 +1,28 @@
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
+    /**
+     * @type {HTMLInputElement}
+     * @description Input element for filtering suppliers by name.
+     */
     const supplierNameFilter = document.getElementById('supplierNameFilter');
+
+    /**
+     * @type {HTMLSelectElement}
+     * @description Select element for filtering suppliers by type.
+     */
     const supplierTypeFilter = document.getElementById('supplierTypeFilter');
+
+    /**
+     * @type {NodeListOf<Element>}
+     * @description List of supplier items to be filtered.
+     */
     const supplierItems = document.querySelectorAll('.supplier-item');
 
+    /**
+     * Normalizes text by converting it to lowercase and removing special characters.
+     * @param {string} text - The text to normalize.
+     * @returns {string} - The normalized text.
+     */
     function normalizeText(text) {
         return text
             .toLowerCase()
@@ -12,6 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
             .trim();
     }
 
+    /**
+     * Filters supplier items based on the input name and selected type.
+     */
     function filterSuppliers() {
         const nameFilterValue = normalizeText(supplierNameFilter.value);
         const typeFilterValue = supplierTypeFilter.value; 
@@ -37,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
     // Event listeners for input and change events
     supplierNameFilter.addEventListener('input', filterSuppliers);
     supplierTypeFilter.addEventListener('change', filterSuppliers);

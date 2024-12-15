@@ -169,9 +169,21 @@ html, body {
     transition: background-color 0.3s ease, color 0.3s ease; 
 }
 
+.btn-green-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+    color: #00ab8b ; 
+    background-color: #ffffff ; 
+    border-color: #00ab8b ; 
+    transition: background-color 0.3s ease, color 0.3s ease; 
+}
+
 .btn-get-started:hover,
 .btn-search:hover,
-.btn-green:hover {
+.btn-green:hover,
+.btn-green-sm:hover {
     background-color: #00ab8b ; 
     color: #fafafa ; 
     border-color: #00ab8b ; 
@@ -183,6 +195,7 @@ html, body {
     border-color: #00ab8b;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
+
 
 .btn-green-inverse {
     color: #ffffff;

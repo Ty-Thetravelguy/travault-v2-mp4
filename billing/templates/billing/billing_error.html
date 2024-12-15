@@ -1,26 +1,36 @@
-Error and Subscription Status Pages
-
+<!-- Template for displaying billing errors and subscription status -->
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Main section with gray background -->
 <section class="bg-gray-200">
+    <!-- Container with top padding and Roboto font -->
     <div class="container top-padding roboto">
+        <!-- Centered row with vertical padding -->
         <div class="row justify-content-center py-5">
+            <!-- Column taking 8/12 of medium screen width -->
             <div class="col-md-8">
+                <!-- Card with shadow effect -->
                 <div class="card shadow">
                     <div class="card-body">
+                        <!-- Conditional display of error messages -->
                         {% if messages %}
+                        <!-- Alert box for displaying Django messages -->
                         <div class="alert alert-danger">
+                            <!-- Loop through and display all messages -->
                             {% for message in messages %}
                             {{ message }}
                             {% endfor %}
                         </div>
                         {% else %}
+                        <!-- Default error message when no specific messages exist -->
                         <div class="alert alert-danger">
                             An error occurred during the billing process. Please try again or contact support.
                         </div>
                         {% endif %}
+                        <!-- Return to Dashboard button container -->
                         <div class="text-center mt-4">
+                            <!-- Link button to return to dashboard -->
                             <a href="{% url 'dashboard:index' %}" class="btn btn-get-started btn-lg">Return to
                                 Dashboard</a>
                         </div>

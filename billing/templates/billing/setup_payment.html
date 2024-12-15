@@ -2,23 +2,35 @@
 {% load static %}
 
 {% block content %}
+<!-- Main section with gray background and full height -->
 <section class="bg-gray-200 full-height-bg">
+    <!-- Container with top padding and Roboto font -->
     <div class="container top-padding roboto">
+        <!-- Centered row with vertical padding -->
         <div class="row justify-content-center py-5">
+            <!-- Column taking 8/12 of medium screen width -->
             <div class="col-md-8">
+                <!-- Card with shadow effect -->
                 <div class="card shadow">
                     <div class="card-body">
+                        <!-- Subscription setup header -->
                         <h2 class="card-title text-center mb-4">Set Up Your Subscription</h2>
+                        <!-- Subscription details container -->
                         <div class="subscription-details mb-4">
+                            <!-- Info alert box showing subscription costs -->
                             <div class="alert alert-info">
                                 <h5>Subscription Details:</h5>
+                                <!-- Monthly pricing details -->
                                 <p>Monthly charge per user: £9.00</p>
                                 <p>Current number of users: 1</p>
                                 <p>Total monthly charge: £9.00</p>
                             </div>
                         </div>
+                        <!-- Payment setup form -->
                         <form method="POST" action="{% url 'billing:setup_payment' %}" id="payment-form">
+                            <!-- CSRF token for form security -->
                             {% csrf_token %}
+                            <!-- Centered submit button container -->
                             <div class="text-center">
                                 <button type="submit" class="btn btn-get-started btn-lg" id="submitButton">
                                     Proceed to Payment

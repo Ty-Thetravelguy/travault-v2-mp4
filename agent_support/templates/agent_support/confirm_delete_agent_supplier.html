@@ -1,25 +1,35 @@
-<!-- agent_support/templates/agent_support/confirm_delete_supplier.html -->
 {% extends "base.html" %}
 {% load static %}
 
 {% block content %}
 <div class="container-fluid mt-5 full-height-bg top-padding bg-gray-200">
+    <!-- Main container for the confirm deletion section -->
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-body text-center">
                     <h3 class="text-danger">Confirm Deletion</h3>
+                    <!-- Header for the confirmation page -->
+
                     <p>Type the supplier's name "<strong>{{ supplier.supplier_name }}</strong>" to confirm deletion:</p>
+                    <!-- Instruction for confirming deletion -->
+
+                    <!-- Form to confirm supplier deletion -->
                     <form method="POST">
                         {% csrf_token %}
                         <div class="form-group">
                             <input type="text" name="supplier_name" class="form-control" placeholder="Supplier Name">
+                            <!-- Input field for supplier name confirmation -->
                         </div>
                         <div class="mt-3">
                             <a href="{% url 'agent_support:agent_support' %}" class="btn btn-secondary">Cancel</a>
+                            <!-- Button to cancel and return to agent support page -->
                             <button type="submit" class="btn btn-danger">Delete</button>
+                            <!-- Button to submit the form and delete the supplier -->
                         </div>
                     </form>
+
+                    <!-- Display messages if any -->
                     {% if messages %}
                     {% for message in messages %}
                     <div class="alert alert-{{ message.tags }} mt-3">{{ message }}</div>

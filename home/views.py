@@ -4,8 +4,9 @@ from django.views.generic import TemplateView
 import logging
 import time
 
-# Initialize the logger
+# Initialize the logger for tracking view performance and access
 logger = logging.getLogger(__name__)
+
 
 class HomePageView(TemplateView):
     """
@@ -21,10 +22,14 @@ class HomePageView(TemplateView):
     template_name = 'home/index.html'
 
     def get(self, request, *args, **kwargs):
+        """
+        Handle GET requests for the home page.
+        
+        Logs the rendering time for performance monitoring.
+        """
         logger.info("Rendering the home page.")
         start_time = time.time()
 
-        # Render the home page
         response = super().get(request, *args, **kwargs)
 
         logger.info(f"HomePageView completed in {time.time() - start_time:.2f} seconds.")
@@ -45,10 +50,14 @@ class TermsOfServiceView(TemplateView):
     template_name = "terms_of_service.html"
 
     def get(self, request, *args, **kwargs):
+        """
+        Handle GET requests for the Terms of Service page.
+        
+        Logs the rendering time for performance monitoring.
+        """
         logger.info("Rendering the Terms of Service page.")
         start_time = time.time()
 
-        # Render the Terms of Service page
         response = super().get(request, *args, **kwargs)
 
         logger.info(f"TermsOfServiceView completed in {time.time() - start_time:.2f} seconds.")
@@ -69,10 +78,14 @@ class PrivacyPolicyView(TemplateView):
     template_name = "privacy_policy.html"
 
     def get(self, request, *args, **kwargs):
+        """
+        Handle GET requests for the Privacy Policy page.
+        
+        Logs the rendering time for performance monitoring.
+        """
         logger.info("Rendering the Privacy Policy page.")
         start_time = time.time()
 
-        # Render the Privacy Policy page
         response = super().get(request, *args, **kwargs)
 
         logger.info(f"PrivacyPolicyView completed in {time.time() - start_time:.2f} seconds.")

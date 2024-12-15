@@ -5,8 +5,20 @@ from crm.models import Company, Contact
 
 
 class TicketForm(forms.ModelForm):
-    subject = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'autocomplete': 'off'}))
+    """
+    Form for creating and editing tickets in the system.
+    
+    This form handles ticket creation and modification, including dynamic field population
+    based on agency context and category types. It manages relationships between
+    companies, contacts, and ticket categorization.
+    """
 
+    # Form field definitions with styling attributes
+    subject = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control', 'autocomplete': 'off'})
+    )
+
+    # Predefined category choices for different ticket types
     CATEGORY_CHOICES_CLIENT = [
         ('complaint', 'Complaint'),
         ('query', 'Query'),
@@ -22,6 +34,7 @@ class TicketForm(forms.ModelForm):
         ('system_enhancement', 'System Enhancement'),
     ]
 
+    # Dynamic form fields that get populated based on context
     category = forms.ChoiceField(
         choices=[], 
         required=False,
@@ -48,9 +61,19 @@ class TicketForm(forms.ModelForm):
     
     class Meta:
         model = Ticket
-        fields = ['company', 'contact', 'priority', 'subject', 'description', 'category_type', 'category', 'assigned_to']
+        fields = ['company', 'contact', 'priority', 'subject', 'description', 
+                 'category_type', 'category', 'assigned_to']
 
     def __init__(self, *args, **kwargs):
+        """
+        Initialize the ticket form with dynamic field population.
+        
+        Handles agency context, company-contact relationships, and category type settings.
+        Manages field visibility and choices based on form context and data.
+        
+        Args:
+            agency: The agency context for the ticket (passed via kwargs)
+        """
         self.agency = kwargs.pop('agency', None)
         super().__init__(*args, **kwargs)
     
@@ -85,6 +108,7 @@ class TicketForm(forms.ModelForm):
         else:
             category_type = self.initial.get('category_type')
 
+        # Set category choices based on category_type
         if category_type == 'client':
             self.fields['category'].choices = self.CATEGORY_CHOICES_CLIENT
         elif category_type == 'agency':
@@ -110,12 +134,19 @@ class TicketForm(forms.ModelForm):
         else:
             self.fields['category'].widget.attrs['disabled'] = 'disabled'
 
-    # Indent the clean_category method inside the class
     def clean_category(self):
+        """
+        Validate the category selection based on category type.
+        
+        Returns:
+            str: The validated category value
+            
+        Raises:
+            ValidationError: If the category doesn't match the category type
+        """
         category = self.cleaned_data.get('category')
         category_type = self.cleaned_data.get('category_type')
 
-        # Validate category based on category_type
         if category_type == 'client' and category not in dict(self.CATEGORY_CHOICES_CLIENT):
             raise forms.ValidationError("Invalid category for client type.")
         elif category_type == 'agency' and category not in dict(self.CATEGORY_CHOICES_AGENCY):
@@ -123,8 +154,15 @@ class TicketForm(forms.ModelForm):
         
         return category
 
-    # Indent the clean_subject method inside the class
     def clean_subject(self):
+        """
+        Process and validate the ticket subject.
+        
+        Creates or retrieves a TicketSubject instance for the given subject text.
+        
+        Returns:
+            TicketSubject: The subject instance for the ticket
+        """
         subject_text = self.cleaned_data['subject']
         subject, _ = TicketSubject.objects.get_or_create(subject=subject_text)
         return subject

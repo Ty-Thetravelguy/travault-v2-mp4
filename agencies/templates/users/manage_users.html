@@ -3,13 +3,18 @@
 
 {% block content %}
 <div class="container-fluid full-height-bg bg-gray-200">
+    <!-- Main container for the manage users section -->
     <div class="container mt-4 full-height-bg bg-gray-200 top-padding">
         <h2 class="roboto text-center">Manage Users</h2>
+        <!-- Header for the manage users page -->
+
         <div class="text-end">
             <a href="{% url 'agencies:add_user' %}" class="btn btn-link project-primary-color" title="Add User">
                 <i class="fas fa-plus"></i>
             </a>
+            <!-- Button to add a new user -->
         </div>
+
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -29,18 +34,24 @@
                     <td>{{ user.first_name }}</td>
                     <td>{{ user.last_name }}</td>
                     <td>{{ user.get_user_type_display }}</td>
+                    <!-- Display user details in table rows -->
+
                     <td>
                         <a href="{% url 'agencies:edit_user' user.id %}" class="btn btn-green-sm btn-sm me-2">
                             <i class="fas fa-edit"></i> Edit</a>
+                        <!-- Button to edit user details -->
+
                         {% if request.user.user_type == 'admin' %}
                         <a href="{% url 'agencies:delete_user' user.id %}" class="btn btn-outline-danger btn-sm">
                             <i class="fas fa-trash-alt"></i> Delete</a>
+                        <!-- Button to delete user, visible only to admin users -->
                         {% endif %}
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
                     <td colspan="6" class="text-center">No users found.</td>
+                    <!-- Message displayed when no users are found -->
                 </tr>
                 {% endfor %}
             </tbody>

@@ -6,27 +6,34 @@
 
 {% block content %}
 <section id="delete-user" class="bg-gray-200 full-height-bg">
+    <!-- Main container for the delete user confirmation -->
     <div class="container top-padding roboto">
         <div class="row justify-content-center py-5">
             <div class="col-md-6">
                 <div class="card shadow">
                     <div class="card-body">
                         <h2 class="card-title text-center mb-4">Delete User: {{ delete_user.username }}</h2>
+                        <!-- Display the username of the user to be deleted -->
 
                         <p class="text-center text-danger mb-4">Are you sure you want to delete this user? This action
                             cannot be undone.</p>
+                        <!-- Warning message about the irreversibility of the action -->
 
+                        <!-- Form to confirm user deletion -->
                         <form method="post">
                             {% csrf_token %}
                             <div class="mb-3">
                                 <label for="confirmation_name" class="form-label">Type the username to confirm:</label>
                                 <input type="text" name="confirmation_name" id="confirmation_name" class="form-control"
                                     placeholder="Enter username to confirm" required>
+                                <!-- Input field for username confirmation -->
                             </div>
 
                             <div class="text-center">
                                 <button type="submit" class="btn btn-danger btn-lg">Delete User</button>
+                                <!-- Button to submit the form and delete the user -->
                                 <a href="{% url 'agencies:manage_users' %}" class="btn btn-secondary btn-lg">Cancel</a>
+                                <!-- Button to cancel and return to user management -->
                             </div>
                         </form>
                     </div>

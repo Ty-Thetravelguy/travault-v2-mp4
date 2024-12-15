@@ -6,13 +6,16 @@
 
 {% block content %}
 <section id="profile" class="bg-gray-200 full-height-bg">
+    <!-- Main container for the user profile section -->
     <div class="container top-padding roboto">
         <div class="row justify-content-center py-5">
             <div class="col-md-6">
                 <div class="card shadow">
                     <div class="card-body">
                         <h2 class="card-title text-center mb-4">Your Profile</h2>
+                        <!-- Header for the profile page -->
 
+                        <!-- Display form errors if any -->
                         {% if form.errors %}
                         <div class="alert alert-danger">
                             <ul>
@@ -25,12 +28,13 @@
                         </div>
                         {% endif %}
 
+                        <!-- Form to update user profile -->
                         <form method="post">
                             {% csrf_token %}
                             {% for field in form %}
                             <div class="mb-3">
                                 <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                {{ field|add_class:"form-control" }}
+                                {{ field|add_class:"form-control" }} <!-- Add class to form fields for styling -->
                                 {% if field.help_text %}
                                 <div class="form-text text-muted">{{ field.help_text }}</div>
                                 {% endif %}
@@ -39,6 +43,7 @@
 
                             <div class="text-center">
                                 <button type="submit" class="btn btn-get-started btn-lg">Update Profile</button>
+                                <!-- Button to submit the form and update the profile -->
                             </div>
                         </form>
                     </div>

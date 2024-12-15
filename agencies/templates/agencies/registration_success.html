@@ -3,12 +3,14 @@
 
 {% block content %}
 <section class="bg-gray-200 full-height-bg">
+    <!-- Main container for the registration success message -->
     <div class="container top-padding roboto">
         <div class="row justify-content-center py-5">
             <div class="col-md-8">
                 <div class="card shadow">
                     <div class="card-body text-center">
                         <h4 class="card-title mb-4">Registration Successful!</h4>
+                        <!-- Success message for registration -->
                         <div class="alert alert-success">
                             <p class="mb-0">Thank you for registering with TraVault!</p>
                         </div>
@@ -22,6 +24,7 @@
                                 <li>Log in to your account</li>
                                 <li>Set up your payment information</li>
                             </ol>
+                            <!-- Instructions for the user to follow after registration -->
                         </div>
                         <div class="mt-4">
                             <p class="mb-2">Didn't receive the email? Check your spam folder or
@@ -31,12 +34,14 @@
                                     email.</button>
                             </form>
                             </p>
+                            <!-- Option to resend verification email -->
                             <p class="text-muted mb-0">If you continue to have issues, please
                                 <button class="btn btn-link p-0 pb-1 fs-6" data-bs-toggle="offcanvas"
                                     data-bs-target="#contactOffcanvas" aria-controls="contactOffcanvas">
                                     contact us
                                 </button>.
                             </p>
+                            <!-- Button to open contact form for further assistance -->
                         </div>
                     </div>
                 </div>
@@ -47,7 +52,7 @@
 
 <!-- Include the contact offcanvas section -->
 <section class="contact-us">
-    <!-- Contact Offcanvas -->
+    <!-- Contact Offcanvas for user inquiries -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="contactOffcanvas" aria-labelledby="contactOffcanvasLabel">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="contactOffcanvasLabel">Contact Us</h5>
@@ -55,6 +60,7 @@
         </div>
         <div class="offcanvas-body">
             <form>
+                <!-- Contact form for user to send inquiries -->
                 <div class="mb-3">
                     <label for="name" class="form-label">Name</label>
                     <input type="text" class="form-control" id="name" required>

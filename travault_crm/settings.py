@@ -3,15 +3,14 @@ import os
 from dotenv import load_dotenv
 from storages.backends.s3boto3 import S3Boto3Storage
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables from .env file in project root
 ENV_FILE = BASE_DIR / '.env'
-
 load_dotenv(ENV_FILE)
 
+# Stripe API keys
 STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 STRIPE_PRICE_ID = os.getenv('STRIPE_PRICE_ID')
@@ -21,12 +20,11 @@ STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
 if not STRIPE_SECRET_KEY:
     raise ValueError("STRIPE_SECRET_KEY is not set. Please set it in your environment variables.")
 
-# Access variables
+# Other API keys
 DIFFBOT_API_KEY = os.getenv('DIFFBOT_API_KEY')
 
+# Django secret key
 SECRET_KEY = os.getenv('SECRET_KEY')
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 # AWS S3 settings
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
@@ -37,11 +35,8 @@ AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 AWS_S3_VERIFY = True
 
 # Media files configuration (S3)
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 MEDIA_ROOT = ''  # Leave empty when using S3
-
 DEFAULT_FILE_STORAGE = 'agencies.storage_backends.MediaStorage'
 
 # Additional S3 settings
@@ -51,10 +46,7 @@ AWS_S3_OBJECT_PARAMETERS = {
 }
 
 # Debug setting (use environment variable in production)
-DEBUG = os.getenv('DEBUG', 'False') == 'False'
-
-DEBUG = True
-
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 # Allowed hosts
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
@@ -65,13 +57,14 @@ if DEBUG:
         'localhost',
         '127.0.0.1'
     ])
+
+# CSRF trusted origins
 CSRF_TRUSTED_ORIGINS = [
     'https://8000-tythetravel-travaultv2m-mpwcm7uefns.ws.codeinstitute-ide.net',
     'https://travault-crm.herokuapp.com'
 ]
 
 # Application definition
-
 INSTALLED_APPS = [
     'agencies',
     'django.contrib.admin',
@@ -83,7 +76,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django_extensions',
     'billing.apps.BillingConfig',
-
 
     # Third-party apps
     'allauth',
@@ -125,8 +117,8 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request', #required by allauth
+                'django.template.context_processors.debug',  # Enables template debugging
+                'django.template.context_processors.request',  # Required by allauth
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -134,16 +126,18 @@ TEMPLATES = [
     },
 ]
 
-
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',  
 ]
 
+# OTP settings
 OTP_TOTP_ISSUER = "Travault-crm"
 
+# Site configuration
 SITE_ID = 1
 
+# Email backend configuration
 if 'DEVELOPMENT' in os.environ:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     DEFAULT_FROM_EMAIL = 'Your Project <noreply@travault.com>'  
@@ -156,9 +150,9 @@ else:
     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASS')
     DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
 
-
 WSGI_APPLICATION = 'travault_crm.wsgi.application'
 
+# CSRF settings
 CSRF_COOKIE_SECURE = True
 CSRF_USE_SESSIONS = True
 
@@ -223,15 +217,12 @@ else:
     CELERY_BROKER_URL = 'redis://localhost:6379/0'
     CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
-# Keep these existing Celery settings
+# Celery configuration
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
-
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # Database configuration
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://neondb_owner:R4QrxfC0MBla@ep-purple-grass-a2m3x556.eu-central-1.aws.neon.tech/barn_otter_coast_427430')
@@ -248,8 +239,6 @@ DATABASES = {
 }
 
 # Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -265,74 +254,61 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-
-
-
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
-
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 # Ensure the 'logs' directory exists
 LOG_DIR = BASE_DIR / 'logs'
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
+# Logging configuration
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
+    'version': 1,  # Specify the version of the logging configuration
+    'disable_existing_loggers': False,  # Keep existing loggers active
     'formatters': {
-        'verbose': {
+        'verbose': {  # Detailed log format with timestamp and module
             'format': '{levelname} {asctime} {module} {message}',
             'style': '{',
         },
-        'simple': {
+        'simple': {  # Simple log format with just the level and message
             'format': '{levelname} {message}',
             'style': '{',
         },
     },
     'handlers': {
-        'file': {
-            'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/error.log'),
-            'formatter': 'verbose',
+        'file': {  # Handler for logging to a file
+            'level': 'ERROR',  # Log only error messages
+            'class': 'logging.FileHandler',  # Use FileHandler to write logs to a file
+            'filename': os.path.join(BASE_DIR, 'logs/error.log'),  # Path to the log file
+            'formatter': 'verbose',  # Use the verbose formatter for detailed logs
         },
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
+        'console': {  # Handler for logging to the console
+            'class': 'logging.StreamHandler',  # Use StreamHandler to output logs to the console
+            'formatter': 'simple',  # Use the simple formatter for concise logs
         },
     },
     'loggers': {
-        'django': {
-            'handlers': ['file', 'console'],
-            'level': 'ERROR',
-            'propagate': True,
+        'django': {  # Logger for Django framework logs
+            'handlers': ['file', 'console'],  # Use both file and console handlers
+            'level': 'ERROR',  # Log only error messages
+            'propagate': True,  # Allow log messages to propagate to parent loggers
         },
-        'activity_log': {  # Your app's name
-            'handlers': ['file', 'console'],
-            'level': 'ERROR',
-            'propagate': False,
+        'activity_log': {  # Logger for the 'activity_log' app
+            'handlers': ['file', 'console'],  # Use both file and console handlers
+            'level': 'ERROR',  # Log only error messages
+            'propagate': False,  # Do not propagate to parent loggers
         },
     },
 }

@@ -17,7 +17,8 @@ View the programme [here](https://travault-686ad8887c30.herokuapp.com/).
    - [Ticket Dashboard](#ticket-dashboard)
    - [Supplier Contact Directory](#supplier-contact-directory)
 4. [Benefits](#benefits)
-5. [Database Schema](#database-schema)
+5. [Wireframe](#wireframe)
+6. [Database Schema](#database-schema)
    - [Agency Table](#agency-table)
    - [Agent Support App](#agent-support-app)
       - [AgentSupportSupplier Table](#agentsupportsupplier-table)
@@ -30,14 +31,14 @@ View the programme [here](https://travault-686ad8887c30.herokuapp.com/).
    - [Ticketing System](#ticketing-system)
       - [Ticket Table](#ticket-table)
    - [Relationships Overview](#relationships-overview)
-6. [Issues / Bugs](#issues--bugs)
+7. [Issues / Bugs](#issues--bugs)
    - [CSS Loading Issues](#css-loading-issues)
    - ["Register" Link Not Working](#register-link-not-working)
    - [AWS S3 Integration Issues](#aws-s3-integration-issues)
    - [Back Button Bug in Contact Edit View](#back-button-bug-in-contact-edit-view)
    - [URL Routing Bug for Add Transaction Fee](#url-routing-bug-for-add-transaction-fee)
    - [Field Duplication Bug in Agency Model](#field-duplication-bug-in-agency-model)
-7. [Testing Report](#testing-report)
+8. [Testing Report](#testing-report)
    - [Registration](#registration)
    - [Agent Support](#agent-support)
    - [The Vault (CRM)](#the-vault-crm)
@@ -51,7 +52,7 @@ View the programme [here](https://travault-686ad8887c30.herokuapp.com/).
    - [Agency Profile](#agency-profile)
    - [Billing](#billing)
    - [Logout](#logout)
-8. [Summary of Technologies](#summary-of-technologies)
+9. [Summary of Technologies](#summary-of-technologies)
    - [Framework](#framework)
    - [Storage](#storage)
    - [Server](#server)
@@ -72,14 +73,14 @@ View the programme [here](https://travault-686ad8887c30.herokuapp.com/).
    - [Automation](#automation)
    - [Error Handling](#error-handling)
    - [Assistance](#assistance)
-9. [Deployment](#deployment)
-   - [Deployment Process](#deployment-process)
-   - [Initial Deployment Attempt](#initial-deployment-attempt)
-   - [New Heroku Account Creation](#new-heroku-account-creation)
-   - [Database Migration Challenges](#database-migration-challenges)
+10. [Deployment](#deployment)
+    - [Deployment Process](#deployment-process)
+    - [Initial Deployment Attempt](#initial-deployment-attempt)
+    - [New Heroku Account Creation](#new-heroku-account-creation)
+    - [Database Migration Challenges](#database-migration-challenges)
       - [Field Length Constraint](#field-length-constraint)
       - [Migration Problems](#migration-problems)
-10. [How to Deploy a Django Project to Heroku](#how-to-deploy-a-django-project-to-heroku)
+11. [How to Deploy a Django Project to Heroku](#how-to-deploy-a-django-project-to-heroku)
     - [Why Deploy on Heroku?](#why-deploy-on-heroku)
     - [Prerequisites](#prerequisites)
     - [Log in to Heroku](#log-in-to-heroku)
@@ -88,7 +89,7 @@ View the programme [here](https://travault-686ad8887c30.herokuapp.com/).
     - [Configure Automatic Deployment](#configure-automatic-deployment)
     - [Run Migrations on Heroku](#run-migrations-on-heroku)
     - [Check Logs & Test the Live App](#check-logs--test-the-live-app)
-11. [Closing Statement](#closing-statement)
+12. [Closing Statement](#closing-statement)
 
 ## Key Features
 
@@ -136,6 +137,10 @@ View the programme [here](https://travault-686ad8887c30.herokuapp.com/).
 - Improved client and supplier relationship management
 - Streamlined communication and issue resolution
 - Enhanced data organization and accessibility
+
+## Wireframes
+
+![Wireframe](/static/readme-imgs/Wireframe.png)
 
 ## Database Schema
 

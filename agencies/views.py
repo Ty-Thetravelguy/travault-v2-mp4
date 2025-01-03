@@ -170,8 +170,11 @@ class CustomLoginView(LoginView):
     """
     Custom login view to handle user authentication.
 
-    This view renders the login page and handles the login process using the default
-    functionality provided by Django's LoginView.
+    This view extends Django-allauth's LoginView to provide custom handling
+    of the login process, including error messages and form validation.
+
+    Attributes:
+        template_name (str): The path to the custom login template.
     """
     template_name = 'account/account_login.html'
 
@@ -179,14 +182,35 @@ class CustomLoginView(LoginView):
         """
         Handle GET requests to render the login form.
 
+        This method logs the form rendering event and returns the login page.
+
         Args:
             request (HttpRequest): The incoming HTTP request from the client.
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
 
         Returns:
-            HttpResponse: A response rendering the login form.
+            HttpResponse: A response rendering the login form template.
         """
         logger.info("Rendering login form.")
         return super().get(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        """
+        Handle invalid login attempts.
+
+        This method is called when the login form validation fails,
+        typically due to incorrect credentials. It adds an error message
+        to the request and returns the form with the error.
+
+        Args:
+            form (Form): The invalid form instance containing the user's input.
+
+        Returns:
+            HttpResponse: A response rendering the login form template with error messages.
+        """
+        messages.error(self.request, "Invalid username or password. Please try again.")
+        return super().form_invalid(form)
 
 
 @login_required

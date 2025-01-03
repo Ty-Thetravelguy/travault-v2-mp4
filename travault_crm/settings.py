@@ -225,7 +225,7 @@ CELERY_TIMEZONE = 'UTC'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 # Database configuration
-DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://neondb_owner:R4QrxfC0MBla@ep-purple-grass-a2m3x556.eu-central-1.aws.neon.tech/barn_otter_coast_427430')
+DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://neondb_owner:m4ewnNkEHL5q@ep-dark-morning-a2kxwkeb.eu-central-1.aws.neon.tech/tutu_eats_boil_663773')
 
 DATABASES = {
     'default': {
